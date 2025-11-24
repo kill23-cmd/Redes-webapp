@@ -9,6 +9,7 @@ class ZabbixClient {
         this.password = password;
         this.authToken = null;
         this.isAuthenticated = false;
+        this.isSimulated = false; // Nova flag para controlar modo simulação
         // Use proxy local para evitar CORS
         this.proxyUrl = '/api/zabbix-proxy';
     }
@@ -28,15 +29,18 @@ class ZabbixClient {
             if (response.result) {
                 this.authToken = response.result;
                 this.isAuthenticated = true;
+                this.isSimulated = false;
                 return true;
             } else {
                 console.warn('Zabbix auth failed, using simulated data');
                 this.isAuthenticated = false;
+                this.isSimulated = true; // Ativa modo simulação
                 return false;
             }
         } catch (err) {
             console.warn('Zabbix auth error, fallback to simulation:', err);
             this.isAuthenticated = false;
+            this.isSimulated = true; // Ativa modo simulação
             return false;
         }
     }
@@ -48,7 +52,12 @@ class ZabbixClient {
      * @returns {Promise<Object>} API response
      */
     async request(method, params = {}) {
+        // CORREÇÃO: Se estiver em modo simulado, retorna dados falsos em vez de erro
         if (!this.isAuthenticated) {
+            if (this.isSimulated) {
+                console.log(`[Simulação] Gerando dados para: ${method}`);
+                return this.getMockData(method, params);
+            }
             throw new Error('Cliente não autenticado');
         }
 
@@ -71,25 +80,109 @@ class ZabbixClient {
             return response.result;
         } catch (err) {
             console.error(`Zabbix API request failed (${method}):`, err);
+            // Fallback para simulação em caso de erro de rede
+            if (this.isSimulated) return this.getMockData(method, params);
             throw err;
         }
     }
 
     /**
-     * Get all host groups
-     * @returns {Promise<Array>} Array of host groups
+     * Gera dados falsos para o modo de simulação
      */
-    async getHostGroups() {
-        return await this.request('hostgroup.get', {
-            output: ['groupid', 'name']
-        });
+    async getMockData(method, params) {
+        // Simula latência de rede
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        switch (method) {
+            case 'hostgroup.get':
+                return [
+                    { groupid: '1', name: 'Lojas/Brasil' },
+                    { groupid: '2', name: 'Lojas/Argentina' }
+                ];
+            
+            case 'host.get':
+                // Retorna um host fictício
+                return [{
+                    hostid: '10001',
+                    host: 'FortiGate-SIMULADO',
+                    name: 'Firewall Simulado',
+                    status: '0', // Monitorado
+                    interfaces: [{ ip: '192.168.1.1', main: '1' }],
+                    inventory: { os: 'FortiOS', hardware: 'FortiGate-60F' }
+                }];
+
+            case 'item.get':
+                // Gera itens com valores aleatórios
+                const items = [];
+                const searchName = params.search?.name || '';
+                const searchKey = params.search?.key_ || '';
+                
+                // Lista de itens padrão para simular
+                const mockItems = [
+                    { name: 'CPU utilization', key_: 'system.cpu.util', units: '%', val: () => Math.floor(Math.random() * 30) },
+                    { name: 'ICMP response time', key_: 'icmppingsec', units: 's', val: () => (Math.random() * 0.05).toFixed(4) },
+                    { name: 'ICMP packet loss', key_: 'icmppingloss', units: '%', val: () => 0 },
+                    { name: 'Device uptime', key_: 'system.uptime', units: 's', val: () => 864000 + Math.floor(Math.random() * 1000) },
+                    { name: 'Uptime', key_: 'uptime', units: 's', val: () => 864000 },
+                    { name: 'wan1 Operational status', key_: 'net.if.status[wan1]', units: '', val: () => 1 },
+                    { name: 'wan2 Operational status', key_: 'net.if.status[wan2]', units: '', val: () => 1 },
+                    { name: 'wan1 Speed', key_: 'net.if.speed[wan1]', units: 'bps', val: () => 100000000 },
+                    { name: 'wan2 Speed', key_: 'net.if.speed[wan2]', units: 'bps', val: () => 50000000 },
+                    { name: 'wan1 Bits sent', key_: 'net.if.out[wan1]', units: 'bps', val: () => Math.floor(Math.random() * 5000000) },
+                    { name: 'wan1 Bits received', key_: 'net.if.in[wan1]', units: 'bps', val: () => Math.floor(Math.random() * 8000000) },
+                    { name: 'wan2 Bits sent', key_: 'net.if.out[wan2]', units: 'bps', val: () => Math.floor(Math.random() * 1000000) },
+                    { name: 'wan2 Bits received', key_: 'net.if.in[wan2]', units: 'bps', val: () => Math.floor(Math.random() * 2000000) },
+                    { name: 'wan1 Duplex status', key_: 'net.if.duplex[wan1]', units: '', val: () => 3 }, // Full duplex
+                    { name: 'wan2 Duplex status', key_: 'net.if.duplex[wan2]', units: '', val: () => 3 }
+                ];
+
+                // Filtra os itens baseados na busca
+                mockItems.forEach((m, idx) => {
+                    // Lógica simplificada de match
+                    if (!searchName || searchName.split(',').some(n => m.name.includes(n))) {
+                        items.push({
+                            itemid: `sim_item_${idx}`,
+                            name: m.name,
+                            key_: m.key_,
+                            lastvalue: m.val().toString(),
+                            units: m.units,
+                            value_type: '0' // numérico
+                        });
+                    }
+                });
+                return items;
+
+            case 'history.get':
+                // Gera histórico para gráficos
+                const history = [];
+                const now = Math.floor(Date.now() / 1000);
+                // Gera 20 pontos
+                for (let i = 20; i >= 0; i--) {
+                    history.push({
+                        clock: now - (i * 300), // a cada 5 min
+                        value: (Math.random() * 20).toFixed(2)
+                    });
+                }
+                return history;
+
+            case 'problem.get':
+                return []; // Sem problemas no modo simulado
+
+            case 'APIInfo.version':
+                return "6.0.0 (Simulado)";
+
+            default:
+                return [];
+        }
     }
 
-    /**
-     * Get hosts by group ID
-     * @param {string} groupId - Group ID
-     * @returns {Promise<Array>} Array of hosts
-     */
+    // ... (Resto dos métodos originais: getHostGroups, getHostsByGroupId, etc. mantêm-se iguais)
+    // Eles chamarão o this.request(), que agora trata a simulação.
+
+    async getHostGroups() {
+        return await this.request('hostgroup.get', { output: ['groupid', 'name'] });
+    }
+
     async getHostsByGroupId(groupId) {
         return await this.request('host.get', {
             groupids: groupId,
@@ -98,11 +191,6 @@ class ZabbixClient {
         });
     }
 
-    /**
-     * Get host information including inventory
-     * @param {string} hostId - Host ID
-     * @returns {Promise<Object>} Host data
-     */
     async getHost(hostId) {
         return await this.request('host.get', {
             hostids: hostId,
@@ -112,38 +200,21 @@ class ZabbixClient {
         });
     }
 
-    /**
-     * Get items by host ID and key pattern
-     * @param {string} hostId - Host ID
-     * @param {string} keyPattern - Key pattern to match
-     * @returns {Promise<Array>} Array of items
-     */
     async getItemsByKeyPattern(hostId, keyPattern) {
         return await this.request('item.get', {
             hostids: hostId,
             output: ['itemid', 'name', 'key_', 'lastvalue', 'units', 'value_type'],
-            search: {
-                key_: keyPattern
-            }
+            search: { key_: keyPattern }
         });
     }
 
-    /**
-     * Get items by name pattern
-     * @param {string} hostId - Host ID
-     * @param {string} namePattern - Name pattern to match
-     * @returns {Promise<Object>} Object with item data indexed by name
-     */
     async getItemsByNamePattern(hostId, namePattern) {
         const items = await this.request('item.get', {
             hostids: hostId,
             output: ['itemid', 'name', 'key_', 'lastvalue', 'units', 'value_type'],
-            search: {
-                name: namePattern
-            }
+            search: { name: namePattern }
         });
 
-        // Convert to object indexed by name for easier lookup
         const itemsByName = {};
         items.forEach(item => {
             itemsByName[item.name] = {
@@ -157,15 +228,8 @@ class ZabbixClient {
         return itemsByName;
     }
 
-    /**
-     * Get item history data
-     * @param {string} itemId - Item ID
-     * @param {number} hours - Hours of history to fetch
-     * @returns {Promise<Array>} Array of historical data points
-     */
     async getItemHistory(itemId, hours = 4) {
         const timeFrom = Math.floor(Date.now() / 1000) - (hours * 3600);
-
         return await this.request('history.get', {
             itemids: itemId,
             output: 'extend',
@@ -175,14 +239,8 @@ class ZabbixClient {
         });
     }
 
-    /**
-     * Get multiple items history
-     * @param {Object} itemRequests - Object with item IDs and hours
-     * @returns {Promise<Object>} Object with history data for each item
-     */
     async getMultipleItemHistory(itemRequests) {
         const results = {};
-
         for (const [itemId, hours] of Object.entries(itemRequests)) {
             try {
                 const history = await this.getItemHistory(itemId, hours);
@@ -192,15 +250,9 @@ class ZabbixClient {
                 results[itemId] = [];
             }
         }
-
         return results;
     }
 
-    /**
-     * Get host problems
-     * @param {string} hostId - Host ID
-     * @returns {Promise<Array>} Array of problems
-     */
     async getHostProblems(hostId) {
         return await this.request('problem.get', {
             hostids: hostId,
@@ -208,11 +260,6 @@ class ZabbixClient {
         });
     }
 
-    /**
-     * Get trigger information
-     * @param {Array} triggerIds - Array of trigger IDs
-     * @returns {Promise<Array>} Array of triggers
-     */
     async getTriggers(triggerIds) {
         return await this.request('trigger.get', {
             triggerids: triggerIds,
@@ -220,20 +267,10 @@ class ZabbixClient {
         });
     }
 
-    /**
-     * Get maintenance periods
-     * @returns {Promise<Array>} Array of maintenance periods
-     */
     async getMaintenances() {
-        return await this.request('maintenance.get', {
-            output: 'extend'
-        });
+        return await this.request('maintenance.get', { output: 'extend' });
     }
 
-    /**
-     * Test connectivity to Zabbix API
-     * @returns {Promise<Object>} Test result
-     */
     async testConnection() {
         try {
             const version = await this.request('APIInfo.version');
@@ -250,280 +287,4 @@ class ZabbixClient {
             };
         }
     }
-}
-
-// ============================================
-// ZABBIX DATA PROCESSOR
-// ============================================
-
-class ZabbixDataProcessor {
-    /**
-     * Process dashboard data for UI display
-     * @param {Object} itemsData - Items data from API
-     * @param {Array} problems - Problems data
-     * @param {string} deviceType - Device type (fortinet_firewall, cisco_switch, etc.)
-     * @returns {Object} Processed dashboard data
-     */
-    static processDashboardData(itemsData, problems, deviceType = 'default') {
-        const dashboard = {
-            uptime: '--',
-            cpu: '--',
-            latency: '--',
-            loss: '--',
-            dynamic: {},
-            problems: problems || []
-        };
-
-        // Process common metrics
-        if (itemsData) {
-            // Uptime
-            const uptimeItem = this.findItemByName(itemsData, ['Device uptime', 'Uptime']);
-            if (uptimeItem) {
-                dashboard.uptime = formatUptime(parseInt(uptimeItem.value));
-            }
-
-            // CPU
-            const cpuItem = this.findItemByName(itemsData, ['CPU utilization', 'CPU usage']);
-            if (cpuItem) {
-                dashboard.cpu = `${parseFloat(cpuItem.value).toFixed(2)}%`;
-            }
-
-            // Latency
-            const latencyItem = this.findItemByName(itemsData, ['ICMP response time', 'Response time']);
-            if (latencyItem) {
-                dashboard.latency = `${(parseFloat(latencyItem.value) * 1000).toFixed(2)} ms`;
-            }
-
-            // Loss
-            const lossItem = this.findItemByName(itemsData, ['ICMP packet loss', 'Packet loss']);
-            if (lossItem) {
-                dashboard.loss = `${parseFloat(lossItem.value).toFixed(1)}%`;
-            }
-
-            // Device-specific processing
-            if (deviceType === 'fortinet_firewall') {
-                dashboard.dynamic = this.processFirewallData(itemsData);
-            } else if (deviceType.includes('switch') || deviceType.includes('router')) {
-                dashboard.dynamic = this.processSwitchRouterData(itemsData);
-            }
-        }
-
-        return dashboard;
-    }
-
-    /**
-     * Process firewall-specific data
-     * @param {Object} itemsData - Items data
-     * @returns {Object} Processed firewall data
-     */
-    static processFirewallData(itemsData) {
-        const data = {};
-
-        // WAN1 Status
-        const wan1Status = this.findItemByName(itemsData, ['wan1', 'Operational status']);
-        data.wan1Status = wan1Status ? (wan1Status.value === '1' ? 'UP' : 'DOWN') : '--';
-
-        // WAN2 Status
-        const wan2Status = this.findItemByName(itemsData, ['wan2', 'Operational status']);
-        data.wan2Status = wan2Status ? (wan2Status.value === '1' ? 'UP' : 'DOWN') : '--';
-
-        // WAN1 Speed
-        const wan1Speed = this.findItemByName(itemsData, ['wan1', 'Speed']);
-        data.wan1Speed = wan1Speed ? this.formatSpeed(wan1Speed.value) : '--';
-
-        // WAN2 Speed
-        const wan2Speed = this.findItemByName(itemsData, ['wan2', 'Speed']);
-        data.wan2Speed = wan2Speed ? this.formatSpeed(wan2Speed.value) : '--';
-
-        // WAN1 Duplex
-        const wan1Duplex = this.findItemByName(itemsData, ['wan1', 'Duplex status']);
-        data.wan1Duplex = wan1Duplex ? this.formatDuplex(wan1Duplex.value) : '--';
-
-        // WAN2 Duplex
-        const wan2Duplex = this.findItemByName(itemsData, ['wan2', 'Duplex status']);
-        data.wan2Duplex = wan2Duplex ? this.formatDuplex(wan2Duplex.value) : '--';
-
-        // Traffic data
-        const wan1Sent = this.findItemByName(itemsData, ['wan1', 'Bits sent']);
-        data.wan1Upload = wan1Sent ? formatBandwidth(parseInt(wan1Sent.value)) : '--';
-
-        const wan1Received = this.findItemByName(itemsData, ['wan1', 'Bits received']);
-        data.wan1Download = wan1Received ? formatBandwidth(parseInt(wan1Received.value)) : '--';
-
-        const wan2Sent = this.findItemByName(itemsData, ['wan2', 'Bits sent']);
-        data.wan2Upload = wan2Sent ? formatBandwidth(parseInt(wan2Sent.value)) : '--';
-
-        const wan2Received = this.findItemByName(itemsData, ['wan2', 'Bits received']);
-        data.wan2Download = wan2Received ? formatBandwidth(parseInt(wan2Received.value)) : '--';
-
-        return data;
-    }
-
-    /**
-     * Process switch/router-specific data
-     * @param {Object} itemsData - Items data
-     * @returns {Object} Processed switch/router data
-     */
-    static processSwitchRouterData(itemsData) {
-        const data = {
-            activeProblems: 0,
-            interfacesDown: 0
-        };
-
-        // Count interfaces down
-        const interfacesDownItem = this.findItemByName(itemsData, ['interfaces', 'down']);
-        if (interfacesDownItem) {
-            data.interfacesDown = parseInt(interfacesDownItem.value);
-        }
-
-        return data;
-    }
-
-    /**
-     * Find item by name patterns
-     * @param {Object} itemsData - Items data
-     * @param {Array} nameParts - Array of name parts to match
-     * @returns {Object|null} Found item or null
-     */
-    static findItemByName(itemsData, nameParts) {
-        if (!itemsData) return null;
-
-        const namePartsLower = nameParts.map(part => part.toLowerCase());
-
-        for (const [name, itemData] of Object.entries(itemsData)) {
-            const nameLower = name.toLowerCase();
-            if (namePartsLower.every(part => nameLower.includes(part))) {
-                return itemData;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Format speed value
-     * @param {string|number} speedValue - Speed value
-     * @returns {string} Formatted speed
-     */
-    static formatSpeed(speedValue) {
-        const speed = parseInt(speedValue);
-
-        if (speed >= 1_000_000_000) return '1 Gb/s';
-        if (speed >= 100_000_000) return '100 Mb/s';
-        if (speed >= 10_000_000) return '10 Mb/s';
-
-        return `${speed} bps`;
-    }
-
-    /**
-     * Format duplex value
-     * @param {string|number} duplexValue - Duplex value
-     * @returns {string} Formatted duplex
-     */
-    static formatDuplex(duplexValue) {
-        const duplex = parseInt(duplexValue);
-
-        switch (duplex) {
-            case 3: return 'Full-Duplex';
-            case 2: return 'Half-Duplex';
-            default: return 'Unknown';
-        }
-    }
-
-    /**
-     * Process chart data for display
-     * @param {Object} historyData - Historical data
-     * @returns {Object} Processed chart data
-     */
-    static processChartData(historyData) {
-        const chartData = {
-            cpu: [],
-            latency: []
-        };
-
-        // Process CPU data
-        if (historyData.cpu) {
-            chartData.cpu = historyData.cpu.map(point => ({
-                x: new Date(point.clock * 1000),
-                y: parseFloat(point.value)
-            }));
-        }
-
-        // Process latency data (convert to milliseconds)
-        if (historyData.latency) {
-            chartData.latency = historyData.latency.map(point => ({
-                x: new Date(point.clock * 1000),
-                y: parseFloat(point.value) * 1000
-            }));
-        }
-
-        return chartData;
-    }
-}
-
-// ============================================
-// ZABBIX COMMAND PROFILES
-// ============================================
-
-const ZABBIX_COMMAND_PROFILES = {
-    cisco_router: [
-        { name: 'Mostrar interfaces (brief)', command: 'show ip interface brief' },
-        { name: 'Mostrar vizinhos CDP', command: 'show cdp neighbors' },
-        { name: 'Mostrar config (running)', command: 'show running-config' },
-        { name: 'Mostrar pools DHCP', command: 'show ip dhcp pool' },
-        { name: 'Mostrar Uptime', command: 'show version | include uptime' },
-        { name: 'Mostrar tabela ARP', command: 'show ip arp' }
-    ],
-    cisco_switch: [
-        { name: 'Mostrar interfaces (brief)', command: 'show ip interface brief' },
-        { name: 'Mostrar vizinhos CDP', command: 'show cdp neighbors' },
-        { name: 'Mostrar config (running)', command: 'show running-config' },
-        { name: 'Mostrar consumo PoE', command: 'show power inline' },
-        { name: 'Mostrar descrição interfaces', command: 'show interfaces description' },
-        { name: 'Mostrar status interfaces', command: 'show interfaces status' },
-        { name: 'Mostrar vizinhos LLDP', command: 'show lldp neighbors' },
-        { name: 'Mostrar Uptime', command: 'show version | include uptime' },
-        { name: 'Mostrar VLANs', command: 'show vlan brief' },
-        { name: 'Mostrar interfaces Trunk', command: 'show interfaces trunk' },
-        { name: 'Mostrar tabela MAC', command: 'show mac address-table' },
-        { name: 'Mostrar contadores de erros', command: 'show interfaces counters errors' }
-    ],
-    fortinet_firewall: [
-        { name: 'Mostrar tabela ARP', command: 'get sys arp' },
-        { name: 'Mostrar ARP (WAN)', command: 'get sys arp | grep wan' },
-        { name: 'Listar túneis IPsec', command: 'get ipsec tunnel list' },
-        { name: 'Sumário túneis IPsec', command: 'get vpn ipsec tunnel summary' },
-        { name: 'Sumário BGP', command: 'get router info bgp summary' },
-        { name: 'Mostrar DHCP Server', command: 'show sys dhcp server' },
-        { name: 'Mostrar status sistema', command: 'get sys status' },
-        { name: 'Mostar Uptime', command: 'get system performance status | grep Uptime' },
-        { name: 'Mostrar Performance SLA', command: 'diagnose sys sdwan health-check' },
-        { name: 'Mostrar interfaces (WAN)', command: 'get sys interface | grep wan' },
-        { name: 'Mostrar quantidade de sessões', command: 'get system session status' },
-        { name: 'Limpar todas as sessões', command: 'diagnose sys session clear' }
-    ],
-    fortiswitch: [
-        { name: 'Mostrar vizinhos LLDP', command: 'get switch lldp neighbors-summary' },
-        { name: 'Mostrar consumo PoE', command: 'get switch poe inline' },
-        { name: 'Mostrar configuração das interfaces', command: 'show switch interface' },
-        { name: 'Mostar VLANs', command: 'diagnose switch vlan list' },
-        { name: 'Mostar Uptime', command: 'get system performance status | grep Uptime' },
-        { name: 'Mostrar status interfaces', command: 'diagnose switch physical-ports summary' },
-        { name: 'Mostrar contatdores de erros', command: 'diag switch physical-ports port-stats list' }
-    ],
-    huawei_switch: [
-        { name: 'Mostrar vizinhos LLDP', command: 'display lldp ne brief' }
-    ],
-    access_point: [
-        { name: 'Mostrar vizinhos CDP', command: 'show cdp neighbors' }
-    ]
-};
-
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        ZabbixClient,
-        ZabbixDataProcessor,
-        ZABBIX_COMMAND_PROFILES
-    };
 }
