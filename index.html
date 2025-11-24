@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador Remoto Zabbix - Dashboard</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <h1 class="app-title">Gerenciador Remoto Zabbix</h1>
+            <div class="device-selector">
+                <label for="device-select">Dispositivo:</label>
+                <select id="device-select" class="device-select">
+                    <option value="">-- Selecione --</option>
+                </select>
+                <button class="settings-btn" title="Configurações">
+                    <i data-lucide="settings"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Left Panel -->
+        <aside class="left-panel">
+            <!-- Quick Search -->
+            <div class="panel-section">
+                <h3 class="section-title">Busca Rápida</h3>
+                <div class="search-group">
+                    <label for="store-search">Loja:</label>
+                    <input type="text" id="store-search" class="search-input" placeholder="Nome da loja...">
+                </div>
+                <div class="search-group">
+                    <label for="circuit-search">Circuito (WAN1/2):</label>
+                    <input type="text" id="circuit-search" class="search-input" placeholder="Circuito...">
+                </div>
+                <div class="search-actions">
+                    <button id="clear-search" class="btn btn-secondary">Limpar Filtro</button>
+                </div>
+            </div>
+
+            <!-- Store Selection -->
+            <div class="panel-section">
+                <h3 class="section-title">Loja</h3>
+                <select id="store-select" class="store-select">
+                    <option value="">-- Selecione uma loja --</option>
+                </select>
+            </div>
+
+            <!-- Hosts List -->
+            <div class="panel-section">
+                <h3 class="section-title">Hosts</h3>
+                <div class="hosts-list" id="hosts-list">
+                    <!-- Hosts serão carregados dinamicamente -->
+                </div>
+            </div>
+
+            <!-- Link Information -->
+            <div class="panel-section">
+                <h3 class="section-title">Informações do Link (Planilha)</h3>
+                <div class="link-info-grid">
+                    <div class="info-item">
+                        <label>WAN1 Op:</label>
+                        <span id="wan1-op">--</span>
+                    </div>
+                    <div class="info-item">
+                        <label>WAN2 Op:</label>
+                        <span id="wan2-op">--</span>
+                    </div>
+                    <div class="info-item">
+                        <label>WAN1 Circ:</label>
+                        <span id="wan1-circ">--</span>
+                    </div>
+                    <div class="info-item">
+                        <label>WAN2 Circ:</label>
+                        <span id="wan2-circ">--</span>
+                    </div>
+                    <div class="info-item">
+                        <label>WAN1 Banda:</label>
+                        <span id="wan1-banda">--</span>
+                    </div>
+                    <div class="info-item">
+                        <label>WAN2 Banda:</label>
+                        <span id="wan2-banda">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Status -->
+            <div class="panel-section">
+                <h3 class="section-title">Host Status</h3>
+                <div class="status-grid" id="status-grid">
+                    <div class="status-item">
+                        <label>Disponibilidade:</label>
+                        <span id="uptime">--</span>
+                    </div>
+                    <div class="status-item">
+                        <label>CPU:</label>
+                        <span id="cpu">--</span>
+                    </div>
+                    <div class="status-item">
+                        <label>Latência:</label>
+                        <span id="latency">--</span>
+                    </div>
+                    <div class="status-item">
+                        <label>Perda de Pacotes:</label>
+                        <span id="loss">--</span>
+                    </div>
+                    <div class="status-item" id="dynamic-status-1">
+                        <label>WAN1 Status:</label>
+                        <span id="wan1-status">--</span>
+                    </div>
+                    <div class="status-item" id="dynamic-status-2">
+                        <label>WAN2 Status:</label>
+                        <span id="wan2-status">--</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Panel -->
+        <section class="right-panel">
+            <!-- Dashboard Cards -->
+            <div class="dashboard-grid">
+                <!-- Status FortiGate Section -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" onclick="toggleSection(this)">
+                        <h2 class="section-title">
+                            <i data-lucide="check"></i>
+                            Status FortiGate
+                        </h2>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="status-cards-grid">
+                            <!-- Availability Card -->
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h4>Disponibilidade</h4>
+                                    <button class="card-settings">
+                                        <i data-lucide="more-vertical"></i>
+                                    </button>
+                                </div>
+                                <div class="availability-content">
+                                    <div class="status-indicator up">
+                                        <div class="status-dot"></div>
+                                        <span>UP</span>
+                                    </div>
+                                    <div class="metric-large" id="uptime-display">14 d 22:10:58</div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">Perda de pacotes:</span>
+                                        <span class="metric-value success">0%</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">Latência:</span>
+                                        <span class="metric-value">60.7 ms</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CPU Usage Card -->
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h4>CPU</h4>
+                                </div>
+                                <div class="gauge-container">
+                                    <canvas id="cpu-gauge" width="120" height="120"></canvas>
+                                    <div class="gauge-center">
+                                        <div class="gauge-value" id="cpu-value">0%</div>
+                                        <div class="gauge-label">CPU</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Memory Usage Card -->
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h4>Memória</h4>
+                                </div>
+                                <div class="gauge-container">
+                                    <canvas id="memory-gauge" width="120" height="120"></canvas>
+                                    <div class="gauge-center">
+                                        <div class="gauge-value" id="memory-value">55%</div>
+                                        <div class="gauge-label">Memória</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WAN, VPN Section -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" onclick="toggleSection(this)">
+                        <h2 class="section-title">
+                            <i data-lucide="check"></i>
+                            WAN, VPN E SEÇÃO
+                        </h2>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="wan-cards-grid">
+                            <!-- WAN1 Status -->
+                            <div class="wan-status-card">
+                                <div class="wan-status">
+                                    <div class="status-indicator up">
+                                        <div class="status-dot"></div>
+                                        <span>UP</span>
+                                    </div>
+                                </div>
+                                <div class="wan-details">
+                                    <div class="wan-title">WAN1</div>
+                                    <div class="wan-type">Full-Duplex</div>
+                                    <div class="wan-speed">1 Gb/s</div>
+                                </div>
+                                <div class="wan-actions">
+                                    <button class="wan-action-btn" title="Configurações">
+                                        <i data-lucide="plus"></i>
+                                    </button>
+                                    <button class="wan-action-btn">
+                                        <i data-lucide="more-vertical"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- WAN2 Status -->
+                            <div class="wan-status-card">
+                                <div class="wan-status">
+                                    <div class="status-indicator up">
+                                        <div class="status-dot"></div>
+                                        <span>UP</span>
+                                    </div>
+                                </div>
+                                <div class="wan-details">
+                                    <div class="wan-title">WAN2</div>
+                                    <div class="wan-type">Full-Duplex</div>
+                                    <div class="wan-speed">100 Mb/s</div>
+                                </div>
+                            </div>
+
+                            <!-- HUB WAN Cards -->
+                            <div class="hub-wan-stack">
+                                <div class="hub-wan-card">
+                                    <div class="hub-wan-status">
+                                        <div class="status-indicator up">
+                                            <div class="status-dot"></div>
+                                            <span>UP</span>
+                                        </div>
+                                    </div>
+                                    <div class="hub-wan-details">
+                                        <div class="hub-wan-title">HUB_WAN1</div>
+                                        <div class="hub-wan-speeds">
+                                            <span>Download: 20.5 kb/s</span>
+                                            <span>Upload: 25.2 kb/s</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="hub-wan-card">
+                                    <div class="hub-wan-status">
+                                        <div class="status-indicator up">
+                                            <div class="status-dot"></div>
+                                            <span>UP</span>
+                                        </div>
+                                    </div>
+                                    <div class="hub-wan-details">
+                                        <div class="hub-wan-title">HUB_WAN2</div>
+                                        <div class="hub-wan-speeds">
+                                            <span>Download: 18.3 kb/s</span>
+                                            <span>Upload: 22.1 kb/s</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="hub-wan-card">
+                                    <div class="hub-wan-status">
+                                        <div class="status-indicator up">
+                                            <div class="status-dot"></div>
+                                            <span>UP</span>
+                                        </div>
+                                    </div>
+                                    <div class="hub-wan-details">
+                                        <div class="hub-wan-title">HUB_WAN3</div>
+                                        <div class="hub-wan-speeds">
+                                            <span>Download: 25.7 kb/s</span>
+                                            <span>Upload: 28.4 kb/s</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="hub-wan-card">
+                                    <div class="hub-wan-status">
+                                        <div class="status-indicator up">
+                                            <div class="status-dot"></div>
+                                            <span>UP</span>
+                                        </div>
+                                    </div>
+                                    <div class="hub-wan-details">
+                                        <div class="hub-wan-title">HUB_WAN4</div>
+                                        <div class="hub-wan-speeds">
+                                            <span>Download: 22.8 kb/s</span>
+                                            <span>Upload: 26.9 kb/s</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Traffic Charts -->
+                        <div class="traffic-charts-grid">
+                            <div class="traffic-chart-card">
+                                <div class="chart-header">
+                                    <h4>WAN1: Upload/Download</h4>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="wan1-traffic-chart"></canvas>
+                                </div>
+                                <div class="chart-stats">
+                                    <div class="stat-row">
+                                        <span class="stat-label">Min:</span>
+                                        <span class="stat-value">0.00 Mb/s</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span class="stat-label">Max:</span>
+                                        <span class="stat-value">1.52 Mb/s</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span class="stat-label">Last*:</span>
+                                        <span class="stat-value">0.82 Mb/s</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="traffic-chart-card">
+                                <div class="chart-header">
+                                    <h4>WAN2: Upload/Download</h4>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="wan2-traffic-chart"></canvas>
+                                </div>
+                                <div class="chart-stats">
+                                    <div class="stat-row">
+                                        <span class="stat-label">Min:</span>
+                                        <span class="stat-value">0.00 kb/s</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span class="stat-label">Max:</span>
+                                        <span class="stat-value">152.45 kb/s</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span class="stat-label">Last*:</span>
+                                        <span class="stat-value">82.17 kb/s</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="sessions-card">
+                                <div class="sessions-content">
+                                    <div class="sessions-value" id="active-sessions">1494</div>
+                                    <div class="sessions-label">Active Sessions</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SSH Commands Panel -->
+            <div class="ssh-panel">
+                <div class="panel-header">
+                    <h3>Comandos Remotos (Simples)</h3>
+                    <div class="action-buttons">
+                        <button id="connect-putty" class="action-btn" title="Conectar PuTTY">
+                            <i data-lucide="terminal"></i>
+                        </button>
+                        <button id="web-access" class="action-btn" title="Acessar na Web">
+                            <i data-lucide="external-link"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="command-controls">
+                    <button id="select-all" class="btn btn-secondary">Selecionar Todos</button>
+                    <button id="deselect-all" class="btn btn-secondary">Desmarcar Todos</button>
+                </div>
+
+                <div class="commands-list" id="commands-list">
+                    <!-- Comandos serão carregados dinamicamente -->
+                </div>
+
+                <div class="command-actions">
+                    <button id="run-commands" class="btn btn-primary">Executar Comandos Selecionados</button>
+                    <button id="advanced-config" class="btn btn-secondary">Configuração Avançada...</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configurações</h3>
+                <button class="modal-close">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>Configuração Zabbix</h4>
+                    <div class="form-group">
+                        <label for="zabbix-url">URL do Zabbix:</label>
+                        <input type="url" id="zabbix-url" class="form-input" placeholder="https://zabbix.exemplo.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="zabbix-user">Usuário:</label>
+                        <input type="text" id="zabbix-user" class="form-input" placeholder="admin">
+                    </div>
+                    <div class="form-group">
+                        <label for="zabbix-pass">Senha:</label>
+                        <input type="password" id="zabbix-pass" class="form-input" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h4>Configuração SSH</h4>
+                    <div class="form-group">
+                        <label for="ssh-user">Usuário SSH:</label>
+                        <input type="text" id="ssh-user" class="form-input" placeholder="admin">
+                    </div>
+                    <div class="form-group">
+                        <label for="ssh-pass">Senha SSH:</label>
+                        <input type="password" id="ssh-pass" class="form-input" placeholder="••••••••">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-settings" class="btn btn-primary">Salvar</button>
+                <button id="cancel-settings" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Carregando...</div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/config-manager.js"></script>
+    <script src="js/zabbix-client.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/ssh-commands.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

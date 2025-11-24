@@ -1,0 +1,23 @@
+{
+  "zabbix": {
+    "url": "https://zabbixbrasil.cencosud.corp/api_jsonrpc.php",
+    "user": "reports",
+    "password": "a#Z2Y0b1c9P#",
+    "enabled": true
+  },
+  "ssh": {
+    "user": "rfmelojr",
+    "password": "",
+    "enabled": false
+  },
+  "dashboard": {
+    "refreshInterval": 30,
+    "chartPeriod": 4,
+    "theme": "dark"
+  },
+  "ui": {
+    "autoRefresh": true,
+    "showNotifications": true,
+    "compactMode": false
+  }
+}

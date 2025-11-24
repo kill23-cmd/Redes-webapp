@@ -1,0 +1,503 @@
+/* ============================================
+   COMPONENTS STYLES - Additional UI Components
+============================================ */
+
+/* ============================================
+   MODAL STYLES
+============================================ */
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  animation: fadeIn var(--transition-fast);
+}
+
+.modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background-color: var(--neutral-900);
+  border: 1px solid var(--neutral-800);
+  border-radius: var(--radius-lg);
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: slideIn var(--transition-medium);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--neutral-800);
+}
+
+.modal-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--neutral-200);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--neutral-400);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+  background-color: var(--neutral-700);
+  color: var(--neutral-200);
+}
+
+.modal-body {
+  padding: var(--space-lg);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  border-top: 1px solid var(--neutral-800);
+}
+
+/* ============================================
+   FORM STYLES
+============================================ */
+
+.settings-section {
+  margin-bottom: var(--space-xl);
+}
+
+.settings-section h4 {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--neutral-200);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--neutral-800);
+}
+
+.form-group {
+  margin-bottom: var(--space-md);
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  color: var(--neutral-200);
+  margin-bottom: var(--space-xs);
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  background-color: var(--neutral-800);
+  color: var(--neutral-200);
+  border: 1px solid var(--neutral-800);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  transition: all var(--transition-fast);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(0, 184, 217, 0.2);
+}
+
+.form-input::placeholder {
+  color: var(--neutral-400);
+}
+
+/* ============================================
+   LOADING STYLES
+============================================ */
+
+.loading-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.loading-overlay.show {
+  display: flex;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--neutral-800);
+  border-top: 4px solid var(--primary-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--space-md);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: var(--neutral-200);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* ============================================
+   UTILITY CLASSES
+============================================ */
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.font-mono { font-family: var(--font-mono); }
+
+.text-success { color: var(--success); }
+.text-error { color: var(--error); }
+.text-warning { color: var(--warning); }
+.text-primary { color: var(--primary-500); }
+.text-muted { color: var(--neutral-400); }
+
+.bg-success { background-color: var(--success); }
+.bg-error { background-color: var(--error); }
+.bg-warning { background-color: var(--warning); }
+.bg-primary { background-color: var(--primary-500); }
+
+.hidden { display: none; }
+.visible { display: block; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR
+============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--neutral-800);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neutral-700);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neutral-600);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--neutral-700) var(--neutral-800);
+}
+
+/* ============================================
+   TOOLTIP STYLES
+============================================ */
+
+.tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.tooltip::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--neutral-700);
+  color: var(--neutral-200);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-fast);
+  z-index: 1000;
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--neutral-700);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-fast);
+  z-index: 1000;
+}
+
+.tooltip:hover::before,
+.tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+  bottom: calc(100% + 8px);
+}
+
+/* ============================================
+   BADGE STYLES
+============================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-success {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: var(--success);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badge-error {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--error);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-warning {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: var(--warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-primary {
+  background-color: rgba(0, 184, 217, 0.2);
+  color: var(--primary-500);
+  border: 1px solid rgba(0, 184, 217, 0.3);
+}
+
+.badge-secondary {
+  background-color: rgba(63, 63, 70, 0.2);
+  color: var(--neutral-400);
+  border: 1px solid rgba(63, 63, 70, 0.3);
+}
+
+/* ============================================
+   PROGRESS BAR STYLES
+============================================ */
+
+.progress {
+  width: 100%;
+  height: 8px;
+  background-color: var(--neutral-800);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--primary-500);
+  border-radius: var(--radius-sm);
+  transition: width var(--transition-medium);
+}
+
+.progress-bar.success {
+  background-color: var(--success);
+}
+
+.progress-bar.error {
+  background-color: var(--error);
+}
+
+.progress-bar.warning {
+  background-color: var(--warning);
+}
+
+/* ============================================
+   ANIMATION UTILITIES
+============================================ */
+
+.fade-in {
+  animation: fadeIn var(--transition-medium);
+}
+
+.slide-up {
+  animation: slideUp var(--transition-medium);
+}
+
+.slide-down {
+  animation: slideDown var(--transition-medium);
+}
+
+.scale-in {
+  animation: scaleIn var(--transition-fast);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY IMPROVEMENTS
+============================================ */
+
+/* Focus visible for keyboard navigation */
+.btn:focus-visible,
+.form-input:focus-visible,
+.device-select:focus-visible,
+.store-select:focus-visible,
+.search-input:focus-visible,
+.modal-close:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --neutral-900: #000000;
+    --neutral-800: #333333;
+    --neutral-700: #555555;
+    --neutral-400: #CCCCCC;
+    --neutral-200: #FFFFFF;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .status-indicator.down {
+    animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .app-header,
+  .left-panel,
+  .ssh-panel,
+  .modal,
+  .loading-overlay {
+    display: none !important;
+  }
+  
+  .main-content {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .collapsible-content {
+    display: block !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .status-card,
+  .wan-status-card,
+  .traffic-chart-card {
+    border: 1px solid #ccc !important;
+    background: white !important;
+  }
+}
