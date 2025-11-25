@@ -1,7 +1,3 @@
-// ============================================
-// DASHBOARD - Main dashboard management and UI control
-// ============================================
-
 class NetworkDashboard {
     constructor() {
         this.zabbixClient = null;
@@ -9,757 +5,349 @@ class NetworkDashboard {
         this.currentHosts = [];
         this.currentSelectedHost = null;
         this.deviceType = 'default';
-        this.refreshInterval = null;
         this.storesData = [];
-
         this.initializeEventListeners();
-        this.loadStoresData();
         this.initializeDashboard();
     }
 
-    /**
-     * Initialize event listeners
-     */
     initializeEventListeners() {
-        // Search functionality
         const storeSearch = document.getElementById('store-search');
         const circuitSearch = document.getElementById('circuit-search');
+        if (storeSearch) storeSearch.addEventListener('input', debounce(() => this.performSearch(), 300));
+        if (circuitSearch) circuitSearch.addEventListener('input', debounce(() => this.performSearch(), 300));
+        document.getElementById('clear-search')?.addEventListener('click', () => this.clearSearch());
+        document.getElementById('store-select')?.addEventListener('change', (e) => this.onStoreSelect(e.target.value));
 
-        if (storeSearch) {
-            storeSearch.addEventListener('input', debounce(() => {
-                this.performSearch();
-            }, 300));
-        }
-
-        if (circuitSearch) {
-            circuitSearch.addEventListener('input', debounce(() => {
-                this.performSearch();
-            }, 300));
-        }
-
-        // Clear search
-        const clearSearchBtn = document.getElementById('clear-search');
-        if (clearSearchBtn) {
-            clearSearchBtn.addEventListener('click', () => {
-                this.clearSearch();
-            });
-        }
-
-        // Store selection
-        const storeSelect = document.getElementById('store-select');
-        if (storeSelect) {
-            storeSelect.addEventListener('change', (e) => {
-                this.onStoreSelect(e.target.value);
-            });
-        }
-
-        // Command buttons
-        const runCommandsBtn = document.getElementById('run-commands');
-        const advancedConfigBtn = document.getElementById('advanced-config');
-        const selectAllBtn = document.getElementById('select-all');
-        const deselectAllBtn = document.getElementById('deselect-all');
-
-        if (runCommandsBtn) {
-            runCommandsBtn.addEventListener('click', () => {
-                this.runSelectedCommands();
-            });
-        }
-
-        if (advancedConfigBtn) {
-            advancedConfigBtn.addEventListener('click', () => {
-                this.openAdvancedConfig();
-            });
-        }
-
-        if (selectAllBtn) {
-            selectAllBtn.addEventListener('click', () => {
-                this.selectAllCommands();
-            });
-        }
-
-        if (deselectAllBtn) {
-            deselectAllBtn.addEventListener('click', () => {
-                this.deselectAllCommands();
-            });
-        }
-
-        // Action buttons
-        const puttyBtn = document.getElementById('connect-putty');
-        const webAccessBtn = document.getElementById('web-access');
-
-        if (puttyBtn) {
-            puttyBtn.addEventListener('click', () => {
-                this.connectPuTTY();
-            });
-        }
-
-        if (webAccessBtn) {
-            webAccessBtn.addEventListener('click', () => {
-                this.openWebAccess();
-            });
-        }
+        document.getElementById('run-commands')?.addEventListener('click', () => this.runSelectedCommands());
+        document.getElementById('select-all')?.addEventListener('click', () => this.selectAllCommands());
+        document.getElementById('deselect-all')?.addEventListener('click', () => this.deselectAllCommands());
+        document.getElementById('connect-putty')?.addEventListener('click', () => this.connectPuTTY());
+        document.getElementById('web-access')?.addEventListener('click', () => this.openWebAccess());
     }
 
-    /**
-     * Initialize dashboard
-     */
     initializeDashboard() {
-        this.showLoading('Inicializando dashboard...');
-
-        // Check if Zabbix is configured
-        const configSummary = configManager.getSummary();
-        if (!configSummary.zabbixConfigured) {
-            this.showNotification('Configure o Zabbix nas opções para continuar', 'warning');
-            return;
+        this.showLoading('Iniciando...');
+        if (configManager.getSummary().zabbixConfigured) {
+            this.initializeZabbixClient();
+        } else {
+            this.showNotification('Configure o Zabbix para começar.', 'warning');
+            this.loadStoresData();
+            this.hideLoading();
         }
-
-        // Initialize Zabbix client
-        this.initializeZabbixClient();
-
-        this.hideLoading();
     }
 
-    /**
-     * Initialize Zabbix client
-     */
     async initializeZabbixClient() {
         try {
             const config = configManager.config;
-
-            // Try to connect to Zabbix if configured
-            if (config.zabbix.url && config.zabbix.user) {
-                this.zabbixClient = new ZabbixClient(
-                    config.zabbix.url,
-                    config.zabbix.user,
-                    config.zabbix.password
-                );
-
-                try {
-                    await this.zabbixClient.authenticate();
-                    showNotification('Conectado ao Zabbix com sucesso!', 'success');
-                } catch (authErr) {
-                    console.warn('Zabbix authentication failed:', authErr);
-                    showNotification('Zabbix offline/não configurado. Usando dados locais.', 'warning');
-                }
-            }
-
-            // Always load stores from Excel API
+            this.zabbixClient = new ZabbixClient(config.zabbix.url, config.zabbix.user, config.zabbix.password);
+            await this.zabbixClient.authenticate();
             await this.loadStoresData();
-
         } catch (err) {
-            console.error('Failed to initialize:', err);
-            showNotification(`Erro na inicialização: ${err.message}`, 'error');
+            console.error('Init failed:', err);
+            this.hideLoading();
         }
     }
 
-    /**
-     * Load stores data from local file
-     */
-    /**
-     * Load stores data from API (Excel)
-     */
     async loadStoresData() {
         try {
-            this.showLoading('Carregando dados das lojas...');
-
             const response = await fetch('/api/stores/search?limit=1000');
-            if (!response.ok) throw new Error('Falha na resposta da API');
-
             const data = await response.json();
             this.storesData = data.stores || [];
-
-            console.log(`Carregadas ${this.storesData.length} lojas do Excel`);
-
-            // Populate store select with these stores
             this.populateStoreSelect(this.storesData);
-
             this.hideLoading();
-
         } catch (err) {
-            console.error('Failed to load stores data:', err);
+            console.error('Erro carregando lojas:', err);
             this.hideLoading();
-            showNotification('Erro ao carregar dados das lojas (Excel)', 'error');
         }
     }
 
-    /**
-     * Load stores/host groups from Zabbix
-     */
-    async loadStores() {
-        try {
-            const hostgroups = await this.zabbixClient.getHostGroups();
-            this.populateStoreSelect(hostgroups);
-        } catch (err) {
-            console.error('Failed to load stores:', err);
-            showNotification('Erro ao carregar lojas do Zabbix', 'error');
-        }
-    }
-
-    /**
-     * Populate store select dropdown
-     * @param {Array} hostgroups - Host groups from Zabbix
-     */
-    /**
-     * Populate store select dropdown
-     * @param {Array} stores - Stores from API
-     */
     populateStoreSelect(stores) {
-        const storeSelect = document.getElementById('store-select');
-        if (!storeSelect) return;
-
-        // Clear existing options
-        storeSelect.innerHTML = '<option value="">-- Selecione uma loja --</option>';
-
-        // Sort stores by ID
+        const select = document.getElementById('store-select');
+        if (!select) return;
+        select.innerHTML = '<option value="">-- Selecione uma loja --</option>';
         stores.sort((a, b) => a.id.localeCompare(b.id));
-
-        // Add options
-        stores.forEach(store => {
-            const option = document.createElement('option');
-            option.value = store.id;
-            option.textContent = `${store.id} - ${store.nome || 'Loja ' + store.id}`;
-            storeSelect.appendChild(option);
+        stores.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = `${s.id} - ${s.nome || 'Loja ' + s.id}`;
+            select.appendChild(opt);
         });
     }
 
-    /**
-     * Perform search across stores
-     */
-    /**
-     * Perform search across stores
-     */
     performSearch() {
-        const storeQuery = document.getElementById('store-search').value.toLowerCase();
-        const circuitQuery = document.getElementById('circuit-search').value.toLowerCase();
+        const qStore = document.getElementById('store-search').value.toLowerCase();
+        const qCirc = document.getElementById('circuit-search').value.toLowerCase();
+        const options = Array.from(document.querySelectorAll('#store-select option')).slice(1);
 
-        const storeSelect = document.getElementById('store-select');
-        if (!storeSelect) return;
-
-        // Get all options except the first one
-        const options = Array.from(storeSelect.querySelectorAll('option')).slice(1);
-
-        // Filter options
-        options.forEach(option => {
-            const storeId = option.value;
-            const storeText = option.textContent.toLowerCase();
-
-            // Find store data
-            const storeData = this.storesData.find(s => s.id === storeId);
-
-            let circuitMatch = true;
-            if (circuitQuery && storeData) {
-                const wan1 = (storeData.circuito_wan1 || '').toLowerCase();
-                const wan2 = (storeData.circuito_wan2 || '').toLowerCase();
-                circuitMatch = wan1.includes(circuitQuery) || wan2.includes(circuitQuery);
+        options.forEach(opt => {
+            const storeData = this.storesData.find(s => s.id === opt.value);
+            const matchStore = !qStore || opt.textContent.toLowerCase().includes(qStore);
+            let matchCirc = true;
+            if (qCirc && storeData) {
+                const w1 = (storeData.circuito_wan1 || '').toLowerCase();
+                const w2 = (storeData.circuito_wan2 || '').toLowerCase();
+                matchCirc = w1.includes(qCirc) || w2.includes(qCirc);
             }
-
-            const storeMatch = !storeQuery || storeText.includes(storeQuery);
-
-            option.style.display = (storeMatch && circuitMatch) ? 'block' : 'none';
+            opt.style.display = (matchStore && matchCirc) ? 'block' : 'none';
         });
     }
 
-    /**
-     * Clear search filters
-     */
     clearSearch() {
         document.getElementById('store-search').value = '';
         document.getElementById('circuit-search').value = '';
-
-        // Show all options
-        const options = document.querySelectorAll('#store-select option');
-        options.forEach(option => {
-            option.style.display = 'block';
-        });
-
-        this.showNotification('Filtros de busca limpos', 'info');
+        this.performSearch();
     }
 
-    /**
-     * Handle store selection
-     * @param {string} groupId - Selected group ID
-     */
-    /**
-     * Handle store selection
-     * @param {string} storeId - Selected store ID
-     */
     async onStoreSelect(storeId) {
         if (!storeId) return;
+        this.showLoading('Buscando hosts...');
+        this.updateLinkInfo(storeId);
 
-        this.showLoading('Carregando hosts...');
-
-        try {
-            // 1. Update Link Info (from Excel data)
-            this.updateLinkInfo(storeId);
-
-            // 2. Load Hosts (from Zabbix or Simulated)
-            let hosts = [];
-
-            if (this.zabbixClient && this.zabbixClient.isAuthenticated) {
-                // Try to find host group with store ID
-                try {
-                    const groups = await this.zabbixClient.getHostGroups();
-                    const group = groups.find(g => g.name.includes(storeId));
-                    if (group) {
-                        hosts = await this.zabbixClient.getHostsByGroupId(group.groupid);
-                    }
-                } catch (zabbixErr) {
-                    console.warn('Error fetching Zabbix hosts:', zabbixErr);
+        let hosts = [];
+        if (this.zabbixClient && this.zabbixClient.isAuthenticated) {
+            try {
+                const groups = await this.zabbixClient.getHostGroups();
+                const group = groups.find(g => g.name.toLowerCase().includes(storeId.toLowerCase()));
+                if (group) {
+                    hosts = await this.zabbixClient.getHostsByGroupId(group.groupid);
                 }
-            }
-
-            // Fallback: Use simulated host if no Zabbix hosts found
-            if (hosts.length === 0) {
-                console.log('Using simulated host for store', storeId);
-                hosts = [{
-                    hostid: `sim-${storeId}`,
-                    host: `FortiGate-${storeId}`,
-                    name: `Firewall Loja ${storeId}`,
-                    status: '0',
-                    inventory: { os: 'FortiOS', hardware: 'FortiGate' }
-                }];
-            }
-
-            this.currentHosts = hosts;
-            this.populateHostsList(hosts);
-
-            // Auto-select first host
-            if (hosts.length > 0) {
-                this.onHostSelect(hosts[0]);
-            }
-
-            this.hideLoading();
-
-        } catch (err) {
-            console.error('Failed to load store details:', err);
-            this.hideLoading();
-            showNotification('Erro ao carregar detalhes da loja', 'error');
+            } catch (e) { console.warn('Erro Zabbix:', e); }
         }
+
+        if (hosts.length === 0) {
+            console.log('Usando host simulado para:', storeId);
+            hosts = [{
+                hostid: `sim-${storeId}`,
+                host: `FortiGate-${storeId}`,
+                name: `Firewall ${storeId} (Simulado)`,
+                status: '0',
+                inventory: { os: 'FortiOS', hardware: 'FortiGate' }
+            }];
+        }
+
+        this.populateHostsList(hosts);
+        if (hosts.length > 0) this.onHostSelect(hosts[0]);
+        this.hideLoading();
     }
 
-    /**
-     * Get store name from group ID
-     * @param {string} groupId - Group ID
-     * @returns {string} Store name
-     */
-    getStoreNameFromGroupId(groupId) {
-        const storeSelect = document.getElementById('store-select');
-        const selectedOption = storeSelect.querySelector(`option[value="${groupId}"]`);
-        return selectedOption ? selectedOption.textContent : '';
-    }
-
-    /**
-     * Populate hosts list
-     * @param {Array} hosts - Array of hosts
-     */
     populateHostsList(hosts) {
-        const hostsList = document.getElementById('hosts-list');
-        if (!hostsList) return;
-
-        hostsList.innerHTML = '';
-
-        hosts.forEach(host => {
-            const hostItem = document.createElement('div');
-            hostItem.className = 'host-item';
-            hostItem.textContent = `${host.name} - ${host.host}`;
-            hostItem.dataset.hostId = host.hostid;
-
-            hostItem.addEventListener('click', () => {
-                this.onHostSelect(host);
-            });
-
-            hostsList.appendChild(hostItem);
+        const list = document.getElementById('hosts-list');
+        if (!list) return;
+        list.innerHTML = '';
+        hosts.forEach(h => {
+            const div = document.createElement('div');
+            div.className = 'host-item';
+            div.textContent = h.name;
+            div.onclick = () => this.onHostSelect(h);
+            list.appendChild(div);
         });
     }
 
-    /**
-     * Handle host selection
-     * @param {Object} host - Selected host object
-     */
     async onHostSelect(host) {
-        // Update UI selection
-        document.querySelectorAll('.host-item').forEach(item => {
-            item.classList.remove('selected');
-        });
-
-        const hostElement = document.querySelector(`[data-host-id="${host.hostid}"]`);
-        if (hostElement) {
-            hostElement.classList.add('selected');
-        }
-
         this.currentSelectedHost = host;
-
-        // Determine device type
         this.deviceType = this.determineDeviceType(host);
-
-        // Load commands for device type
         this.loadCommandsForDevice();
 
-        // Load dashboard data
-        this.loadDashboardData(host);
-    }
-
-    /**
-     * Determine device type based on host data
-     * @param {Object} host - Host object
-     * @returns {string} Device type
-     */
-    determineDeviceType(host) {
-        const inventory = host.inventory || {};
-        const os = inventory.os || '';
-        const hardware = inventory.hardware || '';
-        const hostname = host.name || '';
-
-        const osLower = os.toLowerCase();
-        const hardwareLower = hardware.toLowerCase();
-        const hostnameLower = hostname.toLowerCase();
-
-        if (osLower.includes('fortiswitch')) return 'fortiswitch';
-        if (osLower.includes('fortios')) return 'fortinet_firewall';
-        if (osLower.includes('cisco') && (hardwareLower.includes('router') || hardwareLower.includes('isr'))) return 'cisco_router';
-        if (osLower.includes('cisco') && hardwareLower.includes('switch')) return 'cisco_switch';
-        if (osLower.includes('huawei')) return 'huawei_switch';
-
-        if (hostnameLower.includes('ap')) return 'access_point';
-        if (hostnameLower.includes('rt')) return 'cisco_router';
-        if (hostnameLower.includes('fw')) return 'fortinet_firewall';
-        if (hostnameLower.includes('fsw') || (hostnameLower.includes('forti') && hostnameLower.includes('sw'))) return 'fortiswitch';
-        if (hostnameLower.includes('sw')) return 'cisco_switch';
-
-        return 'default';
-    }
-
-    /**
-     * Load commands for device type
-     */
-    loadCommandsForDevice() {
-        const commandsList = document.getElementById('commands-list');
-        if (!commandsList) return;
-
-        commandsList.innerHTML = '';
-
-        const commands = ZABBIX_COMMAND_PROFILES[this.deviceType] || [];
-
-        commands.forEach(cmd => {
-            const commandItem = document.createElement('div');
-            commandItem.className = 'command-item';
-
-            commandItem.innerHTML = `
-                <input type="checkbox" class="command-checkbox" id="cmd-${cmd.command.replace(/\s+/g, '-')}">
-                <label class="command-label" for="cmd-${cmd.command.replace(/\s+/g, '-')}">${cmd.name}</label>
-            `;
-
-            commandsList.appendChild(commandItem);
-        });
-    }
-
-    /**
-     * Load dashboard data for selected host
-     * @param {Object} host - Selected host
-     */
-    async loadDashboardData(host) {
-        this.showLoading('Carregando dados do dashboard...');
-
+        this.showLoading('Atualizando dados...');
         try {
-            // Get items by name patterns
             const searchNames = [
-                'CPU utilization',
-                'ICMP response time',
-                'ICMP packet loss',
-                'Device uptime',
-                'Uptime',
-                'Number of interfaces in operational state down',
-                'wan1',
-                'wan2'
+                'CPU utilization', 'ICMP response time', 'ICMP packet loss', 'Device uptime', 'Uptime',
+                'wan1', 'wan2', 'bits sent', 'bits received', 'operational status', 'duplex', 'speed',
+                'memory', 'available'
             ];
 
             const itemsData = await this.zabbixClient.getItemsByNamePattern(host.hostid, searchNames.join(','));
             const problems = await this.zabbixClient.getHostProblems(host.hostid);
-
-            // Process and display data
-            const dashboardData = ZabbixDataProcessor.processDashboardData(
-                itemsData,
-                problems,
-                this.deviceType
-            );
+            const dashboardData = ZabbixDataProcessor.processDashboardData(itemsData, problems, this.deviceType);
 
             this.updateDashboardUI(dashboardData);
-
+        } catch (e) {
+            console.error('Erro no update:', e);
+        } finally {
             this.hideLoading();
-
-        } catch (err) {
-            console.error('Failed to load dashboard data:', err);
-            this.hideLoading();
-            showNotification('Erro ao carregar dados do dashboard', 'error');
         }
     }
 
-    /**
-     * Update dashboard UI with processed data
-     * @param {Object} data - Processed dashboard data
-     */
     updateDashboardUI(data) {
-        // Update basic metrics
-        this.updateElement('uptime', data.uptime);
-        this.updateElement('cpu', data.cpu);
-        this.updateElement('latency', data.latency);
-        this.updateElement('loss', data.loss);
+        // 1. Atualiza Sidebar (IDs: sidebar-*)
+        this.updateElement('sidebar-uptime', data.uptime);
+        this.updateElement('sidebar-cpu', data.cpu);
+        this.updateElement('sidebar-latency', data.latency);
+        this.updateElement('sidebar-loss', data.loss);
 
-        // Update dynamic sections based on device type
+        // 2. Atualiza Cards Principais (IDs: card-*)
+        this.updateElement('card-uptime', data.uptime);
+        this.updateElement('card-latency', data.latency);
+
+        // Status indicador
+        const statusEl = document.getElementById('card-status-text');
+        const indEl = document.getElementById('card-status-indicator');
+        if (statusEl && indEl) {
+            const isUp = data.uptime !== '--';
+            statusEl.textContent = isUp ? 'UP' : 'DOWN';
+            indEl.className = `status-indicator ${isUp ? 'up' : 'down'}`;
+        }
+
+        // Loss com cor
+        const lossEl = document.getElementById('card-loss');
+        if (lossEl) {
+            lossEl.textContent = data.loss;
+            const val = parseFloat(data.loss);
+            lossEl.className = `metric-value ${val > 0 ? 'text-error' : 'text-success'}`;
+        }
+
+        // 3. Seções Dinâmicas e WAN
         if (this.deviceType === 'fortinet_firewall') {
             this.updateFirewallUI(data.dynamic);
-        } else if (this.deviceType.includes('switch') || this.deviceType.includes('router')) {
-            this.updateSwitchRouterUI(data.dynamic);
         }
 
-        // Update gauges
-        this.updateGauges(data);
-    }
-
-    /**
-     * Update firewall-specific UI elements
-     * @param {Object} data - Firewall data
-     */
-    updateFirewallUI(data) {
-        this.updateElement('wan1-status', data.wan1Status || '--', data.wan1Status === 'UP' ? 'success' : 'error');
-        this.updateElement('wan2-status', data.wan2Status || '--', data.wan2Status === 'UP' ? 'success' : 'error');
-
-        // Update dynamic status items
-        this.updateDynamicStatusItems([
-            { label: 'WAN1 Status:', value: data.wan1Status },
-            { label: 'WAN1 Speed:', value: data.wan1Speed },
-            { label: 'WAN2 Status:', value: data.wan2Status },
-            { label: 'WAN2 Speed:', value: data.wan2Speed }
-        ]);
-    }
-
-    /**
-     * Update switch/router-specific UI elements
-     * @param {Object} data - Switch/router data
-     */
-    updateSwitchRouterUI(data) {
-        // Update interface down count
-        const interfacesDownElement = this.updateDynamicStatusItems([
-            { label: 'Interfaces Down:', value: data.interfacesDown.toString() }
-        ]);
-
-        if (interfacesDownElement && data.interfacesDown > 0) {
-            interfacesDownElement.classList.add('text-error');
-        }
-    }
-
-    /**
-     * Update dynamic status items
-     * @param {Array} items - Array of status items
-     * @returns {HTMLElement|null} Last updated element
-     */
-    updateDynamicStatusItems(items) {
-        let lastElement = null;
-
-        items.forEach((item, index) => {
-            const element = document.getElementById(`dynamic-status-${index + 1}`);
-            if (element) {
-                const label = element.querySelector('label');
-                const value = element.querySelector('span');
-
-                if (label) label.textContent = item.label;
-                if (value) {
-                    value.textContent = item.value;
-                    lastElement = value;
-                }
-
-                element.style.display = 'flex';
-            }
-        });
-
-        return lastElement;
-    }
-
-    /**
-     * Update UI gauges
-     * @param {Object} data - Dashboard data
-     */
-    updateGauges(data) {
-        // Update CPU gauge
+        // 4. Gauges
         if (data.cpu && data.cpu !== '--') {
-            const cpuValue = parseFloat(data.cpu.replace('%', ''));
-            this.updateGauge('cpu-gauge', cpuValue);
+            this.updateGauge('cpu-gauge', parseFloat(data.cpu));
         }
-
-        // Update Memory gauge (mock data for now)
-        const memoryValue = 55; // This would come from actual data
-        this.updateGauge('memory-gauge', memoryValue);
+        this.updateGauge('memory-gauge', 55);
     }
 
-    /**
-     * Update circular gauge
-     * @param {string} canvasId - Canvas element ID
-     * @param {number} percentage - Percentage value (0-100)
-     */
-    updateGauge(canvasId, percentage) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
+    updateFirewallUI(data) {
+        // Sidebar Dinâmica
+        this.updateSidebarDynamic(1, 'WAN1 Status:', data.wan1Status);
+        this.updateSidebarDynamic(2, 'WAN2 Status:', data.wan2Status);
 
-        const ctx = canvas.getContext('2d');
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        const radius = 50;
-        const lineWidth = 8;
+        // Cards WAN1
+        this.updateElement('card-wan1-status', data.wan1Status);
+        this.updateElement('card-wan1-speed', data.wan1Speed);
+        this.updateElement('card-wan1-duplex', data.wan1Duplex);
+        this.updateElement('card-wan1-upload', data.wan1Upload);
+        this.updateElement('card-wan1-download', data.wan1Download);
 
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const ind1 = document.getElementById('card-wan1-indicator');
+        if (ind1) ind1.className = `status-indicator ${data.wan1Status === 'UP' ? 'up' : 'down'}`;
 
-        // Draw background circle
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-        ctx.strokeStyle = 'var(--neutral-800)';
-        ctx.lineWidth = lineWidth;
-        ctx.stroke();
+        // Cards WAN2
+        this.updateElement('card-wan2-status', data.wan2Status);
+        this.updateElement('card-wan2-speed', data.wan2Speed);
+        this.updateElement('card-wan2-duplex', data.wan2Duplex);
+        this.updateElement('card-wan2-upload', data.wan2Upload);
+        this.updateElement('card-wan2-download', data.wan2Download);
 
-        // Draw progress circle
-        const startAngle = -Math.PI / 2;
-        const endAngle = startAngle + (percentage / 100) * 2 * Math.PI;
+        const ind2 = document.getElementById('card-wan2-indicator');
+        if (ind2) ind2.className = `status-indicator ${data.wan2Status === 'UP' ? 'up' : 'down'}`;
+    }
 
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-        ctx.strokeStyle = 'var(--primary-300)';
-        ctx.lineWidth = lineWidth;
-        ctx.lineCap = 'round';
-        ctx.stroke();
-
-        // Update text
-        const valueElement = document.getElementById(canvasId.replace('-gauge', '-value'));
-        if (valueElement) {
-            valueElement.textContent = `${percentage.toFixed(1)}%`;
+    updateSidebarDynamic(index, label, value) {
+        const el = document.getElementById(`sidebar-dynamic-${index}`);
+        if (el) {
+            el.style.display = 'flex';
+            el.querySelector('label').textContent = label;
+            const span = el.querySelector('span');
+            span.textContent = value || '--';
+            span.className = value === 'UP' ? 'text-success' : (value === 'DOWN' ? 'text-error' : '');
         }
     }
 
-    /**
-     * Update link information panel
-     * @param {string} storeName - Store name
-     */
-    /**
-     * Update link information panel
-     * @param {string} storeId - Store ID
-     */
+    updateElement(id, val) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val || '--';
+    }
+
+    updateGauge(id, val) {
+        if (window.dashboardCharts && window.dashboardCharts.chartManager) {
+            window.dashboardCharts.chartManager.updateGaugeChart(id, val);
+            const textEl = document.getElementById(`${id}-value`);
+            if (textEl) textEl.textContent = `${val.toFixed(1)}%`;
+        }
+    }
+
     updateLinkInfo(storeId) {
-        const storeData = this.storesData.find(store => store.id === storeId);
-
-        if (!storeData) {
-            // Clear all info if store not found
-            ['wan1-op', 'wan1-circ', 'wan1-banda', 'wan2-op', 'wan2-circ', 'wan2-banda'].forEach(id => {
-                this.updateElement(id, '--');
-            });
-            return;
-        }
-
-        // Update link information (using API field names)
-        this.updateElement('wan1-op', storeData.operador_wan1 || 'N/A');
-        this.updateElement('wan1-circ', storeData.circuito_wan1 || 'N/A');
-        this.updateElement('wan1-banda', storeData.banda_wan1 || 'N/A');
-        this.updateElement('wan2-op', storeData.operador_wan2 || 'N/A');
-        this.updateElement('wan2-circ', storeData.circuito_wan2 || 'N/A');
-        this.updateElement('wan2-banda', storeData.banda_wan2 || 'N/A');
-    }
-
-    /**
-     * Update DOM element with value and optional class
-     * @param {string} elementId - Element ID
-     * @param {string} value - Value to set
-     * @param {string} className - Optional class name
-     */
-    updateElement(elementId, value, className = '') {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.textContent = value;
-            element.className = className ? `metric-value ${className}` : 'metric-value';
-        }
-    }
-
-    /**
-     * Show loading overlay
-     * @param {string} message - Loading message
-     */
-    showLoading(message = 'Carregando...') {
-        const overlay = document.getElementById('loading-overlay');
-        const text = overlay?.querySelector('.loading-text');
-
-        if (text) text.textContent = message;
-        if (overlay) overlay.classList.add('show');
-    }
-
-    /**
-     * Hide loading overlay
-     */
-    hideLoading() {
-        const overlay = document.getElementById('loading-overlay');
-        if (overlay) overlay.classList.remove('show');
-    }
-
-    /**
-     * Show notification
-     * @param {string} message - Notification message
-     * @param {string} type - Notification type
-     */
-    showNotification(message, type) {
-        showNotification(message, type);
-    }
-
-    // Command execution methods
-    selectAllCommands() {
-        document.querySelectorAll('.command-checkbox').forEach(cb => {
-            cb.checked = true;
+        const data = this.storesData.find(s => s.id === storeId);
+        if (!data) return;
+        ['wan1-op', 'wan1-circ', 'wan1-banda', 'wan2-op', 'wan2-circ', 'wan2-banda'].forEach(key => {
+            const apiMap = {
+                'wan1-op': 'operador_wan1', 'wan1-circ': 'circuito_wan1', 'wan1-banda': 'banda_wan1',
+                'wan2-op': 'operador_wan2', 'wan2-circ': 'circuito_wan2', 'wan2-banda': 'banda_wan2'
+            };
+            this.updateElement(key, data[apiMap[key]] || 'N/A');
         });
     }
 
-    deselectAllCommands() {
-        document.querySelectorAll('.command-checkbox').forEach(cb => {
-            cb.checked = false;
+    determineDeviceType(host) {
+        const os = (host.inventory?.os || '').toLowerCase();
+        const name = host.name.toLowerCase();
+        if (os.includes('fort') || name.includes('fw')) return 'fortinet_firewall';
+        if (os.includes('cisco') || name.includes('rt')) return 'cisco_router';
+        return 'default';
+    }
+
+    loadCommandsForDevice() {
+        const list = document.getElementById('commands-list');
+        if (!list) return;
+        list.innerHTML = '';
+        const cmds = (window.ZABBIX_COMMAND_PROFILES && window.ZABBIX_COMMAND_PROFILES[this.deviceType]) || [];
+        cmds.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'command-item';
+            div.innerHTML = `<input type="checkbox" class="command-checkbox"><label>${c.name}</label>`;
+            list.appendChild(div);
         });
     }
 
-    runSelectedCommands() {
+    showLoading(msg) {
+        const el = document.getElementById('loading-overlay');
+        if (el) { el.classList.add('show'); el.querySelector('.loading-text').textContent = msg; }
+    }
+    hideLoading() { document.getElementById('loading-overlay')?.classList.remove('show'); }
+    showNotification(msg, type) {
+        if (window.showNotification) window.showNotification(msg, type);
+        else console.log(msg);
+    }
+
+    selectAllCommands() { document.querySelectorAll('.command-checkbox').forEach(c => c.checked = true); }
+    deselectAllCommands() { document.querySelectorAll('.command-checkbox').forEach(c => c.checked = false); }
+
+    async runSelectedCommands() {
         const selectedCommands = [];
-        document.querySelectorAll('.command-checkbox:checked').forEach(cb => {
-            const label = cb.nextElementSibling.textContent;
-            selectedCommands.push(label);
+        const checks = document.querySelectorAll('.command-checkbox:checked');
+        checks.forEach(chk => {
+            const label = chk.nextElementSibling.textContent;
+            const profile = window.ZABBIX_COMMAND_PROFILES[this.deviceType];
+            const cmdObj = profile.find(c => c.name === label);
+            if (cmdObj) selectedCommands.push(cmdObj.command);
         });
 
         if (selectedCommands.length === 0) {
-            this.showNotification('Selecione pelo menos um comando', 'warning');
+            this.showNotification('Selecione comandos.', 'warning');
             return;
         }
 
-        // In a real implementation, this would execute SSH commands
-        this.showNotification(`Executando ${selectedCommands.length} comando(s)...`, 'info');
-    }
+        const host = this.currentSelectedHost;
+        if (!host) return;
 
-    openAdvancedConfig() {
-        this.showNotification('Configuração avançada em desenvolvimento', 'info');
-    }
+        this.showNotification(`Enviando para ${host.host}...`, 'info');
 
-    connectPuTTY() {
-        if (!this.currentSelectedHost) {
-            this.showNotification('Selecione um host primeiro', 'warning');
-            return;
+        const config = configManager.config;
+        const targetHost = (host.interfaces && host.interfaces[0]) ? host.interfaces[0].ip : host.host;
+
+        try {
+            const response = await fetch('/api/ssh-execute', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    host: targetHost,
+                    username: config.ssh.user,
+                    password: config.ssh.password,
+                    commands: selectedCommands
+                })
+            });
+            const result = await response.json();
+            const win = window.open('', '_blank', 'width=800,height=600');
+            win.document.write(`<html><body style="background:#111;color:#0f0;font-family:monospace;white-space:pre-wrap;">${result.output || result.error}</body></html>`);
+        } catch (err) {
+            this.showNotification('Erro SSH: ' + err.message, 'error');
         }
-
-        // In a real implementation, this would launch PuTTY
-        this.showNotification('Conectando via PuTTY...', 'info');
     }
 
-    openWebAccess() {
-        if (!this.currentSelectedHost) {
-            this.showNotification('Selecione um host primeiro', 'warning');
-            return;
-        }
-
-        // Open web interface
-        window.open(`https://${this.currentSelectedHost.host}`, '_blank');
-    }
+    connectPuTTY() { this.showNotification('Abrindo PuTTY...', 'info'); }
+    openWebAccess() { window.open(`https://${this.currentSelectedHost?.host || ''}`, '_blank'); }
 }
 
-// Initialize dashboard when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.dashboard = new NetworkDashboard();
-});
+document.addEventListener('DOMContentLoaded', () => { window.dashboard = new NetworkDashboard(); });

@@ -9,282 +9,164 @@ class ZabbixClient {
         this.password = password;
         this.authToken = null;
         this.isAuthenticated = false;
-        this.isSimulated = false; // Nova flag para controlar modo simulação
-        // Use proxy local para evitar CORS
+        this.isSimulated = false;
         this.proxyUrl = '/api/zabbix-proxy';
     }
 
-    /**
-     * Authenticate with Zabbix API
-     * @returns {Promise<boolean>} Authentication success
-     */
     async authenticate() {
         try {
             const response = await api.post(this.proxyUrl, {
-                jsonrpc: '2.0',
-                method: 'user.login',
-                params: { user: this.username, password: this.password },
-                id: 1
+                jsonrpc: '2.0', method: 'user.login',
+                params: { username: this.username, password: this.password }, id: 1
             });
             if (response.result) {
                 this.authToken = response.result;
                 this.isAuthenticated = true;
                 this.isSimulated = false;
                 return true;
-            } else {
-                console.warn('Zabbix auth failed, using simulated data');
-                this.isAuthenticated = false;
-                this.isSimulated = true; // Ativa modo simulação
-                return false;
             }
+            this.isSimulated = true; return false;
         } catch (err) {
-            console.warn('Zabbix auth error, fallback to simulation:', err);
-            this.isAuthenticated = false;
-            this.isSimulated = true; // Ativa modo simulação
-            return false;
+            this.isSimulated = true; return false;
         }
     }
 
-    /**
-     * Make authenticated API request
-     * @param {string} method - API method name
-     * @param {Object} params - Method parameters
-     * @returns {Promise<Object>} API response
-     */
     async request(method, params = {}) {
-        // CORREÇÃO: Se estiver em modo simulado, retorna dados falsos em vez de erro
-        if (!this.isAuthenticated) {
-            if (this.isSimulated) {
-                console.log(`[Simulação] Gerando dados para: ${method}`);
-                return this.getMockData(method, params);
-            }
-            throw new Error('Cliente não autenticado');
+        if (!this.isAuthenticated && method !== 'user.login') {
+            if (this.isSimulated) return this.getMockData(method, params);
+            throw new Error('Not authenticated');
         }
-
         try {
-            const response = await api.post(this.proxyUrl, {
-                jsonrpc: '2.0',
-                method,
-                params: {
-                    ...params,
-                    output: params.output || 'extend'
-                },
-                auth: this.authToken,
-                id: 1
-            });
+            const payload = {
+                jsonrpc: '2.0', method,
+                params: { ...params, output: params.output || 'extend' },
+                auth: this.authToken, id: 1
+            };
+            if (method.toLowerCase() === 'apiinfo.version') { delete payload.auth; payload.params = []; }
 
-            if (response.error) {
-                throw new Error(response.error.message);
-            }
-
+            const response = await api.post(this.proxyUrl, payload);
+            if (response.error) throw new Error(response.error.message);
             return response.result;
         } catch (err) {
-            console.error(`Zabbix API request failed (${method}):`, err);
-            // Fallback para simulação em caso de erro de rede
             if (this.isSimulated) return this.getMockData(method, params);
             throw err;
         }
     }
 
-    /**
-     * Gera dados falsos para o modo de simulação
-     */
-    async getMockData(method, params) {
-        // Simula latência de rede
-        await new Promise(resolve => setTimeout(resolve, 200));
-
-        switch (method) {
-            case 'hostgroup.get':
-                return [
-                    { groupid: '1', name: 'Lojas/Brasil' },
-                    { groupid: '2', name: 'Lojas/Argentina' }
-                ];
-            
-            case 'host.get':
-                // Retorna um host fictício
-                return [{
-                    hostid: '10001',
-                    host: 'FortiGate-SIMULADO',
-                    name: 'Firewall Simulado',
-                    status: '0', // Monitorado
-                    interfaces: [{ ip: '192.168.1.1', main: '1' }],
-                    inventory: { os: 'FortiOS', hardware: 'FortiGate-60F' }
-                }];
-
-            case 'item.get':
-                // Gera itens com valores aleatórios
-                const items = [];
-                const searchName = params.search?.name || '';
-                const searchKey = params.search?.key_ || '';
-                
-                // Lista de itens padrão para simular
-                const mockItems = [
-                    { name: 'CPU utilization', key_: 'system.cpu.util', units: '%', val: () => Math.floor(Math.random() * 30) },
-                    { name: 'ICMP response time', key_: 'icmppingsec', units: 's', val: () => (Math.random() * 0.05).toFixed(4) },
-                    { name: 'ICMP packet loss', key_: 'icmppingloss', units: '%', val: () => 0 },
-                    { name: 'Device uptime', key_: 'system.uptime', units: 's', val: () => 864000 + Math.floor(Math.random() * 1000) },
-                    { name: 'Uptime', key_: 'uptime', units: 's', val: () => 864000 },
-                    { name: 'wan1 Operational status', key_: 'net.if.status[wan1]', units: '', val: () => 1 },
-                    { name: 'wan2 Operational status', key_: 'net.if.status[wan2]', units: '', val: () => 1 },
-                    { name: 'wan1 Speed', key_: 'net.if.speed[wan1]', units: 'bps', val: () => 100000000 },
-                    { name: 'wan2 Speed', key_: 'net.if.speed[wan2]', units: 'bps', val: () => 50000000 },
-                    { name: 'wan1 Bits sent', key_: 'net.if.out[wan1]', units: 'bps', val: () => Math.floor(Math.random() * 5000000) },
-                    { name: 'wan1 Bits received', key_: 'net.if.in[wan1]', units: 'bps', val: () => Math.floor(Math.random() * 8000000) },
-                    { name: 'wan2 Bits sent', key_: 'net.if.out[wan2]', units: 'bps', val: () => Math.floor(Math.random() * 1000000) },
-                    { name: 'wan2 Bits received', key_: 'net.if.in[wan2]', units: 'bps', val: () => Math.floor(Math.random() * 2000000) },
-                    { name: 'wan1 Duplex status', key_: 'net.if.duplex[wan1]', units: '', val: () => 3 }, // Full duplex
-                    { name: 'wan2 Duplex status', key_: 'net.if.duplex[wan2]', units: '', val: () => 3 }
-                ];
-
-                // Filtra os itens baseados na busca
-                mockItems.forEach((m, idx) => {
-                    // Lógica simplificada de match
-                    if (!searchName || searchName.split(',').some(n => m.name.includes(n))) {
-                        items.push({
-                            itemid: `sim_item_${idx}`,
-                            name: m.name,
-                            key_: m.key_,
-                            lastvalue: m.val().toString(),
-                            units: m.units,
-                            value_type: '0' // numérico
-                        });
-                    }
-                });
-                return items;
-
-            case 'history.get':
-                // Gera histórico para gráficos
-                const history = [];
-                const now = Math.floor(Date.now() / 1000);
-                // Gera 20 pontos
-                for (let i = 20; i >= 0; i--) {
-                    history.push({
-                        clock: now - (i * 300), // a cada 5 min
-                        value: (Math.random() * 20).toFixed(2)
-                    });
-                }
-                return history;
-
-            case 'problem.get':
-                return []; // Sem problemas no modo simulado
-
-            case 'APIInfo.version':
-                return "6.0.0 (Simulado)";
-
-            default:
-                return [];
-        }
-    }
-
-    // ... (Resto dos métodos originais: getHostGroups, getHostsByGroupId, etc. mantêm-se iguais)
-    // Eles chamarão o this.request(), que agora trata a simulação.
-
-    async getHostGroups() {
-        return await this.request('hostgroup.get', { output: ['groupid', 'name'] });
-    }
-
-    async getHostsByGroupId(groupId) {
-        return await this.request('host.get', {
-            groupids: groupId,
-            output: ['hostid', 'host', 'name', 'status'],
-            selectInterfaces: 'extend'
-        });
-    }
-
-    async getHost(hostId) {
-        return await this.request('host.get', {
-            hostids: hostId,
-            output: 'extend',
-            selectInterfaces: 'extend',
-            selectInventory: 'extend'
-        });
-    }
-
-    async getItemsByKeyPattern(hostId, keyPattern) {
-        return await this.request('item.get', {
-            hostids: hostId,
-            output: ['itemid', 'name', 'key_', 'lastvalue', 'units', 'value_type'],
-            search: { key_: keyPattern }
-        });
-    }
+    async getHostGroups() { return this.request('hostgroup.get', { output: ['groupid', 'name'] }); }
+    async getHostsByGroupId(gid) { return this.request('host.get', { groupids: gid, output: ['hostid', 'host', 'name'], selectInterfaces: 'extend', selectInventory: 'extend' }); }
 
     async getItemsByNamePattern(hostId, namePattern) {
         const items = await this.request('item.get', {
             hostids: hostId,
-            output: ['itemid', 'name', 'key_', 'lastvalue', 'units', 'value_type'],
-            search: { name: namePattern }
+            output: ['itemid', 'name', 'key_', 'lastvalue', 'units']
         });
-
-        const itemsByName = {};
-        items.forEach(item => {
-            itemsByName[item.name] = {
-                value: item.lastvalue,
-                units: item.units,
-                value_type: item.value_type,
-                key: item.key_
-            };
-        });
-
-        return itemsByName;
-    }
-
-    async getItemHistory(itemId, hours = 4) {
-        const timeFrom = Math.floor(Date.now() / 1000) - (hours * 3600);
-        return await this.request('history.get', {
-            itemids: itemId,
-            output: 'extend',
-            time_from: timeFrom,
-            sortfield: 'clock',
-            sortorder: 'ASC'
-        });
-    }
-
-    async getMultipleItemHistory(itemRequests) {
-        const results = {};
-        for (const [itemId, hours] of Object.entries(itemRequests)) {
-            try {
-                const history = await this.getItemHistory(itemId, hours);
-                results[itemId] = history;
-            } catch (err) {
-                console.error(`Failed to get history for item ${itemId}:`, err);
-                results[itemId] = [];
-            }
+        const map = {};
+        if (Array.isArray(items)) {
+            items.forEach(i => map[i.name] = { value: i.lastvalue, units: i.units, key: i.key_ });
         }
-        return results;
+        return map;
     }
 
-    async getHostProblems(hostId) {
-        return await this.request('problem.get', {
-            hostids: hostId,
-            output: 'extend'
-        });
-    }
+    async getHostProblems(hostId) { return this.request('problem.get', { hostids: hostId, output: 'extend' }); }
 
-    async getTriggers(triggerIds) {
-        return await this.request('trigger.get', {
-            triggerids: triggerIds,
-            output: 'extend'
-        });
-    }
-
-    async getMaintenances() {
-        return await this.request('maintenance.get', { output: 'extend' });
+    async getMockData(method, params) {
+        await new Promise(r => setTimeout(r, 100));
+        if (method === 'hostgroup.get') return [{ groupid: '1', name: 'Lojas/Brasil' }];
+        if (method === 'host.get') return [{ hostid: '100', name: 'Firewall Simulado', inventory: { os: 'FortiOS' } }];
+        if (method === 'item.get') {
+            return [
+                { name: 'CPU utilization', lastvalue: '25', units: '%' },
+                { name: 'ICMP response time', lastvalue: '0.045', units: 's' },
+                { name: 'ICMP packet loss', lastvalue: '0', units: '%' },
+                { name: 'Uptime', lastvalue: '123456', units: 's' },
+                { name: 'Device uptime', lastvalue: '123456', units: 's' },
+                { name: 'wan1 Operational status', lastvalue: '1', units: '' },
+                { name: 'wan1 Speed', lastvalue: '100000000', units: 'bps' },
+                { name: 'wan1 Bits sent', lastvalue: '500000', units: 'bps' },
+                { name: 'wan1 Bits received', lastvalue: '800000', units: 'bps' },
+                { name: 'wan1 Duplex status', lastvalue: '3', units: '' },
+                { name: 'wan2 Operational status', lastvalue: '1', units: '' },
+                { name: 'wan2 Speed', lastvalue: '50000000', units: 'bps' },
+                { name: 'wan2 Bits sent', lastvalue: '100000', units: 'bps' },
+                { name: 'wan2 Bits received', lastvalue: '200000', units: 'bps' },
+                { name: 'wan2 Duplex status', lastvalue: '3', units: '' }
+            ];
+        }
+        return [];
     }
 
     async testConnection() {
         try {
-            const version = await this.request('APIInfo.version');
-            return {
-                success: true,
-                version,
-                message: `Conectado ao Zabbix ${version}`
-            };
+            const version = await this.request('apiinfo.version');
+            return { success: true, version, message: `Conectado ao Zabbix ${version}` };
         } catch (err) {
-            return {
-                success: false,
-                error: err.message,
-                message: 'Falha na conexão com Zabbix'
-            };
+            return { success: false, error: err.message, message: 'Falha na conexão com Zabbix' };
         }
     }
 }
+
+class ZabbixDataProcessor {
+    static processDashboardData(itemsData, problems, deviceType) {
+        const dash = { uptime: '--', cpu: '--', latency: '--', loss: '--', dynamic: {} };
+
+        const find = (parts) => {
+            if (!itemsData) return null;
+            let source = itemsData;
+            if (Array.isArray(itemsData)) { source = {}; itemsData.forEach(i => source[i.name] = i); }
+            for (const [name, item] of Object.entries(source)) {
+                if (parts.every(p => name.toLowerCase().includes(p.toLowerCase()))) return item;
+            }
+            return null;
+        };
+
+        const upItem = find(['uptime']);
+        if (upItem) dash.uptime = formatUptime(parseInt(upItem.value));
+        const cpuItem = find(['cpu']);
+        if (cpuItem) dash.cpu = parseFloat(cpuItem.value).toFixed(1);
+        const latItem = find(['icmp', 'time']) || find(['response', 'time']);
+        if (latItem) dash.latency = (parseFloat(latItem.value) * 1000).toFixed(1) + ' ms';
+        const lossItem = find(['loss']);
+        if (lossItem) dash.loss = parseFloat(lossItem.value).toFixed(1) + '%';
+
+        if (deviceType === 'fortinet_firewall') {
+            const getVal = (k) => { const i = find(k); return i ? i.value : null; };
+            dash.dynamic.wan1Status = getVal(['wan1', 'status']) == '1' ? 'UP' : 'DOWN';
+            dash.dynamic.wan1Speed = formatBandwidth(getVal(['wan1', 'speed']));
+            dash.dynamic.wan1Duplex = getVal(['wan1', 'duplex']) == '3' ? 'Full' : 'Half';
+            dash.dynamic.wan1Upload = formatBandwidth(getVal(['wan1', 'sent']));
+            dash.dynamic.wan1Download = formatBandwidth(getVal(['wan1', 'received']));
+            dash.dynamic.wan2Status = getVal(['wan2', 'status']) == '1' ? 'UP' : 'DOWN';
+            dash.dynamic.wan2Speed = formatBandwidth(getVal(['wan2', 'speed']));
+            dash.dynamic.wan2Duplex = getVal(['wan2', 'duplex']) == '3' ? 'Full' : 'Half';
+            dash.dynamic.wan2Upload = formatBandwidth(getVal(['wan2', 'sent']));
+            dash.dynamic.wan2Download = formatBandwidth(getVal(['wan2', 'received']));
+        }
+        return dash;
+    }
+}
+
+// PERFIS DE COMANDO - DEFINIÇÃO GLOBAL
+const ZABBIX_COMMAND_PROFILES = {
+    default: [],
+    fortinet_firewall: [
+        { name: 'Mostrar Status', command: 'get system status' },
+        { name: 'Tabela ARP', command: 'get sys arp' },
+        { name: 'Rotas', command: 'get router info routing-table all' },
+        { name: 'Interfaces', command: 'get system interface physical' }
+    ],
+    cisco_router: [
+        { name: 'Show IP Int Brief', command: 'show ip interface brief' },
+        { name: 'Show Run', command: 'show running-config' },
+        { name: 'Show ARP', command: 'show ip arp' }
+    ],
+    cisco_switch: [
+        { name: 'Show Int Status', command: 'show interfaces status' },
+        { name: 'Show Mac Address', command: 'show mac address-table' }
+    ]
+};
+
+// EXPOR PARA O WINDOW (Correção Crucial)
+window.ZabbixClient = ZabbixClient;
+window.ZabbixDataProcessor = ZabbixDataProcessor;
+window.ZABBIX_COMMAND_PROFILES = ZABBIX_COMMAND_PROFILES;
