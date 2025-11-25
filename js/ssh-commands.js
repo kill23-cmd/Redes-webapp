@@ -410,8 +410,10 @@ Release 1808P35, H3C S12504
                         .exit-code-error { background: #ef444420; color: #ef4444; }
                         .controls { display: flex; align-items: center; gap: 10px; background: #3f3f46; padding: 8px 12px; border-radius: 6px; }
                         .refresh-label { font-size: 14px; user-select: none; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-                        .refresh-spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #38bdf8; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
-                        .timestamp-banner { background: #000; color: #fff; padding: 5px 10px; margin-bottom: 15px; font-weight: bold; border-left: 3px solid #38bdf8; }
+                        .refresh-control { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+                        .interval-select { background: #0f172a; color: white; border: 1px solid #334155; padding: 5px; border-radius: 4px; }
+                        .interval-select option { background: #0f172a; color: white; }
+                        .timestamp-banner { background: #334155; color: #38bdf8; padding: 10px; text-align: center; border-radius: 4px; margin-bottom: 15px; font-weight: bold; border: 1px solid #38bdf8; }
                         select.interval-select { background: #27272a; color: #fff; border: 1px solid #52525b; padding: 2px 5px; border-radius: 4px; }
                         @keyframes spin { to { transform: rotate(360deg); } }
                     </style>

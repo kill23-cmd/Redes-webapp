@@ -72,12 +72,19 @@ class ConfigManager {
 
         // 2. Save to Server
         try {
+            // Create a copy of config to sanitize
+            const serverConfig = JSON.parse(JSON.stringify(this.config));
+
+            // Remove sensitive data
+            if (serverConfig.zabbix) delete serverConfig.zabbix.password;
+            if (serverConfig.ssh) delete serverConfig.ssh.password;
+
             const response = await fetch('/api/config', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(this.config)
+                body: JSON.stringify(serverConfig)
             });
 
             if (response.ok) {
