@@ -1,22 +1,19 @@
 class ChartManager {
     constructor() {
         this.charts = {};
-        this.defaultOptions = this.getDefaultChartOptions();
-    }
-
-    getDefaultChartOptions() {
-        return {
+        this.defaultOptions = {
             responsive: true, maintainAspectRatio: false,
-            animation: { duration: 0 }, // Desativa animação para update rápido
-            plugins: {
-                legend: { labels: { color: 'var(--neutral-200)' } }
-            },
+            animation: { duration: 0 },
+            plugins: { legend: { labels: { color: 'var(--text-main)' } } },
             scales: {
                 x: {
                     type: 'time', time: { unit: 'minute', displayFormats: { minute: 'HH:mm' } },
-                    grid: { color: 'var(--neutral-800)' }, ticks: { color: 'var(--neutral-400)' }
+                    grid: { color: 'var(--border)' }, ticks: { color: 'var(--text-muted)' }
                 },
-                y: { grid: { color: 'var(--neutral-800)' }, ticks: { color: 'var(--neutral-400)' } }
+                y: {
+                    grid: { color: 'var(--border)' }, ticks: { color: 'var(--text-muted)' },
+                    beginAtZero: true
+                }
             }
         };
     }
@@ -29,7 +26,7 @@ class ChartManager {
         const ctx = canvas.getContext('2d');
         const config = {
             type: 'doughnut',
-            data: { datasets: [{ data: [0, 100], backgroundColor: ['var(--primary-300)', 'var(--neutral-800)'], borderWidth: 0, cutout: '75%' }] },
+            data: { datasets: [{ data: [0, 100], backgroundColor: ['var(--accent)', 'var(--bg-card-hover)'], borderWidth: 0, cutout: '75%' }] },
             options: { rotation: -90, circumference: 180, plugins: { legend: { display: false }, tooltip: { enabled: false } } }
         };
         this.charts[canvasId] = new Chart(ctx, config);
@@ -42,9 +39,9 @@ class ChartManager {
 
         const val = Math.max(0, Math.min(100, percentage));
         chart.data.datasets[0].data = [val, 100 - val];
-        let color = 'var(--primary-300)';
-        if (val > 80) color = 'var(--error)'; else if (val > 60) color = 'var(--warning)';
-        chart.data.datasets[0].backgroundColor = [color, 'var(--neutral-800)'];
+        let color = 'var(--accent)';
+        if (val > 80) color = 'var(--error)'; else if (val > 60) color = '#f59e0b';
+        chart.data.datasets[0].backgroundColor = [color, 'var(--bg-card-hover)'];
         chart.update();
     }
 
@@ -58,8 +55,8 @@ class ChartManager {
             type: 'line',
             data: {
                 datasets: [
-                    { label: 'Upload (Mbps)', data: [], borderColor: 'var(--primary-300)', backgroundColor: 'rgba(0, 184, 217, 0.1)', fill: true },
-                    { label: 'Download (Mbps)', data: [], borderColor: 'var(--success)', backgroundColor: 'rgba(34, 197, 94, 0.1)', fill: true }
+                    { label: 'Upload (Mbps)', data: [], borderColor: 'var(--accent)', backgroundColor: 'rgba(56, 189, 248, 0.1)', fill: true, borderWidth: 1 },
+                    { label: 'Download (Mbps)', data: [], borderColor: 'var(--success)', backgroundColor: 'rgba(34, 197, 94, 0.1)', fill: true, borderWidth: 1 }
                 ]
             },
             options: this.defaultOptions

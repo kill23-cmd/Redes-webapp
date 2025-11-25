@@ -53,12 +53,12 @@ class ZabbixClient {
     async getHostsByGroupId(gid) { return this.request('host.get', { groupids: gid, output: ['hostid', 'host', 'name'], selectInterfaces: 'extend', selectInventory: 'extend' }); }
 
     async getItemsByNamePattern(hostId, namePattern) {
-        // Busca items reais
+        // Removemos o filtro search do lado servidor para garantir que pegamos tudo e filtramos no JS
+        // Isso resolve problemas com nomes complexos
         const items = await this.request('item.get', {
             hostids: hostId,
             output: ['itemid', 'name', 'key_', 'lastvalue', 'units']
         });
-        // Retorna mapa para facil acesso
         const map = {};
         if (Array.isArray(items)) {
             items.forEach(i => map[i.name] = { value: i.lastvalue, units: i.units, key: i.key_, itemid: i.itemid });
@@ -69,26 +69,17 @@ class ZabbixClient {
     async getItemHistory(itemId, hours = 1) {
         const timeFrom = Math.floor(Date.now() / 1000) - (hours * 3600);
         return await this.request('history.get', {
-            itemids: itemId, output: 'extend', time_from: timeFrom, sortfield: 'clock', sortorder: 'ASC'
+            itemids: itemId, output: 'extend', time_from: timeFrom, sortfield: 'clock', sortorder: 'ASC', limit: 100
         });
     }
 
     async getHostProblems(hostId) {
         return this.request('problem.get', {
-            hostids: hostId,
-            output: 'extend',
-            sortfield: ['eventid'],
-            sortorder: 'DESC'
+            hostids: hostId, output: 'extend', sortfield: ['eventid'], sortorder: 'DESC'
         });
     }
 
-    // Mock
-    async getMockData(method, params) {
-        await new Promise(r => setTimeout(r, 100));
-        if (method === 'hostgroup.get') return [{ groupid: '1', name: 'Lojas/Brasil' }];
-        if (method === 'host.get') return [{ hostid: '100', name: 'FW-MOCK', inventory: { os: 'FortiOS' } }];
-        return [];
-    }
+    async getMockData() { return []; } // Simplificado
     async testConnection() { return { success: true, version: '7.0', message: 'OK' }; }
 }
 
@@ -96,22 +87,20 @@ class ZabbixDataProcessor {
     static processDashboardData(itemsData, problems, deviceType) {
         const dash = { uptime: '--', cpu: '--', latency: '--', loss: '--', memory: '--', dynamic: { problems: [] } };
 
-        // Função de busca ultra-flexível
         const find = (terms) => {
             if (!itemsData) return null;
-            // Normaliza
             let source = itemsData;
             if (Array.isArray(itemsData)) { source = {}; itemsData.forEach(i => source[i.name] = i); }
 
             for (const [name, item] of Object.entries(source)) {
+                // Busca flexível (case insensitive e parcial)
                 const nameLow = name.toLowerCase();
-                // Verifica se TODOS os termos estão no nome
                 if (terms.every(term => nameLow.includes(term.toLowerCase()))) return item;
             }
             return null;
         };
 
-        // 1. CPU (Tenta várias combinações comuns)
+        // 1. CPU
         const cpuItem = find(['cpu', 'util']) || find(['cpu', 'load']) || find(['cpu', 'usage']) || find(['processor', 'load']);
         if (cpuItem) dash.cpu = parseFloat(cpuItem.value).toFixed(1);
 
@@ -119,19 +108,18 @@ class ZabbixDataProcessor {
         const upItem = find(['uptime']);
         if (upItem) dash.uptime = formatUptime(parseInt(upItem.value));
 
-        // 3. Latência/Perda (ICMP Ping)
+        // 3. Latência/Perda
         const latItem = find(['icmp', 'time']) || find(['ping', 'time']) || find(['response', 'time']);
         if (latItem) dash.latency = (parseFloat(latItem.value) * 1000).toFixed(1) + ' ms';
 
         const lossItem = find(['icmp', 'loss']) || find(['ping', 'loss']) || find(['packet', 'loss']);
         if (lossItem) dash.loss = parseFloat(lossItem.value).toFixed(1) + '%';
 
-        // 4. Memória (Cálculo inteligente)
+        // 4. Memória
         const memUtil = find(['memory', 'util']) || find(['memory', 'usage']);
         if (memUtil && memUtil.units.includes('%')) {
             dash.memory = parseFloat(memUtil.value).toFixed(1);
         } else {
-            // Tenta calcular se tiver usado/total
             const memUsed = find(['memory', 'used']);
             const memTotal = find(['memory', 'total']);
             if (memUsed && memTotal && parseFloat(memTotal.value) > 0) {
@@ -139,37 +127,33 @@ class ZabbixDataProcessor {
             }
         }
 
-        // 5. Lógica Específica por Dispositivo
+        // 5. Lógica Específica
         if (deviceType === 'fortinet_firewall') {
-            const getVal = (keys) => {
-                // Tenta encontrar com 'wan1' e depois com as chaves
-                const i = find(['wan1', ...keys]);
-                return i ? i.value : null;
+            const getVal = (keys) => { const i = find(keys); return i ? i.value : null; };
+
+            // Status mais inteligente (aceita '1', 'up', 'Up')
+            const checkStatus = (val) => {
+                if (!val) return 'DOWN';
+                return (val == '1' || val.toLowerCase() == 'up') ? 'UP' : 'DOWN';
             };
 
-            const mapStatus = (v) => v == '1' ? 'UP' : 'DOWN';
+            dash.dynamic.wan1Status = checkStatus(getVal(['wan1', 'status']));
+            dash.dynamic.wan1Speed = formatBandwidth(getVal(['wan1', 'speed']));
 
-            // WAN 1
-            dash.dynamic.wan1Status = mapStatus(find(['wan1', 'status'])?.value);
-            dash.dynamic.wan1Speed = formatBandwidth(find(['wan1', 'speed'])?.value);
-            // Tráfego: Tenta 'sent', 'out', 'upload'
-            dash.dynamic.wan1Upload = formatBandwidth(find(['wan1', 'sent'])?.value || find(['wan1', 'out'])?.value);
-            dash.dynamic.wan1Download = formatBandwidth(find(['wan1', 'received'])?.value || find(['wan1', 'in'])?.value);
+            // Tenta várias chaves para tráfego
+            // Melhorando a busca para evitar pegar "discarded" ou "errors"
+            dash.dynamic.wan1Upload = formatBandwidth(getVal(['wan1', 'bits sent']) || getVal(['wan1', 'out']) || getVal(['wan1', 'upload']));
+            dash.dynamic.wan1Download = formatBandwidth(getVal(['wan1', 'bits received']) || getVal(['wan1', 'in']) || getVal(['wan1', 'download']));
 
-            // WAN 2
-            dash.dynamic.wan2Status = mapStatus(find(['wan2', 'status'])?.value);
-            dash.dynamic.wan2Speed = formatBandwidth(find(['wan2', 'speed'])?.value);
-            dash.dynamic.wan2Upload = formatBandwidth(find(['wan2', 'sent'])?.value || find(['wan2', 'out'])?.value);
-            dash.dynamic.wan2Download = formatBandwidth(find(['wan2', 'received'])?.value || find(['wan2', 'in'])?.value);
+            dash.dynamic.wan2Status = checkStatus(getVal(['wan2', 'status']));
+            dash.dynamic.wan2Speed = formatBandwidth(getVal(['wan2', 'speed']));
+            dash.dynamic.wan2Upload = formatBandwidth(getVal(['wan2', 'bits sent']) || getVal(['wan2', 'out']));
+            dash.dynamic.wan2Download = formatBandwidth(getVal(['wan2', 'bits received']) || getVal(['wan2', 'in']));
         }
         else if (deviceType.includes('switch')) {
-            // Para switches, contamos problemas de interface
             if (problems && Array.isArray(problems)) {
-                // Filtra problemas que contêm "Interface" ou "Link" ou "Down"
                 const ifProblems = problems.filter(p =>
-                    p.name.toLowerCase().includes('interface') ||
-                    p.name.toLowerCase().includes('link') ||
-                    p.name.toLowerCase().includes('port')
+                    p.name.toLowerCase().includes('interface') || p.name.toLowerCase().includes('link') || p.name.toLowerCase().includes('port')
                 );
                 dash.dynamic.interfacesDown = ifProblems.length;
                 dash.dynamic.problems = ifProblems.map(p => p.name);
@@ -182,30 +166,39 @@ class ZabbixDataProcessor {
     }
 }
 
+// PERFIS DE COMANDO ATUALIZADOS
 const ZABBIX_COMMAND_PROFILES = {
     default: [],
     fortinet_firewall: [
-        { name: 'Mostrar Status', command: 'get system status' },
+        { name: 'Get System Status', command: 'get system status' },
+        { name: 'Get Interface', command: 'get system interface physical' },
         { name: 'Tabela ARP', command: 'get sys arp' },
         { name: 'Rotas', command: 'get router info routing-table all' },
-        { name: 'Interfaces', command: 'get system interface physical' }
+        { name: 'Sessões', command: 'get system session status' },
+        { name: 'Top System', command: 'diagnose sys top 5' }
     ],
     cisco_router: [
         { name: 'Show IP Int Brief', command: 'show ip interface brief' },
         { name: 'Show Run', command: 'show running-config' },
-        { name: 'Show ARP', command: 'show ip arp' }
+        { name: 'Show ARP', command: 'show ip arp' },
+        { name: 'Show Routes', command: 'show ip route' }
     ],
     cisco_switch: [
         { name: 'Show Int Status', command: 'show interfaces status' },
         { name: 'Show Mac Address', command: 'show mac address-table' },
-        { name: 'Show VLANs', command: 'show vlan brief' }
+        { name: 'Show VLANs', command: 'show vlan brief' },
+        { name: 'Show Power Inline', command: 'show power inline' },
+        { name: 'Show Log', command: 'show logging | include %LINK' }
     ],
     access_point: [
         { name: 'Show CDP Neighbors', command: 'show cdp neighbors' },
-        { name: 'Show IP Int Brief', command: 'show ip interface brief' }
+        { name: 'Show IP Int Brief', command: 'show ip interface brief' },
+        { name: 'Show Clients', command: 'show client summary' }
     ]
 };
 
 if (typeof module !== 'undefined') {
     module.exports = { ZabbixClient, ZabbixDataProcessor, ZABBIX_COMMAND_PROFILES };
 }
+// Expose to window for dashboard.js
+window.ZABBIX_COMMAND_PROFILES = ZABBIX_COMMAND_PROFILES;

@@ -1,0 +1,904 @@
+🖥️ Host selecionado: BRNOSADM01FW250 (ID: 10512)
+📋 Total de itens encontrados: 3320
+
+--- ITENS RELACIONADOS A WAN/INTERFACE ---
+ID: 1409466 | Nome: Interface ssl.root(SSL VPN interface): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[10] | Valor: 0 bps
+ID: 1409467 | Nome: Interface lan(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[11] | Valor: 0 bps
+ID: 1409468 | Nome: Interface fortilink(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[12] | Valor: 0 bps
+ID: 1409469 | Nome: Interface port11(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[13] | Valor: 0 bps
+ID: 1409470 | Nome: Interface port4(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[14] | Valor: 0 bps
+ID: 1409471 | Nome: Interface port2(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[15] | Valor: 0 bps
+ID: 1409472 | Nome: Interface VLAN_MGMT_AP(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[16] | Valor: 0 bps
+ID: 1409473 | Nome: Interface VLAN_WLAN11(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[17] | Valor: 0 bps
+ID: 1409474 | Nome: Interface cswlan11(b): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[18] | Valor: 0 bps
+ID: 1409475 | Nome: Interface CENCONET(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[19] | Valor: 0 bps
+ID: 1409457 | Nome: Interface dmz(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[1] | Valor: 0 bps
+ID: 1409476 | Nome: Interface cenconet(b): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[20] | Valor: 0 bps
+ID: 1409477 | Nome: Interface VLAN_WLAN12(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[21] | Valor: 0 bps
+ID: 1409478 | Nome: Interface cswlan12(b): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[22] | Valor: 0 bps
+ID: 1409479 | Nome: Interface port1(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[23] | Valor: 0 bps
+ID: 1409480 | Nome: Interface port3(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[24] | Valor: 0 bps
+ID: 1409481 | Nome: Interface port5(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[25] | Valor: 0 bps
+ID: 1409482 | Nome: Interface port6(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[26] | Valor: 0 bps
+ID: 1409483 | Nome: Interface port7(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[27] | Valor: 0 bps
+ID: 1409484 | Nome: Interface port8(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[28] | Valor: 0 bps
+ID: 1409485 | Nome: Interface port9(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[29] | Valor: 0 bps
+ID: 1409458 | Nome: Interface mgmt(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[2] | Valor: 0 bps
+ID: 1409486 | Nome: Interface port10(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[30] | Valor: 0 bps
+ID: 1409487 | Nome: Interface port12(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[31] | Valor: 0 bps
+ID: 1409488 | Nome: Interface port13(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[32] | Valor: 0 bps
+ID: 1409489 | Nome: Interface port14(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[33] | Valor: 0 bps
+ID: 1409490 | Nome: Interface port15(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[34] | Valor: 0 bps
+ID: 1409491 | Nome: Interface port16(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[35] | Valor: 0 bps
+ID: 1409492 | Nome: Interface port17(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[36] | Valor: 0 bps
+ID: 1409493 | Nome: Interface port18(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[37] | Valor: 0 bps
+ID: 1409494 | Nome: Interface port19(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[38] | Valor: 0 bps
+ID: 1409495 | Nome: Interface port20(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[39] | Valor: 0 bps
+ID: 1409459 | Nome: Interface wan1(Super Connect): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[3] | Valor: 0 bps
+ID: 1409496 | Nome: Interface CABEADA(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[40] | Valor: 0 bps
+ID: 1409497 | Nome: Interface Uplink Core(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[41] | Valor: 0 bps
+ID: 1409498 | Nome: Interface default(default.fortilink): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[42] | Valor: 0 bps
+ID: 1409499 | Nome: Interface quarantine(quarantine.fortilink): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[43] | Valor: 0 bps
+ID: 1409500 | Nome: Interface voice(voice.fortilink): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[44] | Valor: 0 bps
+ID: 1409501 | Nome: Interface video(video.fortilink): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[45] | Valor: 0 bps
+ID: 1409502 | Nome: Interface rspan(rspan.fortilink): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[46] | Valor: 0 bps
+ID: 1409503 | Nome: Interface onboarding(onboarding.fortilink): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[47] | Valor: 0 bps
+ID: 1409504 | Nome: Interface Clientes_Cenco(b): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[48] | Valor: 0 bps
+ID: 1409505 | Nome: Interface ClienteCenco(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[49] | Valor: 0 bps
+ID: 1409460 | Nome: Interface wan2(BR Digital): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[4] | Valor: 0 bps
+ID: 1409506 | Nome: Interface LG(b): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[50] | Valor: 0 bps
+ID: 1409507 | Nome: Interface PWC(b): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[51] | Valor: 0 bps
+ID: 1409508 | Nome: Interface ClienteCenco2(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[52] | Valor: 0 bps
+ID: 1559702 | Nome: Interface WLSPARK(b): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[53] | Valor: 0 bps
+ID: 1564537 | Nome: Interface CSWLAN15(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[54] | Valor: 0 bps
+ID: 1564552 | Nome: Interface cswlan15(b): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[55] | Valor: 0 bps
+ID: 1570310 | Nome: Interface cenconetCD(b): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[56] | Valor: 0 bps
+ID: 1409461 | Nome: Interface ha1(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[5] | Valor: 0 bps
+ID: 1409462 | Nome: Interface ha2(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[6] | Valor: 0 bps
+ID: 1409463 | Nome: Interface x1(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[7] | Valor: 0 bps
+ID: 1409464 | Nome: Interface x2(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[8] | Valor: 0 bps
+ID: 1409465 | Nome: Interface modem(): Estimated downstream bandwidth | Key: fgIntfEntEstDownBandwidth.[9] | Valor: 0 bps
+ID: 1409518 | Nome: Interface ssl.root(SSL VPN interface): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[10] | Valor: 0 bps
+ID: 1409519 | Nome: Interface lan(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[11] | Valor: 0 bps
+ID: 1409520 | Nome: Interface fortilink(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[12] | Valor: 0 bps
+ID: 1409521 | Nome: Interface port11(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[13] | Valor: 0 bps
+ID: 1409522 | Nome: Interface port4(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[14] | Valor: 0 bps
+ID: 1409523 | Nome: Interface port2(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[15] | Valor: 0 bps
+ID: 1409524 | Nome: Interface VLAN_MGMT_AP(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[16] | Valor: 0 bps
+ID: 1409525 | Nome: Interface VLAN_WLAN11(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[17] | Valor: 0 bps
+ID: 1409526 | Nome: Interface cswlan11(b): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[18] | Valor: 0 bps
+ID: 1409527 | Nome: Interface CENCONET(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[19] | Valor: 0 bps
+ID: 1409509 | Nome: Interface dmz(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[1] | Valor: 0 bps
+ID: 1409528 | Nome: Interface cenconet(b): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[20] | Valor: 0 bps
+ID: 1409529 | Nome: Interface VLAN_WLAN12(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[21] | Valor: 0 bps
+ID: 1409530 | Nome: Interface cswlan12(b): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[22] | Valor: 0 bps
+ID: 1409531 | Nome: Interface port1(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[23] | Valor: 0 bps
+ID: 1409532 | Nome: Interface port3(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[24] | Valor: 0 bps
+ID: 1409533 | Nome: Interface port5(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[25] | Valor: 0 bps
+ID: 1409534 | Nome: Interface port6(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[26] | Valor: 0 bps
+ID: 1409535 | Nome: Interface port7(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[27] | Valor: 0 bps
+ID: 1409536 | Nome: Interface port8(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[28] | Valor: 0 bps
+ID: 1409537 | Nome: Interface port9(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[29] | Valor: 0 bps
+ID: 1409510 | Nome: Interface mgmt(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[2] | Valor: 0 bps
+ID: 1409538 | Nome: Interface port10(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[30] | Valor: 0 bps
+ID: 1409539 | Nome: Interface port12(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[31] | Valor: 0 bps
+ID: 1409540 | Nome: Interface port13(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[32] | Valor: 0 bps
+ID: 1409541 | Nome: Interface port14(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[33] | Valor: 0 bps
+ID: 1409542 | Nome: Interface port15(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[34] | Valor: 0 bps
+ID: 1409543 | Nome: Interface port16(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[35] | Valor: 0 bps
+ID: 1409544 | Nome: Interface port17(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[36] | Valor: 0 bps
+ID: 1409545 | Nome: Interface port18(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[37] | Valor: 0 bps
+ID: 1409546 | Nome: Interface port19(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[38] | Valor: 0 bps
+ID: 1409547 | Nome: Interface port20(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[39] | Valor: 0 bps
+ID: 1409511 | Nome: Interface wan1(Super Connect): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[3] | Valor: 0 bps
+ID: 1409548 | Nome: Interface CABEADA(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[40] | Valor: 0 bps
+ID: 1409549 | Nome: Interface Uplink Core(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[41] | Valor: 0 bps
+ID: 1409550 | Nome: Interface default(default.fortilink): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[42] | Valor: 0 bps
+ID: 1409551 | Nome: Interface quarantine(quarantine.fortilink): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[43] | Valor: 0 bps
+ID: 1409552 | Nome: Interface voice(voice.fortilink): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[44] | Valor: 0 bps
+ID: 1409553 | Nome: Interface video(video.fortilink): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[45] | Valor: 0 bps
+ID: 1409554 | Nome: Interface rspan(rspan.fortilink): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[46] | Valor: 0 bps
+ID: 1409555 | Nome: Interface onboarding(onboarding.fortilink): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[47] | Valor: 0 bps
+ID: 1409556 | Nome: Interface Clientes_Cenco(b): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[48] | Valor: 0 bps
+ID: 1409557 | Nome: Interface ClienteCenco(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[49] | Valor: 0 bps
+ID: 1409512 | Nome: Interface wan2(BR Digital): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[4] | Valor: 0 bps
+ID: 1409558 | Nome: Interface LG(b): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[50] | Valor: 0 bps
+ID: 1409559 | Nome: Interface PWC(b): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[51] | Valor: 0 bps
+ID: 1409560 | Nome: Interface ClienteCenco2(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[52] | Valor: 0 bps
+ID: 1559703 | Nome: Interface WLSPARK(b): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[53] | Valor: 0 bps
+ID: 1564538 | Nome: Interface CSWLAN15(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[54] | Valor: 0 bps
+ID: 1564553 | Nome: Interface cswlan15(b): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[55] | Valor: 0 bps
+ID: 1570311 | Nome: Interface cenconetCD(b): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[56] | Valor: 0 bps
+ID: 1409513 | Nome: Interface ha1(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[5] | Valor: 0 bps
+ID: 1409514 | Nome: Interface ha2(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[6] | Valor: 0 bps
+ID: 1409515 | Nome: Interface x1(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[7] | Valor: 0 bps
+ID: 1409516 | Nome: Interface x2(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[8] | Valor: 0 bps
+ID: 1409517 | Nome: Interface modem(): Estimated upstream bandwidth | Key: fgIntfEntEstUpBandwidth.[9] | Valor: 0 bps
+ID: 1409570 | Nome: Interface ssl.root(SSL VPN interface): VDOM | Key: fgIntfEntVdom.[10] | Valor: 0 
+ID: 1409571 | Nome: Interface lan(): VDOM | Key: fgIntfEntVdom.[11] | Valor: 1 
+ID: 1409572 | Nome: Interface fortilink(): VDOM | Key: fgIntfEntVdom.[12] | Valor: 1 
+ID: 1409573 | Nome: Interface port11(): VDOM | Key: fgIntfEntVdom.[13] | Valor: 1 
+ID: 1409574 | Nome: Interface port4(): VDOM | Key: fgIntfEntVdom.[14] | Valor: 1 
+ID: 1409575 | Nome: Interface port2(): VDOM | Key: fgIntfEntVdom.[15] | Valor: 1 
+ID: 1409576 | Nome: Interface VLAN_MGMT_AP(): VDOM | Key: fgIntfEntVdom.[16] | Valor: 1 
+ID: 1409577 | Nome: Interface VLAN_WLAN11(): VDOM | Key: fgIntfEntVdom.[17] | Valor: 1 
+ID: 1409578 | Nome: Interface cswlan11(b): VDOM | Key: fgIntfEntVdom.[18] | Valor: 1 
+ID: 1409579 | Nome: Interface CENCONET(): VDOM | Key: fgIntfEntVdom.[19] | Valor: 1 
+ID: 1409561 | Nome: Interface dmz(): VDOM | Key: fgIntfEntVdom.[1] | Valor: 1 
+ID: 1409580 | Nome: Interface cenconet(b): VDOM | Key: fgIntfEntVdom.[20] | Valor: 1 
+ID: 1409581 | Nome: Interface VLAN_WLAN12(): VDOM | Key: fgIntfEntVdom.[21] | Valor: 1 
+ID: 1409582 | Nome: Interface cswlan12(b): VDOM | Key: fgIntfEntVdom.[22] | Valor: 1 
+ID: 1409583 | Nome: Interface port1(): VDOM | Key: fgIntfEntVdom.[23] | Valor: 1 
+ID: 1409584 | Nome: Interface port3(): VDOM | Key: fgIntfEntVdom.[24] | Valor: 1 
+ID: 1409585 | Nome: Interface port5(): VDOM | Key: fgIntfEntVdom.[25] | Valor: 1 
+ID: 1409586 | Nome: Interface port6(): VDOM | Key: fgIntfEntVdom.[26] | Valor: 1 
+ID: 1409587 | Nome: Interface port7(): VDOM | Key: fgIntfEntVdom.[27] | Valor: 1 
+ID: 1409588 | Nome: Interface port8(): VDOM | Key: fgIntfEntVdom.[28] | Valor: 1 
+ID: 1409589 | Nome: Interface port9(): VDOM | Key: fgIntfEntVdom.[29] | Valor: 1 
+ID: 1409562 | Nome: Interface mgmt(): VDOM | Key: fgIntfEntVdom.[2] | Valor: 1 
+ID: 1409590 | Nome: Interface port10(): VDOM | Key: fgIntfEntVdom.[30] | Valor: 1 
+ID: 1409591 | Nome: Interface port12(): VDOM | Key: fgIntfEntVdom.[31] | Valor: 1 
+ID: 1409592 | Nome: Interface port13(): VDOM | Key: fgIntfEntVdom.[32] | Valor: 1 
+ID: 1409593 | Nome: Interface port14(): VDOM | Key: fgIntfEntVdom.[33] | Valor: 1 
+ID: 1409594 | Nome: Interface port15(): VDOM | Key: fgIntfEntVdom.[34] | Valor: 1 
+ID: 1409595 | Nome: Interface port16(): VDOM | Key: fgIntfEntVdom.[35] | Valor: 1 
+ID: 1409596 | Nome: Interface port17(): VDOM | Key: fgIntfEntVdom.[36] | Valor: 1 
+ID: 1409597 | Nome: Interface port18(): VDOM | Key: fgIntfEntVdom.[37] | Valor: 1 
+ID: 1409598 | Nome: Interface port19(): VDOM | Key: fgIntfEntVdom.[38] | Valor: 1 
+ID: 1409599 | Nome: Interface port20(): VDOM | Key: fgIntfEntVdom.[39] | Valor: 1 
+ID: 1409563 | Nome: Interface wan1(Super Connect): VDOM | Key: fgIntfEntVdom.[3] | Valor: 1 
+ID: 1409600 | Nome: Interface CABEADA(): VDOM | Key: fgIntfEntVdom.[40] | Valor: 1 
+ID: 1409601 | Nome: Interface Uplink Core(): VDOM | Key: fgIntfEntVdom.[41] | Valor: 1 
+ID: 1409602 | Nome: Interface default(default.fortilink): VDOM | Key: fgIntfEntVdom.[42] | Valor: 1 
+ID: 1409603 | Nome: Interface quarantine(quarantine.fortilink): VDOM | Key: fgIntfEntVdom.[43] | Valor: 1 
+ID: 1409604 | Nome: Interface voice(voice.fortilink): VDOM | Key: fgIntfEntVdom.[44] | Valor: 1 
+ID: 1409605 | Nome: Interface video(video.fortilink): VDOM | Key: fgIntfEntVdom.[45] | Valor: 1 
+ID: 1409606 | Nome: Interface rspan(rspan.fortilink): VDOM | Key: fgIntfEntVdom.[46] | Valor: 1 
+ID: 1409607 | Nome: Interface onboarding(onboarding.fortilink): VDOM | Key: fgIntfEntVdom.[47] | Valor: 1 
+ID: 1409608 | Nome: Interface Clientes_Cenco(b): VDOM | Key: fgIntfEntVdom.[48] | Valor: 1 
+ID: 1409609 | Nome: Interface ClienteCenco(): VDOM | Key: fgIntfEntVdom.[49] | Valor: 1 
+ID: 1409564 | Nome: Interface wan2(BR Digital): VDOM | Key: fgIntfEntVdom.[4] | Valor: 1 
+ID: 1409610 | Nome: Interface LG(b): VDOM | Key: fgIntfEntVdom.[50] | Valor: 1 
+ID: 1409611 | Nome: Interface PWC(b): VDOM | Key: fgIntfEntVdom.[51] | Valor: 1 
+ID: 1409612 | Nome: Interface ClienteCenco2(): VDOM | Key: fgIntfEntVdom.[52] | Valor: 1 
+ID: 1559704 | Nome: Interface WLSPARK(b): VDOM | Key: fgIntfEntVdom.[53] | Valor: 1 
+ID: 1564539 | Nome: Interface CSWLAN15(): VDOM | Key: fgIntfEntVdom.[54] | Valor: 1 
+ID: 1564554 | Nome: Interface cswlan15(b): VDOM | Key: fgIntfEntVdom.[55] | Valor: 1 
+ID: 1570312 | Nome: Interface cenconetCD(b): VDOM | Key: fgIntfEntVdom.[56] | Valor: 1 
+ID: 1409565 | Nome: Interface ha1(): VDOM | Key: fgIntfEntVdom.[5] | Valor: 1 
+ID: 1409566 | Nome: Interface ha2(): VDOM | Key: fgIntfEntVdom.[6] | Valor: 1 
+ID: 1409567 | Nome: Interface x1(): VDOM | Key: fgIntfEntVdom.[7] | Valor: 1 
+ID: 1409568 | Nome: Interface x2(): VDOM | Key: fgIntfEntVdom.[8] | Valor: 1 
+ID: 1409569 | Nome: Interface modem(): VDOM | Key: fgIntfEntVdom.[9] | Valor: 1 
+ID: 1559059 | Nome: Available Bidirectional Bandwidth of Performance SLA SLA_LAN on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthBi.[SLA_LAN.1] | Valor: 0 B
+ID: 1559060 | Nome: Available Bidirectional Bandwidth of Performance SLA SLA_LAN_2 on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthBi.[SLA_LAN_2.1] | Valor: 0 B
+ID: 1559056 | Nome: Available Bidirectional Bandwidth of Performance SLA SLA_PRIVATE on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthBi.[SLA_PRIVATE.1] | Valor: 0 B
+ID: 1559053 | Nome: Available Bidirectional Bandwidth of Performance SLA SLA_PUBLIC on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthBi.[SLA_PUBLIC.1] | Valor: 1766733 B
+ID: 1559054 | Nome: Available Bidirectional Bandwidth of Performance SLA SLA_PUBLIC on SD-WAN member 2 | Key: fgVWLHealthCheckLinkBandwidthBi.[SLA_PUBLIC.2] | Valor: 1972955 B
+ID: 1559055 | Nome: Available Bidirectional Bandwidth of Performance SLA SLA_PUBLIC on SD-WAN member 4 | Key: fgVWLHealthCheckLinkBandwidthBi.[SLA_PUBLIC.4] | Valor: 1909636 B
+ID: 1559057 | Nome: Available Bidirectional Bandwidth of Performance SLA SLA_teams on SD-WAN member 2 | Key: fgVWLHealthCheckLinkBandwidthBi.[SLA_teams.2] | Valor: 0 B
+ID: 1559058 | Nome: Available Bidirectional Bandwidth of Performance SLA SLA_teams on SD-WAN member 4 | Key: fgVWLHealthCheckLinkBandwidthBi.[SLA_teams.4] | Valor: 0 B
+ID: 1559067 | Nome: Available Incoming Bandwidth of Performance SLA SLA_LAN on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthIn.[SLA_LAN.1] | Valor: 0 B
+ID: 1559068 | Nome: Available Incoming Bandwidth of Performance SLA SLA_LAN_2 on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthIn.[SLA_LAN_2.1] | Valor: 0 B
+ID: 1559064 | Nome: Available Incoming Bandwidth of Performance SLA SLA_PRIVATE on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthIn.[SLA_PRIVATE.1] | Valor: 0 B
+ID: 1559061 | Nome: Available Incoming Bandwidth of Performance SLA SLA_PUBLIC on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthIn.[SLA_PUBLIC.1] | Valor: 910729 B
+ID: 1559062 | Nome: Available Incoming Bandwidth of Performance SLA SLA_PUBLIC on SD-WAN member 2 | Key: fgVWLHealthCheckLinkBandwidthIn.[SLA_PUBLIC.2] | Valor: 978205 B
+ID: 1559063 | Nome: Available Incoming Bandwidth of Performance SLA SLA_PUBLIC on SD-WAN member 4 | Key: fgVWLHealthCheckLinkBandwidthIn.[SLA_PUBLIC.4] | Valor: 935970 B
+ID: 1559065 | Nome: Available Incoming Bandwidth of Performance SLA SLA_teams on SD-WAN member 2 | Key: fgVWLHealthCheckLinkBandwidthIn.[SLA_teams.2] | Valor: 0 B
+ID: 1559066 | Nome: Available Incoming Bandwidth of Performance SLA SLA_teams on SD-WAN member 4 | Key: fgVWLHealthCheckLinkBandwidthIn.[SLA_teams.4] | Valor: 0 B
+ID: 1559075 | Nome: Available Outgoing Bandwidth of Performance SLA SLA_LAN on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthOut.[SLA_LAN.1] | Valor: 0 B
+ID: 1559076 | Nome: Available Outgoing Bandwidth of Performance SLA SLA_LAN_2 on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthOut.[SLA_LAN_2.1] | Valor: 0 B
+ID: 1559072 | Nome: Available Outgoing Bandwidth of Performance SLA SLA_PRIVATE on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthOut.[SLA_PRIVATE.1] | Valor: 0 B
+ID: 1559069 | Nome: Available Outgoing Bandwidth of Performance SLA SLA_PUBLIC on SD-WAN member 1 | Key: fgVWLHealthCheckLinkBandwidthOut.[SLA_PUBLIC.1] | Valor: 856004 B
+ID: 1559070 | Nome: Available Outgoing Bandwidth of Performance SLA SLA_PUBLIC on SD-WAN member 2 | Key: fgVWLHealthCheckLinkBandwidthOut.[SLA_PUBLIC.2] | Valor: 994750 B
+ID: 1559071 | Nome: Available Outgoing Bandwidth of Performance SLA SLA_PUBLIC on SD-WAN member 4 | Key: fgVWLHealthCheckLinkBandwidthOut.[SLA_PUBLIC.4] | Valor: 972822 B
+ID: 1559073 | Nome: Available Outgoing Bandwidth of Performance SLA SLA_teams on SD-WAN member 2 | Key: fgVWLHealthCheckLinkBandwidthOut.[SLA_teams.2] | Valor: 0 B
+ID: 1559074 | Nome: Available Outgoing Bandwidth of Performance SLA SLA_teams on SD-WAN member 4 | Key: fgVWLHealthCheckLinkBandwidthOut.[SLA_teams.4] | Valor: 0 B
+ID: 1559083 | Nome: Jitter to SLA_LAN on SD-WAN member 1 | Key: fgVWLHealthCheckLinkJitter[SLA_LAN.1] | Valor: 0 ms
+ID: 1559084 | Nome: Jitter to SLA_LAN_2 on SD-WAN member 1 | Key: fgVWLHealthCheckLinkJitter[SLA_LAN_2.1] | Valor: 0 ms
+ID: 1559080 | Nome: Jitter to SLA_PRIVATE on SD-WAN member 1 | Key: fgVWLHealthCheckLinkJitter[SLA_PRIVATE.1] | Valor: 0 ms
+ID: 1559077 | Nome: Jitter to SLA_PUBLIC on SD-WAN member 1 | Key: fgVWLHealthCheckLinkJitter[SLA_PUBLIC.1] | Valor: 0.057 ms
+ID: 1559078 | Nome: Jitter to SLA_PUBLIC on SD-WAN member 2 | Key: fgVWLHealthCheckLinkJitter[SLA_PUBLIC.2] | Valor: 0.052 ms
+ID: 1559079 | Nome: Jitter to SLA_PUBLIC on SD-WAN member 4 | Key: fgVWLHealthCheckLinkJitter[SLA_PUBLIC.4] | Valor: 0.013 ms
+ID: 1559081 | Nome: Jitter to SLA_teams on SD-WAN member 2 | Key: fgVWLHealthCheckLinkJitter[SLA_teams.2] | Valor: 0 ms
+ID: 1559082 | Nome: Jitter to SLA_teams on SD-WAN member 4 | Key: fgVWLHealthCheckLinkJitter[SLA_teams.4] | Valor: 0 ms
+ID: 1559091 | Nome: Latency to SLA_LAN on SD-WAN member 1 | Key: fgVWLHealthCheckLinkLatency[SLA_LAN.1] | Valor: 0 ms
+ID: 1559092 | Nome: Latency to SLA_LAN_2 on SD-WAN member 1 | Key: fgVWLHealthCheckLinkLatency[SLA_LAN_2.1] | Valor: 0 ms
+ID: 1559088 | Nome: Latency to SLA_PRIVATE on SD-WAN member 1 | Key: fgVWLHealthCheckLinkLatency[SLA_PRIVATE.1] | Valor: 0 ms
+ID: 1559085 | Nome: Latency to SLA_PUBLIC on SD-WAN member 1 | Key: fgVWLHealthCheckLinkLatency[SLA_PUBLIC.1] | Valor: 33.288 ms
+ID: 1559086 | Nome: Latency to SLA_PUBLIC on SD-WAN member 2 | Key: fgVWLHealthCheckLinkLatency[SLA_PUBLIC.2] | Valor: 39.612 ms
+ID: 1559087 | Nome: Latency to SLA_PUBLIC on SD-WAN member 4 | Key: fgVWLHealthCheckLinkLatency[SLA_PUBLIC.4] | Valor: 30.803 ms
+ID: 1559089 | Nome: Latency to SLA_teams on SD-WAN member 2 | Key: fgVWLHealthCheckLinkLatency[SLA_teams.2] | Valor: 0 ms
+ID: 1559090 | Nome: Latency to SLA_teams on SD-WAN member 4 | Key: fgVWLHealthCheckLinkLatency[SLA_teams.4] | Valor: 0 ms
+ID: 1559099 | Nome: Packet Loss to SLA_LAN on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketLoss[SLA_LAN.1] | Valor: 0 %
+ID: 1559100 | Nome: Packet Loss to SLA_LAN_2 on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketLoss[SLA_LAN_2.1] | Valor: 0 %
+ID: 1559096 | Nome: Packet Loss to SLA_PRIVATE on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketLoss[SLA_PRIVATE.1] | Valor: 0 %
+ID: 1559093 | Nome: Packet Loss to SLA_PUBLIC on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketLoss[SLA_PUBLIC.1] | Valor: 0 %
+ID: 1559094 | Nome: Packet Loss to SLA_PUBLIC on SD-WAN member 2 | Key: fgVWLHealthCheckLinkPacketLoss[SLA_PUBLIC.2] | Valor: 0 %
+ID: 1559095 | Nome: Packet Loss to SLA_PUBLIC on SD-WAN member 4 | Key: fgVWLHealthCheckLinkPacketLoss[SLA_PUBLIC.4] | Valor: 0 %
+ID: 1559097 | Nome: Packet Loss to SLA_teams on SD-WAN member 2 | Key: fgVWLHealthCheckLinkPacketLoss[SLA_teams.2] | Valor: 0 %
+ID: 1559098 | Nome: Packet Loss to SLA_teams on SD-WAN member 4 | Key: fgVWLHealthCheckLinkPacketLoss[SLA_teams.4] | Valor: 0 %
+ID: 1559107 | Nome: Packets received from SLA_LAN on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketRecv[SLA_LAN.1] | Valor: 0 
+ID: 1559108 | Nome: Packets received from SLA_LAN_2 on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketRecv[SLA_LAN_2.1] | Valor: 0 
+ID: 1559104 | Nome: Packets received from SLA_PRIVATE on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketRecv[SLA_PRIVATE.1] | Valor: 0 
+ID: 1559101 | Nome: Packets received from SLA_PUBLIC on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketRecv[SLA_PUBLIC.1] | Valor: 0.9417107599890929 
+ID: 1559102 | Nome: Packets received from SLA_PUBLIC on SD-WAN member 2 | Key: fgVWLHealthCheckLinkPacketRecv[SLA_PUBLIC.2] | Valor: 0.9413538394007128 
+ID: 1559103 | Nome: Packets received from SLA_PUBLIC on SD-WAN member 4 | Key: fgVWLHealthCheckLinkPacketRecv[SLA_PUBLIC.4] | Valor: 0.9942812107236281 
+ID: 1559105 | Nome: Packets received from SLA_teams on SD-WAN member 2 | Key: fgVWLHealthCheckLinkPacketRecv[SLA_teams.2] | Valor: 0 
+ID: 1559106 | Nome: Packets received from SLA_teams on SD-WAN member 4 | Key: fgVWLHealthCheckLinkPacketRecv[SLA_teams.4] | Valor: 0 
+ID: 1559115 | Nome: Packets sent to SLA_LAN on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketSend[SLA_LAN.1] | Valor: 0 
+ID: 1559116 | Nome: Packets sent to SLA_LAN_2 on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketSend[SLA_LAN_2.1] | Valor: 0 
+ID: 1559112 | Nome: Packets sent to SLA_PRIVATE on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketSend[SLA_PRIVATE.1] | Valor: 0 
+ID: 1559109 | Nome: Packets sent to SLA_PUBLIC on SD-WAN member 1 | Key: fgVWLHealthCheckLinkPacketSend[SLA_PUBLIC.1] | Valor: 0.9424235474265723 
+ID: 1559110 | Nome: Packets sent to SLA_PUBLIC on SD-WAN member 2 | Key: fgVWLHealthCheckLinkPacketSend[SLA_PUBLIC.2] | Valor: 0.9998695609540644 
+ID: 1559111 | Nome: Packets sent to SLA_PUBLIC on SD-WAN member 4 | Key: fgVWLHealthCheckLinkPacketSend[SLA_PUBLIC.4] | Valor: 0.9832031053662021 
+ID: 1559113 | Nome: Packets sent to SLA_teams on SD-WAN member 2 | Key: fgVWLHealthCheckLinkPacketSend[SLA_teams.2] | Valor: 0 
+ID: 1559114 | Nome: Packets sent to SLA_teams on SD-WAN member 4 | Key: fgVWLHealthCheckLinkPacketSend[SLA_teams.4] | Valor: 0 
+ID: 1559117 | Nome: Health Check State to SLA_PUBLIC on SD-WAN member 1 | Key: fgVWLHealthCheckLinkState[1] | Valor: 0 
+ID: 1559118 | Nome: Health Check State to SLA_PUBLIC on SD-WAN member 2 | Key: fgVWLHealthCheckLinkState[2] | Valor: 0 
+ID: 1559119 | Nome: Health Check State to SLA_PUBLIC on SD-WAN member 4 | Key: fgVWLHealthCheckLinkState[3] | Valor: 0 
+ID: 1559120 | Nome: Health Check State to SLA_PRIVATE on SD-WAN member 1 | Key: fgVWLHealthCheckLinkState[4] | Valor: 0 
+ID: 1559121 | Nome: Health Check State to SLA_teams on SD-WAN member 2 | Key: fgVWLHealthCheckLinkState[5] | Valor: 0 
+ID: 1559122 | Nome: Health Check State to SLA_teams on SD-WAN member 4 | Key: fgVWLHealthCheckLinkState[6] | Valor: 0 
+ID: 1559123 | Nome: Health Check State to SLA_LAN on SD-WAN member 1 | Key: fgVWLHealthCheckLinkState[7] | Valor: 0 
+ID: 1559124 | Nome: Health Check State to SLA_LAN_2 on SD-WAN member 1 | Key: fgVWLHealthCheckLinkState[8] | Valor: 0 
+ID: 1559131 | Nome: VDOM of Performance SLA SLA_LAN on SD-WAN member 1 | Key: fgVWLHealthCheckLinkVdom.[SLA_LAN.1] | Valor:  
+ID: 1559132 | Nome: VDOM of Performance SLA SLA_LAN_2 on SD-WAN member 1 | Key: fgVWLHealthCheckLinkVdom.[SLA_LAN_2.1] | Valor:  
+ID: 1559128 | Nome: VDOM of Performance SLA SLA_PRIVATE on SD-WAN member 1 | Key: fgVWLHealthCheckLinkVdom.[SLA_PRIVATE.1] | Valor:  
+ID: 1559125 | Nome: VDOM of Performance SLA SLA_PUBLIC on SD-WAN member 1 | Key: fgVWLHealthCheckLinkVdom.[SLA_PUBLIC.1] | Valor: root 
+ID: 1559126 | Nome: VDOM of Performance SLA SLA_PUBLIC on SD-WAN member 2 | Key: fgVWLHealthCheckLinkVdom.[SLA_PUBLIC.2] | Valor: root 
+ID: 1559127 | Nome: VDOM of Performance SLA SLA_PUBLIC on SD-WAN member 4 | Key: fgVWLHealthCheckLinkVdom.[SLA_PUBLIC.4] | Valor: root 
+ID: 1559129 | Nome: VDOM of Performance SLA SLA_teams on SD-WAN member 2 | Key: fgVWLHealthCheckLinkVdom.[SLA_teams.2] | Valor:  
+ID: 1559130 | Nome: VDOM of Performance SLA SLA_teams on SD-WAN member 4 | Key: fgVWLHealthCheckLinkVdom.[SLA_teams.4] | Valor:  
+ID: 1409615 | Nome: Interface port13(): Duplex status | Key: net.if.duplex[dot3StatsDuplexStatus.32] | Valor: 3 
+ID: 1409613 | Nome: Interface wan1(Super Connect): Duplex status | Key: net.if.duplex[dot3StatsDuplexStatus.3] | Valor: 3 
+ID: 1409614 | Nome: Interface wan2(BR Digital): Duplex status | Key: net.if.duplex[dot3StatsDuplexStatus.4] | Valor: 3 
+ID: 1409623 | Nome: Interface ssl.root(SSL VPN interface): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.10] | Valor: 0 
+ID: 1409624 | Nome: Interface lan(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.11] | Valor: 0 
+ID: 1409625 | Nome: Interface fortilink(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.12] | Valor: 0 
+ID: 1409626 | Nome: Interface port11(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.13] | Valor: 0 
+ID: 1409627 | Nome: Interface port2(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.15] | Valor: 0 
+ID: 1409628 | Nome: Interface VLAN_MGMT_AP(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.16] | Valor: 0 
+ID: 1409629 | Nome: Interface VLAN_WLAN11(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.17] | Valor: 0 
+ID: 1409630 | Nome: Interface cswlan11(b): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.18] | Valor: 0 
+ID: 1409631 | Nome: Interface CENCONET(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.19] | Valor: 0 
+ID: 1409616 | Nome: Interface dmz(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.1] | Valor: 0 
+ID: 1409632 | Nome: Interface cenconet(b): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.20] | Valor: 0 
+ID: 1409633 | Nome: Interface VLAN_WLAN12(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.21] | Valor: 0 
+ID: 1409634 | Nome: Interface cswlan12(b): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.22] | Valor: 0 
+ID: 1409635 | Nome: Interface port1(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.23] | Valor: 0 
+ID: 1409636 | Nome: Interface port3(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.24] | Valor: 0 
+ID: 1409637 | Nome: Interface port5(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.25] | Valor: 0 
+ID: 1409638 | Nome: Interface port6(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.26] | Valor: 0 
+ID: 1409639 | Nome: Interface port7(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.27] | Valor: 0 
+ID: 1409641 | Nome: Interface port9(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.29] | Valor: 0 
+ID: 1409642 | Nome: Interface port10(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.30] | Valor: 0 
+ID: 1409643 | Nome: Interface port12(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.31] | Valor: 0 
+ID: 1409644 | Nome: Interface port13(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.32] | Valor: 0 
+ID: 1409645 | Nome: Interface port14(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.33] | Valor: 0 
+ID: 1409646 | Nome: Interface port15(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.34] | Valor: 0 
+ID: 1409647 | Nome: Interface port16(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.35] | Valor: 0 
+ID: 1409648 | Nome: Interface port17(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.36] | Valor: 0 
+ID: 1409649 | Nome: Interface port18(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.37] | Valor: 0 
+ID: 1409650 | Nome: Interface port19(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.38] | Valor: 0 
+ID: 1409651 | Nome: Interface port20(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.39] | Valor: 0 
+ID: 1409617 | Nome: Interface wan1(Super Connect): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.3] | Valor: 0 
+ID: 1409652 | Nome: Interface CABEADA(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.40] | Valor: 0 
+ID: 1409653 | Nome: Interface Uplink Core(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.41] | Valor: 0 
+ID: 1409654 | Nome: Interface default(default.fortilink): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.42] | Valor: 0 
+ID: 1409655 | Nome: Interface quarantine(quarantine.fortilink): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.43] | Valor: 0 
+ID: 1409656 | Nome: Interface voice(voice.fortilink): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.44] | Valor: 0 
+ID: 1409657 | Nome: Interface video(video.fortilink): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.45] | Valor: 0 
+ID: 1409658 | Nome: Interface rspan(rspan.fortilink): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.46] | Valor: 0 
+ID: 1409659 | Nome: Interface onboarding(onboarding.fortilink): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.47] | Valor: 0 
+ID: 1409661 | Nome: Interface ClienteCenco(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.49] | Valor: 0 
+ID: 1409618 | Nome: Interface wan2(BR Digital): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.4] | Valor: 0 
+ID: 1409663 | Nome: Interface PWC(b): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.51] | Valor: 0 
+ID: 1409664 | Nome: Interface ClienteCenco2(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.52] | Valor: 0 
+ID: 1564540 | Nome: Interface CSWLAN15(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.54] | Valor: 0 
+ID: 1564555 | Nome: Interface cswlan15(b): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.55] | Valor: 0 
+ID: 1570313 | Nome: Interface cenconetCD(b): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.56] | Valor: 0 
+ID: 1409619 | Nome: Interface ha1(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.5] | Valor: 0 
+ID: 1409620 | Nome: Interface ha2(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.6] | Valor: 0 
+ID: 1409621 | Nome: Interface x1(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.7] | Valor: 0 
+ID: 1409622 | Nome: Interface x2(): Inbound packets discarded | Key: net.if.in.discards[ifInDiscards.8] | Valor: 0 
+ID: 1409672 | Nome: Interface ssl.root(SSL VPN interface): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.10] | Valor: 0 
+ID: 1409673 | Nome: Interface lan(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.11] | Valor: 0 
+ID: 1409674 | Nome: Interface fortilink(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.12] | Valor: 0 
+ID: 1409675 | Nome: Interface port11(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.13] | Valor: 0 
+ID: 1409676 | Nome: Interface port2(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.15] | Valor: 0 
+ID: 1409677 | Nome: Interface VLAN_MGMT_AP(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.16] | Valor: 0 
+ID: 1409678 | Nome: Interface VLAN_WLAN11(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.17] | Valor: 0 
+ID: 1409679 | Nome: Interface cswlan11(b): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.18] | Valor: 0 
+ID: 1409680 | Nome: Interface CENCONET(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.19] | Valor: 0 
+ID: 1409665 | Nome: Interface dmz(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.1] | Valor: 0 
+ID: 1409681 | Nome: Interface cenconet(b): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.20] | Valor: 0 
+ID: 1409682 | Nome: Interface VLAN_WLAN12(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.21] | Valor: 0 
+ID: 1409683 | Nome: Interface cswlan12(b): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.22] | Valor: 0 
+ID: 1409684 | Nome: Interface port1(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.23] | Valor: 0 
+ID: 1409685 | Nome: Interface port3(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.24] | Valor: 0 
+ID: 1409686 | Nome: Interface port5(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.25] | Valor: 0 
+ID: 1409687 | Nome: Interface port6(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.26] | Valor: 0 
+ID: 1409688 | Nome: Interface port7(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.27] | Valor: 0 
+ID: 1409690 | Nome: Interface port9(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.29] | Valor: 0 
+ID: 1409691 | Nome: Interface port10(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.30] | Valor: 0 
+ID: 1409692 | Nome: Interface port12(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.31] | Valor: 0 
+ID: 1409693 | Nome: Interface port13(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.32] | Valor: 0 
+ID: 1409694 | Nome: Interface port14(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.33] | Valor: 0 
+ID: 1409695 | Nome: Interface port15(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.34] | Valor: 0 
+ID: 1409696 | Nome: Interface port16(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.35] | Valor: 0 
+ID: 1409697 | Nome: Interface port17(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.36] | Valor: 0 
+ID: 1409698 | Nome: Interface port18(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.37] | Valor: 0 
+ID: 1409699 | Nome: Interface port19(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.38] | Valor: 0 
+ID: 1409700 | Nome: Interface port20(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.39] | Valor: 0 
+ID: 1409666 | Nome: Interface wan1(Super Connect): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.3] | Valor: 0 
+ID: 1409701 | Nome: Interface CABEADA(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.40] | Valor: 0 
+ID: 1409702 | Nome: Interface Uplink Core(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.41] | Valor: 0 
+ID: 1409703 | Nome: Interface default(default.fortilink): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.42] | Valor: 0 
+ID: 1409704 | Nome: Interface quarantine(quarantine.fortilink): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.43] | Valor: 0 
+ID: 1409705 | Nome: Interface voice(voice.fortilink): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.44] | Valor: 0 
+ID: 1409706 | Nome: Interface video(video.fortilink): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.45] | Valor: 0 
+ID: 1409707 | Nome: Interface rspan(rspan.fortilink): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.46] | Valor: 0 
+ID: 1409708 | Nome: Interface onboarding(onboarding.fortilink): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.47] | Valor: 0 
+ID: 1409710 | Nome: Interface ClienteCenco(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.49] | Valor: 0 
+ID: 1409667 | Nome: Interface wan2(BR Digital): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.4] | Valor: 0 
+ID: 1409712 | Nome: Interface PWC(b): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.51] | Valor: 0 
+ID: 1409713 | Nome: Interface ClienteCenco2(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.52] | Valor: 0 
+ID: 1564541 | Nome: Interface CSWLAN15(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.54] | Valor: 0 
+ID: 1564556 | Nome: Interface cswlan15(b): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.55] | Valor: 0 
+ID: 1570314 | Nome: Interface cenconetCD(b): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.56] | Valor: 0 
+ID: 1409668 | Nome: Interface ha1(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.5] | Valor: 0 
+ID: 1409669 | Nome: Interface ha2(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.6] | Valor: 0 
+ID: 1409670 | Nome: Interface x1(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.7] | Valor: 0 
+ID: 1409671 | Nome: Interface x2(): Inbound packets with errors | Key: net.if.in.errors[ifInErrors.8] | Valor: 0 
+ID: 1409721 | Nome: Interface ssl.root(SSL VPN interface): Bits received | Key: net.if.in[ifHCInOctets.10] | Valor: 0 bps
+ID: 1409722 | Nome: Interface lan(): Bits received | Key: net.if.in[ifHCInOctets.11] | Valor: 0 bps
+ID: 1409723 | Nome: Interface fortilink(): Bits received | Key: net.if.in[ifHCInOctets.12] | Valor: 0 bps
+ID: 1409724 | Nome: Interface port11(): Bits received | Key: net.if.in[ifHCInOctets.13] | Valor: 0 bps
+ID: 1409725 | Nome: Interface port2(): Bits received | Key: net.if.in[ifHCInOctets.15] | Valor: 0 bps
+ID: 1409726 | Nome: Interface VLAN_MGMT_AP(): Bits received | Key: net.if.in[ifHCInOctets.16] | Valor: 1547064 bps
+ID: 1409727 | Nome: Interface VLAN_WLAN11(): Bits received | Key: net.if.in[ifHCInOctets.17] | Valor: 29430200 bps
+ID: 1409728 | Nome: Interface cswlan11(b): Bits received | Key: net.if.in[ifHCInOctets.18] | Valor: 0 bps
+ID: 1409729 | Nome: Interface CENCONET(): Bits received | Key: net.if.in[ifHCInOctets.19] | Valor: 6259224 bps
+ID: 1409714 | Nome: Interface dmz(): Bits received | Key: net.if.in[ifHCInOctets.1] | Valor: 0 bps
+ID: 1409730 | Nome: Interface cenconet(b): Bits received | Key: net.if.in[ifHCInOctets.20] | Valor: 0 bps
+ID: 1409731 | Nome: Interface VLAN_WLAN12(): Bits received | Key: net.if.in[ifHCInOctets.21] | Valor: 2438240 bps
+ID: 1409732 | Nome: Interface cswlan12(b): Bits received | Key: net.if.in[ifHCInOctets.22] | Valor: 0 bps
+ID: 1409733 | Nome: Interface port1(): Bits received | Key: net.if.in[ifHCInOctets.23] | Valor: 0 bps
+ID: 1409734 | Nome: Interface port3(): Bits received | Key: net.if.in[ifHCInOctets.24] | Valor: 0 bps
+ID: 1409735 | Nome: Interface port5(): Bits received | Key: net.if.in[ifHCInOctets.25] | Valor: 0 bps
+ID: 1409736 | Nome: Interface port6(): Bits received | Key: net.if.in[ifHCInOctets.26] | Valor: 0 bps
+ID: 1409737 | Nome: Interface port7(): Bits received | Key: net.if.in[ifHCInOctets.27] | Valor: 0 bps
+ID: 1409739 | Nome: Interface port9(): Bits received | Key: net.if.in[ifHCInOctets.29] | Valor: 0 bps
+ID: 1409740 | Nome: Interface port10(): Bits received | Key: net.if.in[ifHCInOctets.30] | Valor: 0 bps
+ID: 1409741 | Nome: Interface port12(): Bits received | Key: net.if.in[ifHCInOctets.31] | Valor: 0 bps
+ID: 1409742 | Nome: Interface port13(): Bits received | Key: net.if.in[ifHCInOctets.32] | Valor: 99274096 bps
+ID: 1409743 | Nome: Interface port14(): Bits received | Key: net.if.in[ifHCInOctets.33] | Valor: 0 bps
+ID: 1409744 | Nome: Interface port15(): Bits received | Key: net.if.in[ifHCInOctets.34] | Valor: 0 bps
+ID: 1409745 | Nome: Interface port16(): Bits received | Key: net.if.in[ifHCInOctets.35] | Valor: 0 bps
+ID: 1409746 | Nome: Interface port17(): Bits received | Key: net.if.in[ifHCInOctets.36] | Valor: 0 bps
+ID: 1409747 | Nome: Interface port18(): Bits received | Key: net.if.in[ifHCInOctets.37] | Valor: 0 bps
+ID: 1409748 | Nome: Interface port19(): Bits received | Key: net.if.in[ifHCInOctets.38] | Valor: 0 bps
+ID: 1409749 | Nome: Interface port20(): Bits received | Key: net.if.in[ifHCInOctets.39] | Valor: 0 bps
+ID: 1409715 | Nome: Interface wan1(Super Connect): Bits received | Key: net.if.in[ifHCInOctets.3] | Valor: 23913304 bps
+ID: 1409750 | Nome: Interface CABEADA(): Bits received | Key: net.if.in[ifHCInOctets.40] | Valor: 20432536 bps
+ID: 1409751 | Nome: Interface Uplink Core(): Bits received | Key: net.if.in[ifHCInOctets.41] | Valor: 99617456 bps
+ID: 1409752 | Nome: Interface default(default.fortilink): Bits received | Key: net.if.in[ifHCInOctets.42] | Valor: 0 bps
+ID: 1409753 | Nome: Interface quarantine(quarantine.fortilink): Bits received | Key: net.if.in[ifHCInOctets.43] | Valor: 0 bps
+ID: 1409754 | Nome: Interface voice(voice.fortilink): Bits received | Key: net.if.in[ifHCInOctets.44] | Valor: 0 bps
+ID: 1409755 | Nome: Interface video(video.fortilink): Bits received | Key: net.if.in[ifHCInOctets.45] | Valor: 0 bps
+ID: 1409756 | Nome: Interface rspan(rspan.fortilink): Bits received | Key: net.if.in[ifHCInOctets.46] | Valor: 0 bps
+ID: 1409757 | Nome: Interface onboarding(onboarding.fortilink): Bits received | Key: net.if.in[ifHCInOctets.47] | Valor: 0 bps
+ID: 1409759 | Nome: Interface ClienteCenco(): Bits received | Key: net.if.in[ifHCInOctets.49] | Valor: 272 bps
+ID: 1409716 | Nome: Interface wan2(BR Digital): Bits received | Key: net.if.in[ifHCInOctets.4] | Valor: 79577704 bps
+ID: 1409761 | Nome: Interface PWC(b): Bits received | Key: net.if.in[ifHCInOctets.51] | Valor: 0 bps
+ID: 1409762 | Nome: Interface ClienteCenco2(): Bits received | Key: net.if.in[ifHCInOctets.52] | Valor: 272 bps
+ID: 1564542 | Nome: Interface CSWLAN15(): Bits received | Key: net.if.in[ifHCInOctets.54] | Valor: 680 bps
+ID: 1564557 | Nome: Interface cswlan15(b): Bits received | Key: net.if.in[ifHCInOctets.55] | Valor: 0 bps
+ID: 1570315 | Nome: Interface cenconetCD(b): Bits received | Key: net.if.in[ifHCInOctets.56] | Valor: 0 bps
+ID: 1409717 | Nome: Interface ha1(): Bits received | Key: net.if.in[ifHCInOctets.5] | Valor: 0 bps
+ID: 1409718 | Nome: Interface ha2(): Bits received | Key: net.if.in[ifHCInOctets.6] | Valor: 0 bps
+ID: 1409719 | Nome: Interface x1(): Bits received | Key: net.if.in[ifHCInOctets.7] | Valor: 0 bps
+ID: 1409720 | Nome: Interface x2(): Bits received | Key: net.if.in[ifHCInOctets.8] | Valor: 0 bps
+ID: 1409770 | Nome: Interface ssl.root(SSL VPN interface): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.10] | Valor: 0 
+ID: 1409771 | Nome: Interface lan(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.11] | Valor: 0 
+ID: 1409772 | Nome: Interface fortilink(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.12] | Valor: 0 
+ID: 1409773 | Nome: Interface port11(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.13] | Valor: 0 
+ID: 1409774 | Nome: Interface port2(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.15] | Valor: 0 
+ID: 1409775 | Nome: Interface VLAN_MGMT_AP(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.16] | Valor: 0 
+ID: 1409776 | Nome: Interface VLAN_WLAN11(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.17] | Valor: 0 
+ID: 1409777 | Nome: Interface cswlan11(b): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.18] | Valor: 0 
+ID: 1409778 | Nome: Interface CENCONET(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.19] | Valor: 0 
+ID: 1409763 | Nome: Interface dmz(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.1] | Valor: 0 
+ID: 1409779 | Nome: Interface cenconet(b): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.20] | Valor: 0 
+ID: 1409780 | Nome: Interface VLAN_WLAN12(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.21] | Valor: 0 
+ID: 1409781 | Nome: Interface cswlan12(b): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.22] | Valor: 0 
+ID: 1409782 | Nome: Interface port1(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.23] | Valor: 0 
+ID: 1409783 | Nome: Interface port3(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.24] | Valor: 0 
+ID: 1409784 | Nome: Interface port5(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.25] | Valor: 0 
+ID: 1409785 | Nome: Interface port6(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.26] | Valor: 0 
+ID: 1409786 | Nome: Interface port7(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.27] | Valor: 0 
+ID: 1409788 | Nome: Interface port9(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.29] | Valor: 0 
+ID: 1409789 | Nome: Interface port10(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.30] | Valor: 0 
+ID: 1409790 | Nome: Interface port12(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.31] | Valor: 0 
+ID: 1409791 | Nome: Interface port13(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.32] | Valor: 0 
+ID: 1409792 | Nome: Interface port14(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.33] | Valor: 0 
+ID: 1409793 | Nome: Interface port15(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.34] | Valor: 0 
+ID: 1409794 | Nome: Interface port16(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.35] | Valor: 0 
+ID: 1409795 | Nome: Interface port17(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.36] | Valor: 0 
+ID: 1409796 | Nome: Interface port18(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.37] | Valor: 0 
+ID: 1409797 | Nome: Interface port19(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.38] | Valor: 0 
+ID: 1409798 | Nome: Interface port20(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.39] | Valor: 0 
+ID: 1409764 | Nome: Interface wan1(Super Connect): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.3] | Valor: 0 
+ID: 1409799 | Nome: Interface CABEADA(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.40] | Valor: 0 
+ID: 1409800 | Nome: Interface Uplink Core(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.41] | Valor: 0 
+ID: 1409801 | Nome: Interface default(default.fortilink): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.42] | Valor: 0 
+ID: 1409802 | Nome: Interface quarantine(quarantine.fortilink): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.43] | Valor: 0 
+ID: 1409803 | Nome: Interface voice(voice.fortilink): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.44] | Valor: 0 
+ID: 1409804 | Nome: Interface video(video.fortilink): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.45] | Valor: 0 
+ID: 1409805 | Nome: Interface rspan(rspan.fortilink): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.46] | Valor: 0 
+ID: 1409806 | Nome: Interface onboarding(onboarding.fortilink): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.47] | Valor: 0 
+ID: 1409808 | Nome: Interface ClienteCenco(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.49] | Valor: 0 
+ID: 1409765 | Nome: Interface wan2(BR Digital): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.4] | Valor: 0 
+ID: 1409810 | Nome: Interface PWC(b): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.51] | Valor: 0 
+ID: 1409811 | Nome: Interface ClienteCenco2(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.52] | Valor: 0 
+ID: 1564543 | Nome: Interface CSWLAN15(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.54] | Valor: 0 
+ID: 1564558 | Nome: Interface cswlan15(b): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.55] | Valor: 0 
+ID: 1570316 | Nome: Interface cenconetCD(b): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.56] | Valor: 0 
+ID: 1409766 | Nome: Interface ha1(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.5] | Valor: 0 
+ID: 1409767 | Nome: Interface ha2(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.6] | Valor: 0 
+ID: 1409768 | Nome: Interface x1(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.7] | Valor: 0 
+ID: 1409769 | Nome: Interface x2(): Outbound packets discarded | Key: net.if.out.discards[ifOutDiscards.8] | Valor: 0 
+ID: 1409819 | Nome: Interface ssl.root(SSL VPN interface): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.10] | Valor: 0 
+ID: 1409820 | Nome: Interface lan(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.11] | Valor: 0 
+ID: 1409821 | Nome: Interface fortilink(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.12] | Valor: 0 
+ID: 1409822 | Nome: Interface port11(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.13] | Valor: 0 
+ID: 1409823 | Nome: Interface port2(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.15] | Valor: 0 
+ID: 1409824 | Nome: Interface VLAN_MGMT_AP(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.16] | Valor: 0 
+ID: 1409825 | Nome: Interface VLAN_WLAN11(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.17] | Valor: 0 
+ID: 1409826 | Nome: Interface cswlan11(b): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.18] | Valor: 0 
+ID: 1409827 | Nome: Interface CENCONET(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.19] | Valor: 0 
+ID: 1409812 | Nome: Interface dmz(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.1] | Valor: 0 
+ID: 1409828 | Nome: Interface cenconet(b): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.20] | Valor: 0 
+ID: 1409829 | Nome: Interface VLAN_WLAN12(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.21] | Valor: 0 
+ID: 1409830 | Nome: Interface cswlan12(b): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.22] | Valor: 0 
+ID: 1409831 | Nome: Interface port1(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.23] | Valor: 0 
+ID: 1409832 | Nome: Interface port3(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.24] | Valor: 0 
+ID: 1409833 | Nome: Interface port5(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.25] | Valor: 0 
+ID: 1409834 | Nome: Interface port6(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.26] | Valor: 0 
+ID: 1409835 | Nome: Interface port7(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.27] | Valor: 0 
+ID: 1409837 | Nome: Interface port9(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.29] | Valor: 0 
+ID: 1409838 | Nome: Interface port10(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.30] | Valor: 0 
+ID: 1409839 | Nome: Interface port12(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.31] | Valor: 0 
+ID: 1409840 | Nome: Interface port13(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.32] | Valor: 0 
+ID: 1409841 | Nome: Interface port14(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.33] | Valor: 0 
+ID: 1409842 | Nome: Interface port15(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.34] | Valor: 0 
+ID: 1409843 | Nome: Interface port16(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.35] | Valor: 0 
+ID: 1409844 | Nome: Interface port17(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.36] | Valor: 0 
+ID: 1409845 | Nome: Interface port18(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.37] | Valor: 0 
+ID: 1409846 | Nome: Interface port19(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.38] | Valor: 0 
+ID: 1409847 | Nome: Interface port20(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.39] | Valor: 0 
+ID: 1409813 | Nome: Interface wan1(Super Connect): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.3] | Valor: 0 
+ID: 1409848 | Nome: Interface CABEADA(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.40] | Valor: 0 
+ID: 1409849 | Nome: Interface Uplink Core(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.41] | Valor: 0 
+ID: 1409850 | Nome: Interface default(default.fortilink): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.42] | Valor: 0 
+ID: 1409851 | Nome: Interface quarantine(quarantine.fortilink): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.43] | Valor: 0 
+ID: 1409852 | Nome: Interface voice(voice.fortilink): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.44] | Valor: 0 
+ID: 1409853 | Nome: Interface video(video.fortilink): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.45] | Valor: 0 
+ID: 1409854 | Nome: Interface rspan(rspan.fortilink): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.46] | Valor: 0 
+ID: 1409855 | Nome: Interface onboarding(onboarding.fortilink): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.47] | Valor: 0 
+ID: 1409857 | Nome: Interface ClienteCenco(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.49] | Valor: 0 
+ID: 1409814 | Nome: Interface wan2(BR Digital): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.4] | Valor: 0 
+ID: 1409859 | Nome: Interface PWC(b): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.51] | Valor: 0 
+ID: 1409860 | Nome: Interface ClienteCenco2(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.52] | Valor: 0 
+ID: 1564544 | Nome: Interface CSWLAN15(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.54] | Valor: 0 
+ID: 1564559 | Nome: Interface cswlan15(b): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.55] | Valor: 0 
+ID: 1570317 | Nome: Interface cenconetCD(b): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.56] | Valor: 0 
+ID: 1409815 | Nome: Interface ha1(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.5] | Valor: 0 
+ID: 1409816 | Nome: Interface ha2(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.6] | Valor: 0 
+ID: 1409817 | Nome: Interface x1(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.7] | Valor: 0 
+ID: 1409818 | Nome: Interface x2(): Outbound packets with errors | Key: net.if.out.errors[ifOutErrors.8] | Valor: 0 
+ID: 1409868 | Nome: Interface ssl.root(SSL VPN interface): Bits sent | Key: net.if.out[ifHCOutOctets.10] | Valor: 0 bps
+ID: 1409869 | Nome: Interface lan(): Bits sent | Key: net.if.out[ifHCOutOctets.11] | Valor: 0 bps
+ID: 1409870 | Nome: Interface fortilink(): Bits sent | Key: net.if.out[ifHCOutOctets.12] | Valor: 0 bps
+ID: 1409871 | Nome: Interface port11(): Bits sent | Key: net.if.out[ifHCOutOctets.13] | Valor: 0 bps
+ID: 1409872 | Nome: Interface port2(): Bits sent | Key: net.if.out[ifHCOutOctets.15] | Valor: 0 bps
+ID: 1409873 | Nome: Interface VLAN_MGMT_AP(): Bits sent | Key: net.if.out[ifHCOutOctets.16] | Valor: 2779880 bps
+ID: 1409874 | Nome: Interface VLAN_WLAN11(): Bits sent | Key: net.if.out[ifHCOutOctets.17] | Valor: 54142392 bps
+ID: 1409875 | Nome: Interface cswlan11(b): Bits sent | Key: net.if.out[ifHCOutOctets.18] | Valor: 0 bps
+ID: 1409876 | Nome: Interface CENCONET(): Bits sent | Key: net.if.out[ifHCOutOctets.19] | Valor: 23978936 bps
+ID: 1409861 | Nome: Interface dmz(): Bits sent | Key: net.if.out[ifHCOutOctets.1] | Valor: 0 bps
+ID: 1409877 | Nome: Interface cenconet(b): Bits sent | Key: net.if.out[ifHCOutOctets.20] | Valor: 0 bps
+ID: 1409878 | Nome: Interface VLAN_WLAN12(): Bits sent | Key: net.if.out[ifHCOutOctets.21] | Valor: 5412552 bps
+ID: 1409879 | Nome: Interface cswlan12(b): Bits sent | Key: net.if.out[ifHCOutOctets.22] | Valor: 0 bps
+ID: 1409880 | Nome: Interface port1(): Bits sent | Key: net.if.out[ifHCOutOctets.23] | Valor: 0 bps
+ID: 1409881 | Nome: Interface port3(): Bits sent | Key: net.if.out[ifHCOutOctets.24] | Valor: 0 bps
+ID: 1409882 | Nome: Interface port5(): Bits sent | Key: net.if.out[ifHCOutOctets.25] | Valor: 0 bps
+ID: 1409883 | Nome: Interface port6(): Bits sent | Key: net.if.out[ifHCOutOctets.26] | Valor: 0 bps
+ID: 1409884 | Nome: Interface port7(): Bits sent | Key: net.if.out[ifHCOutOctets.27] | Valor: 0 bps
+ID: 1409886 | Nome: Interface port9(): Bits sent | Key: net.if.out[ifHCOutOctets.29] | Valor: 0 bps
+ID: 1409887 | Nome: Interface port10(): Bits sent | Key: net.if.out[ifHCOutOctets.30] | Valor: 0 bps
+ID: 1409888 | Nome: Interface port12(): Bits sent | Key: net.if.out[ifHCOutOctets.31] | Valor: 0 bps
+ID: 1409889 | Nome: Interface port13(): Bits sent | Key: net.if.out[ifHCOutOctets.32] | Valor: 168196336 bps
+ID: 1409890 | Nome: Interface port14(): Bits sent | Key: net.if.out[ifHCOutOctets.33] | Valor: 0 bps
+ID: 1409891 | Nome: Interface port15(): Bits sent | Key: net.if.out[ifHCOutOctets.34] | Valor: 0 bps
+ID: 1409892 | Nome: Interface port16(): Bits sent | Key: net.if.out[ifHCOutOctets.35] | Valor: 0 bps
+ID: 1409893 | Nome: Interface port17(): Bits sent | Key: net.if.out[ifHCOutOctets.36] | Valor: 0 bps
+ID: 1409894 | Nome: Interface port18(): Bits sent | Key: net.if.out[ifHCOutOctets.37] | Valor: 0 bps
+ID: 1409895 | Nome: Interface port19(): Bits sent | Key: net.if.out[ifHCOutOctets.38] | Valor: 0 bps
+ID: 1409896 | Nome: Interface port20(): Bits sent | Key: net.if.out[ifHCOutOctets.39] | Valor: 0 bps
+ID: 1409862 | Nome: Interface wan1(Super Connect): Bits sent | Key: net.if.out[ifHCOutOctets.3] | Valor: 5728176 bps
+ID: 1409897 | Nome: Interface CABEADA(): Bits sent | Key: net.if.out[ifHCOutOctets.40] | Valor: 54903184 bps
+ID: 1409898 | Nome: Interface Uplink Core(): Bits sent | Key: net.if.out[ifHCOutOctets.41] | Valor: 168556328 bps
+ID: 1409899 | Nome: Interface default(default.fortilink): Bits sent | Key: net.if.out[ifHCOutOctets.42] | Valor: 0 bps
+ID: 1409900 | Nome: Interface quarantine(quarantine.fortilink): Bits sent | Key: net.if.out[ifHCOutOctets.43] | Valor: 0 bps
+ID: 1409901 | Nome: Interface voice(voice.fortilink): Bits sent | Key: net.if.out[ifHCOutOctets.44] | Valor: 0 bps
+ID: 1409902 | Nome: Interface video(video.fortilink): Bits sent | Key: net.if.out[ifHCOutOctets.45] | Valor: 0 bps
+ID: 1409903 | Nome: Interface rspan(rspan.fortilink): Bits sent | Key: net.if.out[ifHCOutOctets.46] | Valor: 0 bps
+ID: 1409904 | Nome: Interface onboarding(onboarding.fortilink): Bits sent | Key: net.if.out[ifHCOutOctets.47] | Valor: 0 bps
+ID: 1409906 | Nome: Interface ClienteCenco(): Bits sent | Key: net.if.out[ifHCOutOctets.49] | Valor: 0 bps
+ID: 1409863 | Nome: Interface wan2(BR Digital): Bits sent | Key: net.if.out[ifHCOutOctets.4] | Valor: 27913560 bps
+ID: 1409908 | Nome: Interface PWC(b): Bits sent | Key: net.if.out[ifHCOutOctets.51] | Valor: 0 bps
+ID: 1409909 | Nome: Interface ClienteCenco2(): Bits sent | Key: net.if.out[ifHCOutOctets.52] | Valor: 0 bps
+ID: 1564545 | Nome: Interface CSWLAN15(): Bits sent | Key: net.if.out[ifHCOutOctets.54] | Valor: 0 bps
+ID: 1564560 | Nome: Interface cswlan15(b): Bits sent | Key: net.if.out[ifHCOutOctets.55] | Valor: 0 bps
+ID: 1570318 | Nome: Interface cenconetCD(b): Bits sent | Key: net.if.out[ifHCOutOctets.56] | Valor: 0 bps
+ID: 1409864 | Nome: Interface ha1(): Bits sent | Key: net.if.out[ifHCOutOctets.5] | Valor: 0 bps
+ID: 1409865 | Nome: Interface ha2(): Bits sent | Key: net.if.out[ifHCOutOctets.6] | Valor: 0 bps
+ID: 1409866 | Nome: Interface x1(): Bits sent | Key: net.if.out[ifHCOutOctets.7] | Valor: 0 bps
+ID: 1409867 | Nome: Interface x2(): Bits sent | Key: net.if.out[ifHCOutOctets.8] | Valor: 0 bps
+ID: 1409917 | Nome: Interface ssl.root(SSL VPN interface): Speed | Key: net.if.speed[ifHighSpeed.10] | Valor: 0 bps
+ID: 1409918 | Nome: Interface lan(): Speed | Key: net.if.speed[ifHighSpeed.11] | Valor: 0 bps
+ID: 1409919 | Nome: Interface fortilink(): Speed | Key: net.if.speed[ifHighSpeed.12] | Valor: 0 bps
+ID: 1409920 | Nome: Interface port11(): Speed | Key: net.if.speed[ifHighSpeed.13] | Valor: 0 bps
+ID: 1409921 | Nome: Interface port2(): Speed | Key: net.if.speed[ifHighSpeed.15] | Valor: 0 bps
+ID: 1409922 | Nome: Interface VLAN_MGMT_AP(): Speed | Key: net.if.speed[ifHighSpeed.16] | Valor: 1000000000 bps
+ID: 1409923 | Nome: Interface VLAN_WLAN11(): Speed | Key: net.if.speed[ifHighSpeed.17] | Valor: 1000000000 bps
+ID: 1409924 | Nome: Interface cswlan11(b): Speed | Key: net.if.speed[ifHighSpeed.18] | Valor: 0 bps
+ID: 1409925 | Nome: Interface CENCONET(): Speed | Key: net.if.speed[ifHighSpeed.19] | Valor: 1000000000 bps
+ID: 1409910 | Nome: Interface dmz(): Speed | Key: net.if.speed[ifHighSpeed.1] | Valor: 0 bps
+ID: 1409926 | Nome: Interface cenconet(b): Speed | Key: net.if.speed[ifHighSpeed.20] | Valor: 0 bps
+ID: 1409927 | Nome: Interface VLAN_WLAN12(): Speed | Key: net.if.speed[ifHighSpeed.21] | Valor: 1000000000 bps
+ID: 1409928 | Nome: Interface cswlan12(b): Speed | Key: net.if.speed[ifHighSpeed.22] | Valor: 0 bps
+ID: 1409929 | Nome: Interface port1(): Speed | Key: net.if.speed[ifHighSpeed.23] | Valor: 0 bps
+ID: 1409930 | Nome: Interface port3(): Speed | Key: net.if.speed[ifHighSpeed.24] | Valor: 0 bps
+ID: 1409931 | Nome: Interface port5(): Speed | Key: net.if.speed[ifHighSpeed.25] | Valor: 0 bps
+ID: 1409932 | Nome: Interface port6(): Speed | Key: net.if.speed[ifHighSpeed.26] | Valor: 0 bps
+ID: 1409933 | Nome: Interface port7(): Speed | Key: net.if.speed[ifHighSpeed.27] | Valor: 0 bps
+ID: 1409935 | Nome: Interface port9(): Speed | Key: net.if.speed[ifHighSpeed.29] | Valor: 0 bps
+ID: 1409936 | Nome: Interface port10(): Speed | Key: net.if.speed[ifHighSpeed.30] | Valor: 0 bps
+ID: 1409937 | Nome: Interface port12(): Speed | Key: net.if.speed[ifHighSpeed.31] | Valor: 0 bps
+ID: 1409938 | Nome: Interface port13(): Speed | Key: net.if.speed[ifHighSpeed.32] | Valor: 1000000000 bps
+ID: 1409939 | Nome: Interface port14(): Speed | Key: net.if.speed[ifHighSpeed.33] | Valor: 0 bps
+ID: 1409940 | Nome: Interface port15(): Speed | Key: net.if.speed[ifHighSpeed.34] | Valor: 0 bps
+ID: 1409941 | Nome: Interface port16(): Speed | Key: net.if.speed[ifHighSpeed.35] | Valor: 0 bps
+ID: 1409942 | Nome: Interface port17(): Speed | Key: net.if.speed[ifHighSpeed.36] | Valor: 0 bps
+ID: 1409943 | Nome: Interface port18(): Speed | Key: net.if.speed[ifHighSpeed.37] | Valor: 0 bps
+ID: 1409944 | Nome: Interface port19(): Speed | Key: net.if.speed[ifHighSpeed.38] | Valor: 0 bps
+ID: 1409945 | Nome: Interface port20(): Speed | Key: net.if.speed[ifHighSpeed.39] | Valor: 0 bps
+ID: 1409911 | Nome: Interface wan1(Super Connect): Speed | Key: net.if.speed[ifHighSpeed.3] | Valor: 1000000000 bps
+ID: 1409946 | Nome: Interface CABEADA(): Speed | Key: net.if.speed[ifHighSpeed.40] | Valor: 1000000000 bps
+ID: 1409947 | Nome: Interface Uplink Core(): Speed | Key: net.if.speed[ifHighSpeed.41] | Valor: 1000000000 bps
+ID: 1409948 | Nome: Interface default(default.fortilink): Speed | Key: net.if.speed[ifHighSpeed.42] | Valor: 0 bps
+ID: 1409949 | Nome: Interface quarantine(quarantine.fortilink): Speed | Key: net.if.speed[ifHighSpeed.43] | Valor: 0 bps
+ID: 1409950 | Nome: Interface voice(voice.fortilink): Speed | Key: net.if.speed[ifHighSpeed.44] | Valor: 0 bps
+ID: 1409951 | Nome: Interface video(video.fortilink): Speed | Key: net.if.speed[ifHighSpeed.45] | Valor: 0 bps
+ID: 1409952 | Nome: Interface rspan(rspan.fortilink): Speed | Key: net.if.speed[ifHighSpeed.46] | Valor: 0 bps
+ID: 1409953 | Nome: Interface onboarding(onboarding.fortilink): Speed | Key: net.if.speed[ifHighSpeed.47] | Valor: 0 bps
+ID: 1409955 | Nome: Interface ClienteCenco(): Speed | Key: net.if.speed[ifHighSpeed.49] | Valor: 1000000000 bps
+ID: 1409912 | Nome: Interface wan2(BR Digital): Speed | Key: net.if.speed[ifHighSpeed.4] | Valor: 1000000000 bps
+ID: 1409957 | Nome: Interface PWC(b): Speed | Key: net.if.speed[ifHighSpeed.51] | Valor: 0 bps
+ID: 1409958 | Nome: Interface ClienteCenco2(): Speed | Key: net.if.speed[ifHighSpeed.52] | Valor: 1000000000 bps
+ID: 1564546 | Nome: Interface CSWLAN15(): Speed | Key: net.if.speed[ifHighSpeed.54] | Valor: 1000000000 bps
+ID: 1564561 | Nome: Interface cswlan15(b): Speed | Key: net.if.speed[ifHighSpeed.55] | Valor: 0 bps
+ID: 1570319 | Nome: Interface cenconetCD(b): Speed | Key: net.if.speed[ifHighSpeed.56] | Valor: 0 bps
+ID: 1409913 | Nome: Interface ha1(): Speed | Key: net.if.speed[ifHighSpeed.5] | Valor: 0 bps
+ID: 1409914 | Nome: Interface ha2(): Speed | Key: net.if.speed[ifHighSpeed.6] | Valor: 0 bps
+ID: 1409915 | Nome: Interface x1(): Speed | Key: net.if.speed[ifHighSpeed.7] | Valor: 0 bps
+ID: 1409916 | Nome: Interface x2(): Speed | Key: net.if.speed[ifHighSpeed.8] | Valor: 0 bps
+ID: 1409966 | Nome: Interface ssl.root(SSL VPN interface): Operational status | Key: net.if.status[ifOperStatus.10] | Valor: 0 
+ID: 1409967 | Nome: Interface lan(): Operational status | Key: net.if.status[ifOperStatus.11] | Valor: 2 
+ID: 1409968 | Nome: Interface fortilink(): Operational status | Key: net.if.status[ifOperStatus.12] | Valor: 2 
+ID: 1409969 | Nome: Interface port11(): Operational status | Key: net.if.status[ifOperStatus.13] | Valor: 2 
+ID: 1409970 | Nome: Interface port2(): Operational status | Key: net.if.status[ifOperStatus.15] | Valor: 2 
+ID: 1409971 | Nome: Interface VLAN_MGMT_AP(): Operational status | Key: net.if.status[ifOperStatus.16] | Valor: 1 
+ID: 1409972 | Nome: Interface VLAN_WLAN11(): Operational status | Key: net.if.status[ifOperStatus.17] | Valor: 1 
+ID: 1409973 | Nome: Interface cswlan11(b): Operational status | Key: net.if.status[ifOperStatus.18] | Valor: 1 
+ID: 1409974 | Nome: Interface CENCONET(): Operational status | Key: net.if.status[ifOperStatus.19] | Valor: 1 
+ID: 1409959 | Nome: Interface dmz(): Operational status | Key: net.if.status[ifOperStatus.1] | Valor: 2 
+ID: 1409975 | Nome: Interface cenconet(b): Operational status | Key: net.if.status[ifOperStatus.20] | Valor: 1 
+ID: 1409976 | Nome: Interface VLAN_WLAN12(): Operational status | Key: net.if.status[ifOperStatus.21] | Valor: 1 
+ID: 1409977 | Nome: Interface cswlan12(b): Operational status | Key: net.if.status[ifOperStatus.22] | Valor: 1 
+ID: 1409978 | Nome: Interface port1(): Operational status | Key: net.if.status[ifOperStatus.23] | Valor: 2 
+ID: 1409979 | Nome: Interface port3(): Operational status | Key: net.if.status[ifOperStatus.24] | Valor: 2 
+ID: 1409980 | Nome: Interface port5(): Operational status | Key: net.if.status[ifOperStatus.25] | Valor: 2 
+ID: 1409981 | Nome: Interface port6(): Operational status | Key: net.if.status[ifOperStatus.26] | Valor: 2 
+ID: 1409982 | Nome: Interface port7(): Operational status | Key: net.if.status[ifOperStatus.27] | Valor: 2 
+ID: 1409984 | Nome: Interface port9(): Operational status | Key: net.if.status[ifOperStatus.29] | Valor: 2 
+ID: 1409985 | Nome: Interface port10(): Operational status | Key: net.if.status[ifOperStatus.30] | Valor: 2 
+ID: 1409986 | Nome: Interface port12(): Operational status | Key: net.if.status[ifOperStatus.31] | Valor: 2 
+ID: 1409987 | Nome: Interface port13(): Operational status | Key: net.if.status[ifOperStatus.32] | Valor: 1 
+ID: 1409988 | Nome: Interface port14(): Operational status | Key: net.if.status[ifOperStatus.33] | Valor: 2 
+ID: 1409989 | Nome: Interface port15(): Operational status | Key: net.if.status[ifOperStatus.34] | Valor: 2 
+ID: 1409990 | Nome: Interface port16(): Operational status | Key: net.if.status[ifOperStatus.35] | Valor: 2 
+ID: 1409991 | Nome: Interface port17(): Operational status | Key: net.if.status[ifOperStatus.36] | Valor: 2 
+ID: 1409992 | Nome: Interface port18(): Operational status | Key: net.if.status[ifOperStatus.37] | Valor: 2 
+ID: 1409993 | Nome: Interface port19(): Operational status | Key: net.if.status[ifOperStatus.38] | Valor: 2 
+ID: 1409994 | Nome: Interface port20(): Operational status | Key: net.if.status[ifOperStatus.39] | Valor: 2 
+ID: 1409960 | Nome: Interface wan1(Super Connect): Operational status | Key: net.if.status[ifOperStatus.3] | Valor: 1 
+ID: 1409995 | Nome: Interface CABEADA(): Operational status | Key: net.if.status[ifOperStatus.40] | Valor: 1 
+ID: 1409996 | Nome: Interface Uplink Core(): Operational status | Key: net.if.status[ifOperStatus.41] | Valor: 1 
+ID: 1409997 | Nome: Interface default(default.fortilink): Operational status | Key: net.if.status[ifOperStatus.42] | Valor: 2 
+ID: 1409998 | Nome: Interface quarantine(quarantine.fortilink): Operational status | Key: net.if.status[ifOperStatus.43] | Valor: 2 
+ID: 1409999 | Nome: Interface voice(voice.fortilink): Operational status | Key: net.if.status[ifOperStatus.44] | Valor: 2 
+ID: 1410000 | Nome: Interface video(video.fortilink): Operational status | Key: net.if.status[ifOperStatus.45] | Valor: 2 
+ID: 1410001 | Nome: Interface rspan(rspan.fortilink): Operational status | Key: net.if.status[ifOperStatus.46] | Valor: 2 
+ID: 1410002 | Nome: Interface onboarding(onboarding.fortilink): Operational status | Key: net.if.status[ifOperStatus.47] | Valor: 2 
+ID: 1410004 | Nome: Interface ClienteCenco(): Operational status | Key: net.if.status[ifOperStatus.49] | Valor: 1 
+ID: 1409961 | Nome: Interface wan2(BR Digital): Operational status | Key: net.if.status[ifOperStatus.4] | Valor: 1 
+ID: 1410006 | Nome: Interface PWC(b): Operational status | Key: net.if.status[ifOperStatus.51] | Valor: 1 
+ID: 1410007 | Nome: Interface ClienteCenco2(): Operational status | Key: net.if.status[ifOperStatus.52] | Valor: 1 
+ID: 1564547 | Nome: Interface CSWLAN15(): Operational status | Key: net.if.status[ifOperStatus.54] | Valor: 1 
+ID: 1564562 | Nome: Interface cswlan15(b): Operational status | Key: net.if.status[ifOperStatus.55] | Valor: 1 
+ID: 1570320 | Nome: Interface cenconetCD(b): Operational status | Key: net.if.status[ifOperStatus.56] | Valor: 1 
+ID: 1409962 | Nome: Interface ha1(): Operational status | Key: net.if.status[ifOperStatus.5] | Valor: 2 
+ID: 1409963 | Nome: Interface ha2(): Operational status | Key: net.if.status[ifOperStatus.6] | Valor: 2 
+ID: 1409964 | Nome: Interface x1(): Operational status | Key: net.if.status[ifOperStatus.7] | Valor: 2 
+ID: 1409965 | Nome: Interface x2(): Operational status | Key: net.if.status[ifOperStatus.8] | Valor: 2 
+ID: 1410015 | Nome: Interface ssl.root(SSL VPN interface): Interface type | Key: net.if.type[ifType.10] | Valor: 0 
+ID: 1410016 | Nome: Interface lan(): Interface type | Key: net.if.type[ifType.11] | Valor: 209 
+ID: 1410017 | Nome: Interface fortilink(): Interface type | Key: net.if.type[ifType.12] | Valor: 161 
+ID: 1410018 | Nome: Interface port11(): Interface type | Key: net.if.type[ifType.13] | Valor: 6 
+ID: 1410019 | Nome: Interface port2(): Interface type | Key: net.if.type[ifType.15] | Valor: 6 
+ID: 1410020 | Nome: Interface VLAN_MGMT_AP(): Interface type | Key: net.if.type[ifType.16] | Valor: 135 
+ID: 1410021 | Nome: Interface VLAN_WLAN11(): Interface type | Key: net.if.type[ifType.17] | Valor: 135 
+ID: 1410022 | Nome: Interface cswlan11(b): Interface type | Key: net.if.type[ifType.18] | Valor: 1 
+ID: 1410023 | Nome: Interface CENCONET(): Interface type | Key: net.if.type[ifType.19] | Valor: 135 
+ID: 1410008 | Nome: Interface dmz(): Interface type | Key: net.if.type[ifType.1] | Valor: 6 
+ID: 1410024 | Nome: Interface cenconet(b): Interface type | Key: net.if.type[ifType.20] | Valor: 1 
+ID: 1410025 | Nome: Interface VLAN_WLAN12(): Interface type | Key: net.if.type[ifType.21] | Valor: 135 
+ID: 1410026 | Nome: Interface cswlan12(b): Interface type | Key: net.if.type[ifType.22] | Valor: 1 
+ID: 1410027 | Nome: Interface port1(): Interface type | Key: net.if.type[ifType.23] | Valor: 6 
+ID: 1410028 | Nome: Interface port3(): Interface type | Key: net.if.type[ifType.24] | Valor: 6 
+ID: 1410029 | Nome: Interface port5(): Interface type | Key: net.if.type[ifType.25] | Valor: 6 
+ID: 1410030 | Nome: Interface port6(): Interface type | Key: net.if.type[ifType.26] | Valor: 6 
+ID: 1410031 | Nome: Interface port7(): Interface type | Key: net.if.type[ifType.27] | Valor: 6 
+ID: 1410033 | Nome: Interface port9(): Interface type | Key: net.if.type[ifType.29] | Valor: 6 
+ID: 1410034 | Nome: Interface port10(): Interface type | Key: net.if.type[ifType.30] | Valor: 6 
+ID: 1410035 | Nome: Interface port12(): Interface type | Key: net.if.type[ifType.31] | Valor: 6 
+ID: 1410036 | Nome: Interface port13(): Interface type | Key: net.if.type[ifType.32] | Valor: 6 
+ID: 1410037 | Nome: Interface port14(): Interface type | Key: net.if.type[ifType.33] | Valor: 6 
+ID: 1410038 | Nome: Interface port15(): Interface type | Key: net.if.type[ifType.34] | Valor: 6 
+ID: 1410039 | Nome: Interface port16(): Interface type | Key: net.if.type[ifType.35] | Valor: 6 
+ID: 1410040 | Nome: Interface port17(): Interface type | Key: net.if.type[ifType.36] | Valor: 6 
+ID: 1410041 | Nome: Interface port18(): Interface type | Key: net.if.type[ifType.37] | Valor: 6 
+ID: 1410042 | Nome: Interface port19(): Interface type | Key: net.if.type[ifType.38] | Valor: 6 
+ID: 1410043 | Nome: Interface port20(): Interface type | Key: net.if.type[ifType.39] | Valor: 6 
+ID: 1410009 | Nome: Interface wan1(Super Connect): Interface type | Key: net.if.type[ifType.3] | Valor: 6 
+ID: 1410044 | Nome: Interface CABEADA(): Interface type | Key: net.if.type[ifType.40] | Valor: 135 
+ID: 1410045 | Nome: Interface Uplink Core(): Interface type | Key: net.if.type[ifType.41] | Valor: 161 
+ID: 1410046 | Nome: Interface default(default.fortilink): Interface type | Key: net.if.type[ifType.42] | Valor: 135 
+ID: 1410047 | Nome: Interface quarantine(quarantine.fortilink): Interface type | Key: net.if.type[ifType.43] | Valor: 135 
+ID: 1410048 | Nome: Interface voice(voice.fortilink): Interface type | Key: net.if.type[ifType.44] | Valor: 135 
+ID: 1410049 | Nome: Interface video(video.fortilink): Interface type | Key: net.if.type[ifType.45] | Valor: 135 
+ID: 1410050 | Nome: Interface rspan(rspan.fortilink): Interface type | Key: net.if.type[ifType.46] | Valor: 135 
+ID: 1410051 | Nome: Interface onboarding(onboarding.fortilink): Interface type | Key: net.if.type[ifType.47] | Valor: 135 
+ID: 1410053 | Nome: Interface ClienteCenco(): Interface type | Key: net.if.type[ifType.49] | Valor: 135 
+ID: 1410010 | Nome: Interface wan2(BR Digital): Interface type | Key: net.if.type[ifType.4] | Valor: 6 
+ID: 1410055 | Nome: Interface PWC(b): Interface type | Key: net.if.type[ifType.51] | Valor: 1 
+ID: 1410056 | Nome: Interface ClienteCenco2(): Interface type | Key: net.if.type[ifType.52] | Valor: 135 
+ID: 1564548 | Nome: Interface CSWLAN15(): Interface type | Key: net.if.type[ifType.54] | Valor: 135 
+ID: 1564563 | Nome: Interface cswlan15(b): Interface type | Key: net.if.type[ifType.55] | Valor: 1 
+ID: 1570321 | Nome: Interface cenconetCD(b): Interface type | Key: net.if.type[ifType.56] | Valor: 1 
+ID: 1410011 | Nome: Interface ha1(): Interface type | Key: net.if.type[ifType.5] | Valor: 6 
+ID: 1410012 | Nome: Interface ha2(): Interface type | Key: net.if.type[ifType.6] | Valor: 6 
+ID: 1410013 | Nome: Interface x1(): Interface type | Key: net.if.type[ifType.7] | Valor: 6 
+ID: 1410014 | Nome: Interface x2(): Interface type | Key: net.if.type[ifType.8] | Valor: 6 
+
+--- ITENS RELACIONADOS A STATUS ---
+ID: 1406936 | Nome: HA Cluster Member 1 - Sync Status | Key: fgHaStatsSyncStatus.[1] | Valor: 0
+ID: 1559117 | Nome: Health Check State to SLA_PUBLIC on SD-WAN member 1 | Key: fgVWLHealthCheckLinkState[1] | Valor: 0
+ID: 1559118 | Nome: Health Check State to SLA_PUBLIC on SD-WAN member 2 | Key: fgVWLHealthCheckLinkState[2] | Valor: 0
+ID: 1559119 | Nome: Health Check State to SLA_PUBLIC on SD-WAN member 4 | Key: fgVWLHealthCheckLinkState[3] | Valor: 0
+ID: 1559120 | Nome: Health Check State to SLA_PRIVATE on SD-WAN member 1 | Key: fgVWLHealthCheckLinkState[4] | Valor: 0
+ID: 1559121 | Nome: Health Check State to SLA_teams on SD-WAN member 2 | Key: fgVWLHealthCheckLinkState[5] | Valor: 0
+ID: 1559122 | Nome: Health Check State to SLA_teams on SD-WAN member 4 | Key: fgVWLHealthCheckLinkState[6] | Valor: 0
+ID: 1559123 | Nome: Health Check State to SLA_LAN on SD-WAN member 1 | Key: fgVWLHealthCheckLinkState[7] | Valor: 0
+ID: 1559124 | Nome: Health Check State to SLA_LAN_2 on SD-WAN member 1 | Key: fgVWLHealthCheckLinkState[8] | Valor: 0
+ID: 1293817 | Nome: SSL VPN state | Key: fgVpnSslState | Valor: 0
+ID: 1407585 | Nome: FortiAP PU431FTH21001640 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21001640] | Valor: 3
+ID: 1407586 | Nome: FortiAP PU431FTH21002671 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002671] | Valor: 3
+ID: 1407587 | Nome: FortiAP PU431FTH21002676 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002676] | Valor: 3
+ID: 1407588 | Nome: FortiAP PU431FTH21002677 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002677] | Valor: 3
+ID: 1407589 | Nome: FortiAP PU431FTH21002682 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002682] | Valor: 3
+ID: 1407590 | Nome: FortiAP PU431FTH21002689 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002689] | Valor: 3
+ID: 1407591 | Nome: FortiAP PU431FTH21002699 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002699] | Valor: 3
+ID: 1407592 | Nome: FortiAP PU431FTH21002705 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002705] | Valor: 3
+ID: 1407593 | Nome: FortiAP PU431FTH21002711 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002711] | Valor: 3
+ID: 1407594 | Nome: FortiAP PU431FTH21002728 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002728] | Valor: 3
+ID: 1407595 | Nome: FortiAP PU431FTH21002729 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002729] | Valor: 3
+ID: 1407596 | Nome: FortiAP PU431FTH21002750 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002750] | Valor: 3
+ID: 1407597 | Nome: FortiAP PU431FTH21002776 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002776] | Valor: 3
+ID: 1407598 | Nome: FortiAP PU431FTH21002777 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002777] | Valor: 3
+ID: 1435174 | Nome: FortiAP PU431FTH21002781 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002781] | Valor: 3
+ID: 1407599 | Nome: FortiAP PU431FTH21002820 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002820] | Valor: 3
+ID: 1407600 | Nome: FortiAP PU431FTH21002826 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002826] | Valor: 3
+ID: 1407601 | Nome: FortiAP PU431FTH21002833 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002833] | Valor: 3
+ID: 1407602 | Nome: FortiAP PU431FTH21002835 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002835] | Valor: 3
+ID: 1407603 | Nome: FortiAP PU431FTH21002840 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002840] | Valor: 3
+ID: 1407604 | Nome: FortiAP PU431FTH21002867 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002867] | Valor: 3
+ID: 1407605 | Nome: FortiAP PU431FTH21002877 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002877] | Valor: 3
+ID: 1407606 | Nome: FortiAP PU431FTH21002887 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002887] | Valor: 3
+ID: 1407607 | Nome: FortiAP PU431FTH21002930 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002930] | Valor: 3
+ID: 1407608 | Nome: FortiAP PU431FTH21002998 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21002998] | Valor: 3
+ID: 1407609 | Nome: FortiAP PU431FTH21003013 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003013] | Valor: 3
+ID: 1407610 | Nome: FortiAP PU431FTH21003021 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003021] | Valor: 3
+ID: 1407611 | Nome: FortiAP PU431FTH21003026 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003026] | Valor: 3
+ID: 1407612 | Nome: FortiAP PU431FTH21003034 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003034] | Valor: 3
+ID: 1407613 | Nome: FortiAP PU431FTH21003038 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003038] | Valor: 3
+ID: 1407614 | Nome: FortiAP PU431FTH21003062 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003062] | Valor: 3
+ID: 1407615 | Nome: FortiAP PU431FTH21003065 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003065] | Valor: 3
+ID: 1407616 | Nome: FortiAP PU431FTH21003073 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003073] | Valor: 3
+ID: 1407617 | Nome: FortiAP PU431FTH21003074 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003074] | Valor: 3
+ID: 1407618 | Nome: FortiAP PU431FTH21003168 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003168] | Valor: 3
+ID: 1407619 | Nome: FortiAP PU431FTH21003202 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003202] | Valor: 3
+ID: 1407620 | Nome: FortiAP PU431FTH21003225 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003225] | Valor: 3
+ID: 1407621 | Nome: FortiAP PU431FTH21003228 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003228] | Valor: 3
+ID: 1407622 | Nome: FortiAP PU431FTH21003229 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003229] | Valor: 3
+ID: 1407623 | Nome: FortiAP PU431FTH21003259 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003259] | Valor: 3
+ID: 1407624 | Nome: FortiAP PU431FTH21003301 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003301] | Valor: 3
+ID: 1407625 | Nome: FortiAP PU431FTH21003320 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003320] | Valor: 3
+ID: 1407626 | Nome: FortiAP PU431FTH21003335 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003335] | Valor: 3
+ID: 1407627 | Nome: FortiAP PU431FTH21003354 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003354] | Valor: 3
+ID: 1407628 | Nome: FortiAP PU431FTH21003386 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003386] | Valor: 3
+ID: 1407630 | Nome: FortiAP PU431FTH21003423 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003423] | Valor: 3
+ID: 1407631 | Nome: FortiAP PU431FTH21003439 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21003439] | Valor: 3
+ID: 1407633 | Nome: FortiAP PU431FTH21004942 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21004942] | Valor: 3
+ID: 1407634 | Nome: FortiAP PU431FTH21004950 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21004950] | Valor: 3
+ID: 1407635 | Nome: FortiAP PU431FTH21005059 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005059] | Valor: 3
+ID: 1407636 | Nome: FortiAP PU431FTH21005378 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005378] | Valor: 3
+ID: 1407637 | Nome: FortiAP PU431FTH21005384 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005384] | Valor: 3
+ID: 1407638 | Nome: FortiAP PU431FTH21005459 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005459] | Valor: 3
+ID: 1407639 | Nome: FortiAP PU431FTH21005519 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005519] | Valor: 3
+ID: 1407640 | Nome: FortiAP PU431FTH21005563 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005563] | Valor: 3
+ID: 1407641 | Nome: FortiAP PU431FTH21005574 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005574] | Valor: 3
+ID: 1407642 | Nome: FortiAP PU431FTH21005612 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005612] | Valor: 3
+ID: 1407643 | Nome: FortiAP PU431FTH21005638 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005638] | Valor: 3
+ID: 1407644 | Nome: FortiAP PU431FTH21005641 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005641] | Valor: 3
+ID: 1407645 | Nome: FortiAP PU431FTH21005661 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005661] | Valor: 3
+ID: 1407646 | Nome: FortiAP PU431FTH21005792 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005792] | Valor: 3
+ID: 1407647 | Nome: FortiAP PU431FTH21005864 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005864] | Valor: 3
+ID: 1407648 | Nome: FortiAP PU431FTH21005893 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21005893] | Valor: 3
+ID: 1407649 | Nome: FortiAP PU431FTH21006025 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21006025] | Valor: 3
+ID: 1407650 | Nome: FortiAP PU431FTH21006111 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21006111] | Valor: 3
+ID: 1407651 | Nome: FortiAP PU431FTH21006226 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21006226] | Valor: 3
+ID: 1407652 | Nome: FortiAP PU431FTH21006402 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21006402] | Valor: 3
+ID: 1407653 | Nome: FortiAP PU431FTH21006510 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21006510] | Valor: 3
+ID: 1407654 | Nome: FortiAP PU431FTH21006572 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21006572] | Valor: 3
+ID: 1407655 | Nome: FortiAP PU431FTH21006643 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21006643] | Valor: 3
+ID: 1407656 | Nome: FortiAP PU431FTH21006691 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21006691] | Valor: 3
+ID: 1449809 | Nome: FortiAP PU431FTH21013336 - Administrative Status | Key: fgWcWtpConfigWtpAdmin.[PU431FTH21013336] | Valor: 3
+ID: 1407945 | Nome: FortiAP PU431FTH21001640 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21001640] | Valor: 2
+ID: 1407946 | Nome: FortiAP PU431FTH21002671 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002671] | Valor: 2
+ID: 1407947 | Nome: FortiAP PU431FTH21002676 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002676] | Valor: 2
+ID: 1407948 | Nome: FortiAP PU431FTH21002677 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002677] | Valor: 2
+ID: 1407949 | Nome: FortiAP PU431FTH21002682 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002682] | Valor: 2
+ID: 1407950 | Nome: FortiAP PU431FTH21002689 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002689] | Valor: 2
+ID: 1407951 | Nome: FortiAP PU431FTH21002699 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002699] | Valor: 2
+ID: 1407952 | Nome: FortiAP PU431FTH21002705 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002705] | Valor: 2
+ID: 1407953 | Nome: FortiAP PU431FTH21002711 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002711] | Valor: 2
+ID: 1407954 | Nome: FortiAP PU431FTH21002728 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002728] | Valor: 2
+ID: 1407955 | Nome: FortiAP PU431FTH21002729 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002729] | Valor: 2
+ID: 1407956 | Nome: FortiAP PU431FTH21002750 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002750] | Valor: 2
+ID: 1407957 | Nome: FortiAP PU431FTH21002776 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002776] | Valor: 2
+ID: 1407958 | Nome: FortiAP PU431FTH21002777 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002777] | Valor: 2
+ID: 1435179 | Nome: FortiAP PU431FTH21002781 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002781] | Valor: 2
+ID: 1407959 | Nome: FortiAP PU431FTH21002820 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002820] | Valor: 2
+ID: 1407960 | Nome: FortiAP PU431FTH21002826 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002826] | Valor: 2
+ID: 1407961 | Nome: FortiAP PU431FTH21002833 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002833] | Valor: 2
+ID: 1407962 | Nome: FortiAP PU431FTH21002835 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002835] | Valor: 2
+ID: 1407963 | Nome: FortiAP PU431FTH21002840 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002840] | Valor: 2
+ID: 1407964 | Nome: FortiAP PU431FTH21002867 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002867] | Valor: 2
+ID: 1407965 | Nome: FortiAP PU431FTH21002877 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002877] | Valor: 2
+ID: 1407966 | Nome: FortiAP PU431FTH21002887 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002887] | Valor: 2
+ID: 1407967 | Nome: FortiAP PU431FTH21002930 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002930] | Valor: 2
+ID: 1407968 | Nome: FortiAP PU431FTH21002998 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21002998] | Valor: 2
+ID: 1407969 | Nome: FortiAP PU431FTH21003013 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003013] | Valor: 2
+ID: 1407970 | Nome: FortiAP PU431FTH21003021 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003021] | Valor: 2
+ID: 1407971 | Nome: FortiAP PU431FTH21003026 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003026] | Valor: 2
+ID: 1407972 | Nome: FortiAP PU431FTH21003034 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003034] | Valor: 2
+ID: 1407973 | Nome: FortiAP PU431FTH21003038 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003038] | Valor: 2
+ID: 1407974 | Nome: FortiAP PU431FTH21003062 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003062] | Valor: 2
+ID: 1407975 | Nome: FortiAP PU431FTH21003065 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003065] | Valor: 2
+ID: 1407976 | Nome: FortiAP PU431FTH21003073 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003073] | Valor: 2
+ID: 1407977 | Nome: FortiAP PU431FTH21003074 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003074] | Valor: 2
+ID: 1407978 | Nome: FortiAP PU431FTH21003168 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003168] | Valor: 2
+ID: 1407979 | Nome: FortiAP PU431FTH21003202 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003202] | Valor: 2
+ID: 1407980 | Nome: FortiAP PU431FTH21003225 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003225] | Valor: 2
+ID: 1407981 | Nome: FortiAP PU431FTH21003228 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003228] | Valor: 2
+ID: 1407982 | Nome: FortiAP PU431FTH21003229 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003229] | Valor: 2
+ID: 1407983 | Nome: FortiAP PU431FTH21003259 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003259] | Valor: 2
+ID: 1407984 | Nome: FortiAP PU431FTH21003301 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003301] | Valor: 2
+ID: 1407985 | Nome: FortiAP PU431FTH21003320 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003320] | Valor: 2
+ID: 1407986 | Nome: FortiAP PU431FTH21003335 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003335] | Valor: 2
+ID: 1407987 | Nome: FortiAP PU431FTH21003354 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003354] | Valor: 2
+ID: 1407988 | Nome: FortiAP PU431FTH21003386 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003386] | Valor: 2
+ID: 1407990 | Nome: FortiAP PU431FTH21003423 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003423] | Valor: 2
+ID: 1407991 | Nome: FortiAP PU431FTH21003439 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21003439] | Valor: 2
+ID: 1407993 | Nome: FortiAP PU431FTH21004942 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21004942] | Valor: 2
+ID: 1407994 | Nome: FortiAP PU431FTH21004950 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21004950] | Valor: 2
+ID: 1407995 | Nome: FortiAP PU431FTH21005059 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005059] | Valor: 2
+ID: 1407996 | Nome: FortiAP PU431FTH21005378 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005378] | Valor: 2
+ID: 1407997 | Nome: FortiAP PU431FTH21005384 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005384] | Valor: 2
+ID: 1407998 | Nome: FortiAP PU431FTH21005459 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005459] | Valor: 2
+ID: 1407999 | Nome: FortiAP PU431FTH21005519 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005519] | Valor: 2
+ID: 1408000 | Nome: FortiAP PU431FTH21005563 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005563] | Valor: 2
+ID: 1408001 | Nome: FortiAP PU431FTH21005574 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005574] | Valor: 2
+ID: 1408002 | Nome: FortiAP PU431FTH21005612 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005612] | Valor: 2
+ID: 1408003 | Nome: FortiAP PU431FTH21005638 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005638] | Valor: 2
+ID: 1408004 | Nome: FortiAP PU431FTH21005641 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005641] | Valor: 2
+ID: 1408005 | Nome: FortiAP PU431FTH21005661 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005661] | Valor: 2
+ID: 1408006 | Nome: FortiAP PU431FTH21005792 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005792] | Valor: 2
+ID: 1408007 | Nome: FortiAP PU431FTH21005864 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005864] | Valor: 2
+ID: 1408008 | Nome: FortiAP PU431FTH21005893 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21005893] | Valor: 2
+ID: 1408009 | Nome: FortiAP PU431FTH21006025 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21006025] | Valor: 2
+ID: 1408010 | Nome: FortiAP PU431FTH21006111 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21006111] | Valor: 2
+ID: 1408011 | Nome: FortiAP PU431FTH21006226 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21006226] | Valor: 2
+ID: 1408012 | Nome: FortiAP PU431FTH21006402 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21006402] | Valor: 2
+ID: 1408013 | Nome: FortiAP PU431FTH21006510 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21006510] | Valor: 2
+ID: 1408014 | Nome: FortiAP PU431FTH21006572 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21006572] | Valor: 2
+ID: 1408015 | Nome: FortiAP PU431FTH21006643 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21006643] | Valor: 2
+ID: 1408016 | Nome: FortiAP PU431FTH21006691 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21006691] | Valor: 2
+ID: 1449814 | Nome: FortiAP PU431FTH21013336 - Status | Key: fgWcWtpSessionConnectionState[PU431FTH21013336] | Valor: 2
+ID: 1409615 | Nome: Interface port13(): Duplex status | Key: net.if.duplex[dot3StatsDuplexStatus.32] | Valor: 3
+ID: 1409613 | Nome: Interface wan1(Super Connect): Duplex status | Key: net.if.duplex[dot3StatsDuplexStatus.3] | Valor: 3
+ID: 1409614 | Nome: Interface wan2(BR Digital): Duplex status | Key: net.if.duplex[dot3StatsDuplexStatus.4] | Valor: 3
+ID: 1409966 | Nome: Interface ssl.root(SSL VPN interface): Operational status | Key: net.if.status[ifOperStatus.10] | Valor: 0
+ID: 1409967 | Nome: Interface lan(): Operational status | Key: net.if.status[ifOperStatus.11] | Valor: 2
+ID: 1409968 | Nome: Interface fortilink(): Operational status | Key: net.if.status[ifOperStatus.12] | Valor: 2
+ID: 1409969 | Nome: Interface port11(): Operational status | Key: net.if.status[ifOperStatus.13] | Valor: 2
+ID: 1409970 | Nome: Interface port2(): Operational status | Key: net.if.status[ifOperStatus.15] | Valor: 2
+ID: 1409971 | Nome: Interface VLAN_MGMT_AP(): Operational status | Key: net.if.status[ifOperStatus.16] | Valor: 1
+ID: 1409972 | Nome: Interface VLAN_WLAN11(): Operational status | Key: net.if.status[ifOperStatus.17] | Valor: 1
+ID: 1409973 | Nome: Interface cswlan11(b): Operational status | Key: net.if.status[ifOperStatus.18] | Valor: 1
+ID: 1409974 | Nome: Interface CENCONET(): Operational status | Key: net.if.status[ifOperStatus.19] | Valor: 1
+ID: 1409959 | Nome: Interface dmz(): Operational status | Key: net.if.status[ifOperStatus.1] | Valor: 2
+ID: 1409975 | Nome: Interface cenconet(b): Operational status | Key: net.if.status[ifOperStatus.20] | Valor: 1
+ID: 1409976 | Nome: Interface VLAN_WLAN12(): Operational status | Key: net.if.status[ifOperStatus.21] | Valor: 1
+ID: 1409977 | Nome: Interface cswlan12(b): Operational status | Key: net.if.status[ifOperStatus.22] | Valor: 1
+ID: 1409978 | Nome: Interface port1(): Operational status | Key: net.if.status[ifOperStatus.23] | Valor: 2
+ID: 1409979 | Nome: Interface port3(): Operational status | Key: net.if.status[ifOperStatus.24] | Valor: 2
+ID: 1409980 | Nome: Interface port5(): Operational status | Key: net.if.status[ifOperStatus.25] | Valor: 2
+ID: 1409981 | Nome: Interface port6(): Operational status | Key: net.if.status[ifOperStatus.26] | Valor: 2
+ID: 1409982 | Nome: Interface port7(): Operational status | Key: net.if.status[ifOperStatus.27] | Valor: 2
+ID: 1409984 | Nome: Interface port9(): Operational status | Key: net.if.status[ifOperStatus.29] | Valor: 2
+ID: 1409985 | Nome: Interface port10(): Operational status | Key: net.if.status[ifOperStatus.30] | Valor: 2
+ID: 1409986 | Nome: Interface port12(): Operational status | Key: net.if.status[ifOperStatus.31] | Valor: 2
+ID: 1409987 | Nome: Interface port13(): Operational status | Key: net.if.status[ifOperStatus.32] | Valor: 1
+ID: 1409988 | Nome: Interface port14(): Operational status | Key: net.if.status[ifOperStatus.33] | Valor: 2
+ID: 1409989 | Nome: Interface port15(): Operational status | Key: net.if.status[ifOperStatus.34] | Valor: 2
+ID: 1409990 | Nome: Interface port16(): Operational status | Key: net.if.status[ifOperStatus.35] | Valor: 2
+ID: 1409991 | Nome: Interface port17(): Operational status | Key: net.if.status[ifOperStatus.36] | Valor: 2
+ID: 1409992 | Nome: Interface port18(): Operational status | Key: net.if.status[ifOperStatus.37] | Valor: 2
+ID: 1409993 | Nome: Interface port19(): Operational status | Key: net.if.status[ifOperStatus.38] | Valor: 2
+ID: 1409994 | Nome: Interface port20(): Operational status | Key: net.if.status[ifOperStatus.39] | Valor: 2
+ID: 1409960 | Nome: Interface wan1(Super Connect): Operational status | Key: net.if.status[ifOperStatus.3] | Valor: 1
+ID: 1409995 | Nome: Interface CABEADA(): Operational status | Key: net.if.status[ifOperStatus.40] | Valor: 1
+ID: 1409996 | Nome: Interface Uplink Core(): Operational status | Key: net.if.status[ifOperStatus.41] | Valor: 1
+ID: 1409997 | Nome: Interface default(default.fortilink): Operational status | Key: net.if.status[ifOperStatus.42] | Valor: 2
+ID: 1409998 | Nome: Interface quarantine(quarantine.fortilink): Operational status | Key: net.if.status[ifOperStatus.43] | Valor: 2
+ID: 1409999 | Nome: Interface voice(voice.fortilink): Operational status | Key: net.if.status[ifOperStatus.44] | Valor: 2
+ID: 1410000 | Nome: Interface video(video.fortilink): Operational status | Key: net.if.status[ifOperStatus.45] | Valor: 2
+ID: 1410001 | Nome: Interface rspan(rspan.fortilink): Operational status | Key: net.if.status[ifOperStatus.46] | Valor: 2
+ID: 1410002 | Nome: Interface onboarding(onboarding.fortilink): Operational status | Key: net.if.status[ifOperStatus.47] | Valor: 2
+ID: 1410004 | Nome: Interface ClienteCenco(): Operational status | Key: net.if.status[ifOperStatus.49] | Valor: 1
+ID: 1409961 | Nome: Interface wan2(BR Digital): Operational status | Key: net.if.status[ifOperStatus.4] | Valor: 1
+ID: 1410006 | Nome: Interface PWC(b): Operational status | Key: net.if.status[ifOperStatus.51] | Valor: 1
+ID: 1410007 | Nome: Interface ClienteCenco2(): Operational status | Key: net.if.status[ifOperStatus.52] | Valor: 1
+ID: 1564547 | Nome: Interface CSWLAN15(): Operational status | Key: net.if.status[ifOperStatus.54] | Valor: 1
+ID: 1564562 | Nome: Interface cswlan15(b): Operational status | Key: net.if.status[ifOperStatus.55] | Valor: 1
+ID: 1570320 | Nome: Interface cenconetCD(b): Operational status | Key: net.if.status[ifOperStatus.56] | Valor: 1
+ID: 1409962 | Nome: Interface ha1(): Operational status | Key: net.if.status[ifOperStatus.5] | Valor: 2
+ID: 1409963 | Nome: Interface ha2(): Operational status | Key: net.if.status[ifOperStatus.6] | Valor: 2
+ID: 1409964 | Nome: Interface x1(): Operational status | Key: net.if.status[ifOperStatus.7] | Valor: 2
+ID: 1409965 | Nome: Interface x2(): Operational status | Key: net.if.status[ifOperStatus.8] | Valor: 2

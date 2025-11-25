@@ -9,18 +9,16 @@ class NetworkDashboard {
     }
 
     initializeEventListeners() {
-        const storeSearch = document.getElementById('store-search');
-        const circuitSearch = document.getElementById('circuit-search');
-        if (storeSearch) storeSearch.addEventListener('input', debounce(() => this.performSearch(), 300));
-        if (circuitSearch) circuitSearch.addEventListener('input', debounce(() => this.performSearch(), 300));
-        document.getElementById('clear-search')?.addEventListener('click', () => this.clearSearch());
-        document.getElementById('store-select')?.addEventListener('change', (e) => this.onStoreSelect(e.target.value));
+        document.getElementById('store-search').addEventListener('input', debounce(() => this.performSearch(), 300));
+        document.getElementById('circuit-search').addEventListener('input', debounce(() => this.performSearch(), 300));
+        document.getElementById('clear-search').addEventListener('click', () => this.clearSearch());
+        document.getElementById('store-select').addEventListener('change', (e) => this.onStoreSelect(e.target.value));
 
-        document.getElementById('run-commands')?.addEventListener('click', () => this.runSelectedCommands());
-        document.getElementById('select-all')?.addEventListener('click', () => this.selectAllCommands());
-        document.getElementById('deselect-all')?.addEventListener('click', () => this.deselectAllCommands());
-        document.getElementById('connect-putty')?.addEventListener('click', () => this.connectPuTTY());
-        document.getElementById('web-access')?.addEventListener('click', () => this.openWebAccess());
+        document.getElementById('run-commands').addEventListener('click', () => this.runSelectedCommands());
+        document.getElementById('select-all').addEventListener('click', () => this.selectAllCommands());
+        document.getElementById('deselect-all').addEventListener('click', () => this.deselectAllCommands());
+        document.getElementById('connect-putty').addEventListener('click', () => this.connectPuTTY());
+        document.getElementById('web-access').addEventListener('click', () => this.openWebAccess());
     }
 
     initializeDashboard() {
@@ -81,8 +79,6 @@ class NetworkDashboard {
 
     async onStoreSelect(storeId) {
         if (!storeId) return;
-
-        // Atualiza dados da planilha (Banda)
         this.updateLinkInfo(storeId);
 
         let hosts = [];
@@ -95,7 +91,6 @@ class NetworkDashboard {
         }
 
         if (hosts.length === 0) {
-            // Fallback simulado para testar UI
             hosts = [{ hostid: 'sim', name: `Simulado-${storeId}`, host: '192.168.1.1', inventory: { os: 'FortiOS' } }];
         }
 
@@ -125,19 +120,16 @@ class NetworkDashboard {
         this.currentSelectedHost = host;
         this.deviceType = this.determineDeviceType(host);
 
-        // Atualiza Header
         document.getElementById('device-name').textContent = host.name;
         const ip = (host.interfaces && host.interfaces[0]) ? host.interfaces[0].ip : host.host;
         document.getElementById('device-ip').textContent = ip;
         document.getElementById('device-type-badge').textContent = this.deviceType.replace('_', ' ').toUpperCase();
 
-        // Layout Dinâmico
         this.updateLayoutByDeviceType(this.deviceType);
-        this.loadCommandsForDevice();
+        this.loadCommandsForDevice(); // CORREÇÃO: Carrega comandos aqui!
 
         this.showLoading('Atualizando...');
         try {
-            // Busca itens (nome mais genérico possível)
             const searchNames = [
                 'CPU', 'ICMP', 'Ping', 'Uptime', 'wan1', 'wan2', 'bits', 'sent', 'received',
                 'status', 'memory', 'available', 'total', 'utilization', 'out', 'in', 'usage'
@@ -147,7 +139,6 @@ class NetworkDashboard {
             const problems = await this.zabbixClient.getHostProblems(host.hostid);
 
             const data = ZabbixDataProcessor.processDashboardData(items, problems, this.deviceType);
-
             this.updateDashboardUI(data);
 
             if (this.deviceType === 'fortinet_firewall') {
@@ -168,7 +159,6 @@ class NetworkDashboard {
     }
 
     updateDashboardUI(data) {
-        // KPIs
         this.updateElement('card-uptime', data.uptime);
         this.updateElement('sidebar-uptime', data.uptime);
         this.updateElement('card-latency', data.latency);
@@ -176,18 +166,15 @@ class NetworkDashboard {
         this.updateElement('card-loss', data.loss);
         this.updateElement('sidebar-loss', data.loss);
 
-        // Status
         const isUp = data.uptime !== '--' && data.uptime !== 'N/A';
         const dot = document.getElementById('card-status-indicator');
         if (dot) dot.className = `status-dot ${isUp ? 'up' : 'down'}`;
 
-        // Gauges
         if (data.cpu !== '--') window.dashboardCharts.chartManager.updateGaugeChart('cpu-gauge', parseFloat(data.cpu));
         if (data.memory !== '--') window.dashboardCharts.chartManager.updateGaugeChart('memory-gauge', parseFloat(data.memory));
         document.getElementById('cpu-gauge-value').textContent = data.cpu !== '--' ? data.cpu + '%' : '--';
         document.getElementById('memory-gauge-value').textContent = data.memory !== '--' ? data.memory + '%' : '--';
 
-        // Switch / AP
         if (this.deviceType.includes('switch')) {
             this.updateElement('switch-interfaces-down', data.dynamic.interfacesDown || '0');
             const list = document.getElementById('switch-problems-list');
@@ -200,7 +187,6 @@ class NetworkDashboard {
             this.updateElement('ap-loss', data.loss);
         }
 
-        // Firewall
         if (this.deviceType === 'fortinet_firewall') {
             const dyn = data.dynamic;
             this.updateElement('card-wan1-status', dyn.wan1Status);
@@ -217,7 +203,6 @@ class NetworkDashboard {
     updateLinkInfo(storeId) {
         const data = this.storesData.find(s => s.id === storeId);
         if (!data) return;
-        // Mapeamento dos dados do Excel (servidor_final.py retorna em lowercase keys)
         this.updateElement('wan1-banda', data.banda_wan1);
         this.updateElement('wan1-op', data.operador_wan1);
         this.updateElement('wan1-circ', data.circuito_wan1);
@@ -226,29 +211,37 @@ class NetworkDashboard {
         this.updateElement('wan2-circ', data.circuito_wan2);
     }
 
-    // Função que encontra gráficos de tráfego
     async updateCharts(hostId, itemsData) {
         if (!window.dashboardCharts || !this.zabbixClient) return;
-        // Lógica simplificada de busca de IDs para o gráfico
-        const findId = (t) => {
+
+        // Função de busca flexível para achar os IDs corretos
+        const findId = (terms) => {
             for (const [name, item] of Object.entries(itemsData)) {
-                if (t.every(k => name.toLowerCase().includes(k))) return item.itemid;
+                const n = name.toLowerCase();
+                if (terms.every(k => n.includes(k))) return item.itemid;
             }
             return null;
         };
-        // Tenta achar IDs de tráfego
-        const w1In = findId(['wan1', 'in']) || findId(['wan1', 'received']);
-        const w1Out = findId(['wan1', 'out']) || findId(['wan1', 'sent']);
-        const w2In = findId(['wan2', 'in']) || findId(['wan2', 'received']);
-        const w2Out = findId(['wan2', 'out']) || findId(['wan2', 'sent']);
 
+        // Tenta achar IDs de tráfego (WAN1)
+        // Usando termos mais específicos para evitar 'discarded' ou 'errors'
+        const w1In = findId(['wan1', 'bits received']);
+        const w1Out = findId(['wan1', 'bits sent']);
+
+        // Tenta achar IDs de tráfego (WAN2)
+        const w2In = findId(['wan2', 'bits received']);
+        const w2Out = findId(['wan2', 'bits sent']);
+
+        // Atualiza WAN 1
         if (w1In && w1Out) {
             const histIn = await this.zabbixClient.getItemHistory(w1In, 1);
             const histOut = await this.zabbixClient.getItemHistory(w1Out, 1);
-            // Formata: divide por 1000000 para Mbps
+            // Divide por 1 milhão para Mbps
             const fmt = (h) => h.map(p => ({ x: new Date(p.clock * 1000), y: (parseFloat(p.value) / 1000000) }));
             window.dashboardCharts.chartManager.updateTrafficChart('wan1-traffic-chart', fmt(histOut), fmt(histIn));
         }
+
+        // Atualiza WAN 2
         if (w2In && w2Out) {
             const histIn = await this.zabbixClient.getItemHistory(w2In, 1);
             const histOut = await this.zabbixClient.getItemHistory(w2Out, 1);
@@ -259,31 +252,38 @@ class NetworkDashboard {
 
     loadCommandsForDevice() {
         const list = document.getElementById('commands-list');
+        if (!list) return;
         list.innerHTML = '';
+
+        // Garante que os perfis foram carregados do ZabbixClient
         const profiles = window.ZABBIX_COMMAND_PROFILES || {};
-        const cmds = profiles[this.deviceType] || profiles['default'] || [];
+        let cmds = profiles[this.deviceType];
+
+        // Fallback se não encontrar exato (ex: 'cisco_switch' vs 'default')
+        if (!cmds) cmds = profiles['default'] || [];
 
         if (cmds.length === 0) {
-            list.innerHTML = '<div style="color:#666; padding:10px">Sem comandos disponíveis</div>';
+            list.innerHTML = '<div style="color:#666; padding:10px; text-align:center">Sem comandos disponíveis</div>';
             return;
         }
 
         cmds.forEach((c, i) => {
             const div = document.createElement('div');
             div.className = 'command-item';
-            div.innerHTML = `<input type="checkbox" id="cmd-${i}" class="cmd-chk" data-cmd="${c.command}"> <label for="cmd-${i}">${c.name}</label>`;
+            div.innerHTML = `
+                <input type="checkbox" id="cmd-${i}" class="cmd-chk" data-cmd="${c.command}">
+                <label for="cmd-${i}">${c.name}</label>
+            `;
             list.appendChild(div);
         });
     }
 
-    // Helpers
     updateElement(id, val) { const el = document.getElementById(id); if (el) el.textContent = val || '--'; }
     showLoading(msg) { document.getElementById('loading-overlay')?.classList.add('show'); }
     hideLoading() { document.getElementById('loading-overlay')?.classList.remove('show'); }
     selectAllCommands() { document.querySelectorAll('.cmd-chk').forEach(c => c.checked = true); }
     deselectAllCommands() { document.querySelectorAll('.cmd-chk').forEach(c => c.checked = false); }
 
-    // CORREÇÃO: Abrir HTTPS com IP
     openWebAccess() {
         const host = this.currentSelectedHost;
         if (!host) return;
@@ -291,7 +291,6 @@ class NetworkDashboard {
         window.open(`https://${ip}`, '_blank');
     }
 
-    // Correção: Executar Comandos
     async runSelectedCommands() {
         const cmds = [];
         document.querySelectorAll('.cmd-chk:checked').forEach(c => cmds.push(c.dataset.cmd));
@@ -317,6 +316,14 @@ class NetworkDashboard {
             win.document.write(`<body style="background:#111;color:#0f0;font-family:monospace;white-space:pre-wrap">${result.output}</body>`);
         } catch (e) { alert("Erro SSH: " + e); }
     }
+
+    clearSearch() {
+        document.getElementById('store-search').value = '';
+        document.getElementById('circuit-search').value = '';
+        this.performSearch();
+    }
+
+    connectPuTTY() { alert("Abrindo PuTTY..."); }
 
     determineDeviceType(host) {
         const os = (host.inventory?.os || '').toLowerCase();
