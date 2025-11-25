@@ -66,17 +66,36 @@ class LinksDashboard {
         tbody.innerHTML = '<tr><td colspan="6" class="text-center"><div class="spinner"></div> Carregando dados do Zabbix...</td></tr>';
 
         try {
-            // Fetch all problems
-            const problems = await this.zabbixClient.getAllProblems();
+            // 1. Try to find "Links" host group
+            let groupId = null;
+            try {
+                const groups = await this.zabbixClient.getHostGroups();
+                if (groups && Array.isArray(groups)) {
+                    // Look for "Links" or "Incidentes Links" or similar
+                    const linkGroup = groups.find(g =>
+                        g.name.toLowerCase().includes('links') ||
+                        g.name.toLowerCase().includes('incidentes links')
+                    );
+                    if (linkGroup) {
+                        console.log('Filtering by Host Group:', linkGroup.name);
+                        groupId = linkGroup.groupid;
+                    }
+                }
+            } catch (err) {
+                console.warn('Failed to fetch host groups, proceeding without group filter:', err);
+            }
 
-            // Filter for Link/Interface related issues
+            // 2. Fetch problems (filtered by group if found)
+            const problems = await this.zabbixClient.getAllProblems(groupId);
+
+            // 3. Filter for Link/Interface related issues
             // Keywords: Link, Interface, Down, Ping, ICMP, OSPF, BGP, Tunnel, VPN, Connection
             const keywords = ['link', 'interface', 'down', 'ping', 'icmp', 'ospf', 'bgp', 'tunnel', 'vpn', 'connection', 'loss'];
 
             this.problems = problems.filter(p => {
                 const text = (p.name + (p.tags ? JSON.stringify(p.tags) : '')).toLowerCase();
                 return keywords.some(k => text.includes(k));
-            });
+            }).sort((a, b) => b.clock - a.clock); // Client-side sort by date DESC
 
             this.renderTable(this.problems);
         } catch (error) {

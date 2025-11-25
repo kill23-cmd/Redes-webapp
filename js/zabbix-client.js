@@ -73,19 +73,61 @@ class ZabbixClient {
 
     async getHostProblems(hostId) {
         return this.request('problem.get', {
-            hostids: hostId, output: 'extend', sortfield: ['eventid'], sortorder: 'DESC'
+            hostids: hostId, output: 'extend', sortfield: 'eventid', sortorder: 'DESC'
         });
     }
 
-    async getAllProblems() {
-        return this.request('problem.get', {
-            output: 'extend',
-            selectTags: 'extend',
-            selectHosts: 'extend',
-            recent: 'true',
-            sortfield: ['eventid'],
-            sortorder: 'DESC'
-        });
+    async getAllProblems(groupId = null) {
+        console.log('getAllProblems called with groupId:', groupId);
+
+        const getParams = (level) => {
+            const p = { output: 'extend' };
+
+            // Only add groupids if not 'desperate' and groupId exists
+            if (groupId && level !== 'desperate') {
+                p.groupids = Array.isArray(groupId) ? groupId : [groupId];
+            }
+
+            if (level === 'full') {
+                p.selectTags = 'extend';
+                p.selectHosts = 'extend';
+                p.sortfield = 'eventid';
+                p.sortorder = 'DESC';
+            } else if (level === 'safe') {
+                p.selectTags = 'extend';
+                p.selectHosts = 'extend';
+            } else if (level === 'desperate') {
+                // Try specific fields instead of 'extend' and NO group filter
+                p.output = ['eventid', 'name', 'clock', 'severity', 'r_eventid'];
+                p.selectHosts = 'extend'; // We really need hosts
+            }
+            return p;
+        };
+
+        try {
+            const params = getParams('full');
+            console.log('Attempting fetch: FULL', JSON.stringify(params));
+            return await this.request('problem.get', params);
+        } catch (err) {
+            console.warn('Full fetch failed, retrying SAFE...', err);
+            try {
+                const params = getParams('safe');
+                console.log('Attempting fetch: SAFE', JSON.stringify(params));
+                return await this.request('problem.get', params);
+            } catch (err2) {
+                console.warn('Safe fetch failed, retrying MINIMAL...', err2);
+                try {
+                    const params = getParams('minimal');
+                    console.log('Attempting fetch: MINIMAL', JSON.stringify(params));
+                    return await this.request('problem.get', params);
+                } catch (err3) {
+                    console.warn('Minimal fetch failed, retrying DESPERATE...', err3);
+                    const params = getParams('desperate');
+                    console.log('Attempting fetch: DESPERATE', JSON.stringify(params));
+                    return await this.request('problem.get', params);
+                }
+            }
+        }
     }
 
     async getMockData() { return []; }
