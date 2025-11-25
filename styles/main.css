@@ -42,6 +42,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-y: auto;
+  /* Enable sidebar scrolling */
 }
 
 .brand {
@@ -146,7 +148,8 @@ select {
 .dashboard-scroll {
   overflow-y: auto;
   padding-bottom: 50px;
-  height: 100%;
+  flex: 1;
+  /* Take remaining space */
   padding-right: 10px;
 }
 
@@ -424,4 +427,41 @@ select {
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
+}
+
+/* Sidebar Collapsed State */
+.app-container.sidebar-collapsed {
+  grid-template-columns: 60px 1fr;
+}
+
+.app-container.sidebar-collapsed .brand-text,
+.app-container.sidebar-collapsed .search-container,
+.app-container.sidebar-collapsed .store-selector,
+.app-container.sidebar-collapsed .hosts-container,
+.app-container.sidebar-collapsed .quick-info {
+  display: none;
+}
+
+.app-container.sidebar-collapsed .sidebar {
+  padding: 20px 10px;
+  align-items: center;
+}
+
+.app-container.sidebar-collapsed .brand {
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.app-container.sidebar-collapsed #sidebar-toggle {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+  margin: 0;
+  z-index: 10;
+}
+
+.app-container.sidebar-collapsed .brand-icon {
+  display: block;
+  margin: 0;
 }

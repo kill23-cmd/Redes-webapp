@@ -126,7 +126,7 @@ class APIHandler(http.server.SimpleHTTPRequestHandler):
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         try:
-            client.connect(host, username=username, password=password, timeout=10, look_for_keys=False, allow_agent=False)
+            client.connect(host, username=username, password=password, timeout=10)
             output_log += f"✅ Conectado a {host}\n"
             
             for cmd in commands:

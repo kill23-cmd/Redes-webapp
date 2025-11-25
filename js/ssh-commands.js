@@ -9,7 +9,7 @@ class SSHCommandManager {
         this.commandHistory = [];
         this.initializeUI();
     }
-    
+
     /**
      * Initialize SSH commands UI
      */
@@ -17,7 +17,7 @@ class SSHCommandManager {
         this.setupEventListeners();
         this.loadDefaultCommands();
     }
-    
+
     /**
      * Setup event listeners
      */
@@ -33,7 +33,7 @@ class SSHCommandManager {
                 }
             }
         });
-        
+
         // Load profile button (if exists)
         const loadProfileBtn = document.getElementById('load-profile');
         if (loadProfileBtn) {
@@ -41,7 +41,7 @@ class SSHCommandManager {
                 this.loadProfileCommands();
             });
         }
-        
+
         // Export commands button (if exists)
         const exportBtn = document.getElementById('export-commands');
         if (exportBtn) {
@@ -50,7 +50,7 @@ class SSHCommandManager {
             });
         }
     }
-    
+
     /**
      * Load commands for device profile
      * @param {string} profile - Device profile name
@@ -60,29 +60,29 @@ class SSHCommandManager {
         this.selectedCommands.clear();
         this.loadCommandsList();
     }
-    
+
     /**
      * Load commands list based on current profile
      */
     loadCommandsList() {
         const commandsList = document.getElementById('commands-list');
         if (!commandsList) return;
-        
+
         commandsList.innerHTML = '';
-        
+
         const commands = ZABBIX_COMMAND_PROFILES[this.currentProfile] || [];
-        
+
         if (commands.length === 0) {
             commandsList.innerHTML = '<div class="no-commands">Nenhum comando definido para este tipo de dispositivo.</div>';
             return;
         }
-        
+
         commands.forEach((cmd, index) => {
             const commandItem = this.createCommandItem(cmd, index);
             commandsList.appendChild(commandItem);
         });
     }
-    
+
     /**
      * Create command item element
      * @param {Object} command - Command object
@@ -91,10 +91,10 @@ class SSHCommandManager {
      */
     createCommandItem(command, index) {
         const commandId = `cmd-${command.command.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '')}-${index}`;
-        
+
         const commandItem = document.createElement('div');
         commandItem.className = 'command-item';
-        
+
         commandItem.innerHTML = `
             <input type="checkbox" class="command-checkbox" id="${commandId}">
             <label class="command-label" for="${commandId}">
@@ -105,24 +105,24 @@ class SSHCommandManager {
                 <i data-lucide="copy"></i>
             </button>
         `;
-        
+
         // Add copy button functionality
         const copyBtn = commandItem.querySelector('.command-copy');
         copyBtn.addEventListener('click', (e) => {
             e.preventDefault();
             this.copyCommand(command.command);
         });
-        
+
         return commandItem;
     }
-    
+
     /**
      * Load default commands
      */
     loadDefaultCommands() {
         this.loadCommandsForProfile('default');
     }
-    
+
     /**
      * Select all commands
      */
@@ -132,7 +132,7 @@ class SSHCommandManager {
             this.selectedCommands.add(checkbox.id.replace('cmd-', ''));
         });
     }
-    
+
     /**
      * Deselect all commands
      */
@@ -142,7 +142,7 @@ class SSHCommandManager {
         });
         this.selectedCommands.clear();
     }
-    
+
     /**
      * Get selected commands
      * @returns {Array} Array of selected commands
@@ -157,7 +157,7 @@ class SSHCommandManager {
         });
         return commands;
     }
-    
+
     /**
      * Get command text from checkbox
      * @param {HTMLInputElement} checkbox - Checkbox element
@@ -168,7 +168,7 @@ class SSHCommandManager {
         const commandSpan = label?.querySelector('.command-text');
         return commandSpan ? commandSpan.textContent : '';
     }
-    
+
     /**
      * Execute selected commands
      * @param {Object} host - Host information
@@ -176,28 +176,28 @@ class SSHCommandManager {
      */
     async executeSelectedCommands(host) {
         const selectedCommands = this.getSelectedCommands();
-        
+
         if (selectedCommands.length === 0) {
             throw new Error('Nenhum comando selecionado');
         }
-        
+
         const config = configManager.config;
         if (!config.ssh.user || !config.ssh.password) {
             throw new Error('Configurações SSH não encontradas');
         }
-        
+
         try {
             // Show execution dialog
             const executionDialog = this.createExecutionDialog(host, selectedCommands);
             document.body.appendChild(executionDialog);
-            
-            // Execute commands (mock implementation)
-            const results = await this.mockExecuteCommands(host, selectedCommands);
-            
+
+            // Execute commands via API
+            const results = await this.executeCommands(host, selectedCommands);
+
             // Remove dialog and show results
             executionDialog.remove();
             this.showExecutionResults(results);
-            
+
             // Add to history
             this.addToHistory({
                 host: host.name,
@@ -205,41 +205,53 @@ class SSHCommandManager {
                 timestamp: new Date(),
                 results: results
             });
-            
+
             return results;
-            
+
         } catch (err) {
             console.error('Command execution failed:', err);
             throw err;
         }
     }
-    
+
     /**
      * Mock command execution (replace with real SSH implementation)
      * @param {Object} host - Host information
      * @param {Array} commands - Commands to execute
      * @returns {Promise<Object>} Execution results
      */
-    async mockExecuteCommands(host, commands) {
-        return new Promise((resolve) => {
-            // Simulate execution delay
-            setTimeout(() => {
-                const results = {
-                    host: host.name,
-                    commands: commands.map(cmd => ({
-                        command: cmd,
-                        output: this.generateMockOutput(cmd),
-                        exitCode: 0,
-                        executionTime: Math.random() * 500 + 100 // 100-600ms
-                    })),
-                    totalExecutionTime: Math.random() * 2000 + 500, // 500-2500ms
-                    timestamp: new Date()
-                };
-                resolve(results);
-            }, 1000);
-        });
+    /**
+     * Execute commands via backend API
+     * @param {Object} host - Host information
+     * @param {Array} commands - Commands to execute
+     * @returns {Promise<Object>} Execution results
+     */
+    async executeCommands(host, commands) {
+        const config = configManager.config;
+
+        try {
+            const response = await api.post('/api/ssh-execute', {
+                host: host.host, // Ensure we use the IP or hostname
+                username: config.ssh.user,
+                password: config.ssh.password,
+                commands: commands
+            });
+
+            return {
+                host: host.name,
+                commands: commands.map(cmd => ({
+                    command: cmd,
+                    output: response.output || '',
+                    exitCode: response.success ? 0 : 1
+                })),
+                timestamp: new Date()
+            };
+        } catch (error) {
+            console.error('SSH Execution Error:', error);
+            throw error;
+        }
     }
-    
+
     /**
      * Generate mock command output
      * @param {string} command - Command that was executed
@@ -251,13 +263,13 @@ class SSHCommandManager {
 GigabitEthernet0/0     192.168.1.1    YES manual up                    up      
 GigabitEthernet0/1     10.0.0.1       YES manual up                    up      
 Serial0/0/0            172.16.0.1     YES manual up                    up      `,
-            
+
             'show cdp neighbors': `Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
                                   S - Switch, H - Host, I - IGMP, r - Repeater
 
 Device ID        Local Intrfce     Holdtme    Capability  Platform  Port ID
 SW1              Gig 0/1            158             S I      WS-C2950  2/1    `,
-            
+
             'show running-config': `!
 ! Last configuration change at 15:30:45 UTC Mon Jan 1 2024
 !
@@ -277,7 +289,7 @@ interface GigabitEthernet0/1
  ip address 10.0.0.1 255.255.255.0
  duplex auto
  speed auto`,
-            
+
             'get sys status': `Version: FortiGate-VM64 v7.4.0,build2367,230926
 Serial-Number: FGVM02TM21400123
 BIOS version: 04000002
@@ -286,13 +298,13 @@ Hostname: BRALAGB247FW254
 Operation Mode: NAT
 Current user: admin
 System time: Thu Jan  1 15:30:45 2024`,
-            
+
             'show vlan brief': `VLAN Name                             Status    Ports
 ---- -------------------------------- --------- -------------------------------
 1    default                          active    Gi0/1, Gi0/2, Gi0/3, Gi0/4
 10   VLAN0010                         active    Gi0/5, Gi0/6
 20   VLAN0020                         active    Gi0/7, Gi0/8`,
-            
+
             'display lldp ne brief': `LLDP neighbor-information of port :GigabitEthernet0/0
 -------------------------------------------------------------------------------
 Neighbor's interface descriptions : 
@@ -303,16 +315,16 @@ SystemDesc: H3C Comware Platform Software, Software Version 5.20.99,
 Release 1808P35, H3C S12504 
 ```
         };
-        
+
         // Return specific output if available, otherwise generate generic output
         if (outputs[command]) {
             return outputs[command];
         }
-        
+
         // Generate generic mock output
         return `% ${command}\n${this.generateGenericMockOutput(command)}`;
     }
-    
+
     /**
      * Generate generic mock output
      * @param {string} command - Command
@@ -328,10 +340,10 @@ Release 1808P35, H3C S12504
             'Normal operation',
             'System responsive'
         ];
-        
+
         return variations[Math.floor(Math.random() * variations.length)];
     }
-    
+
     /**
      * Create execution dialog
      * @param {Object} host - Host information
@@ -342,7 +354,7 @@ Release 1808P35, H3C S12504
         const dialog = document.createElement('div');
         dialog.className = 'execution-dialog modal show';
         dialog.style.display = 'flex';
-        
+
         dialog.innerHTML = `
             <div class="modal-content">
                 <div class="modal-header">
@@ -362,10 +374,10 @@ Release 1808P35, H3C S12504
                 </div>
             </div>
         `;
-        
+
         return dialog;
     }
-    
+
     /**
      * Show execution results
      * @param {Object} results - Execution results
@@ -411,7 +423,7 @@ Release 1808P35, H3C S12504
             </html>
         `);
     }
-    
+
     /**
      * Copy command to clipboard
      * @param {string} command - Command to copy
@@ -424,23 +436,23 @@ Release 1808P35, H3C S12504
             showNotification('Erro ao copiar comando', 'error');
         }
     }
-    
+
     /**
      * Add command execution to history
      * @param {Object} entry - History entry
      */
     addToHistory(entry) {
         this.commandHistory.unshift(entry);
-        
+
         // Keep only last 50 entries
         if (this.commandHistory.length > 50) {
             this.commandHistory = this.commandHistory.slice(0, 50);
         }
-        
+
         // Save to localStorage
         storage.set('ssh-command-history', this.commandHistory);
     }
-    
+
     /**
      * Load command history
      */
@@ -448,7 +460,7 @@ Release 1808P35, H3C S12504
         const saved = storage.get('ssh-command-history', []);
         this.commandHistory = saved;
     }
-    
+
     /**
      * Export commands to file
      */
@@ -458,20 +470,20 @@ Release 1808P35, H3C S12504
             showNotification('Selecione pelo menos um comando para exportar', 'warning');
             return;
         }
-        
+
         const exportData = {
             profile: this.currentProfile,
             commands: commands,
             exportedAt: new Date().toISOString()
         };
-        
+
         const dataStr = JSON.stringify(exportData, null, 2);
         const fileName = `comandos-${this.currentProfile}-${Date.now()}.json`;
-        
+
         downloadFile(dataStr, fileName, 'application/json');
         showNotification(`Comandos exportados para ${fileName}`, 'success');
     }
-    
+
     /**
      * Import commands from file
      * @param {File} file - File to import
@@ -480,7 +492,7 @@ Release 1808P35, H3C S12504
         try {
             const content = await file.text();
             const data = JSON.parse(content);
-            
+
             if (data.commands && Array.isArray(data.commands)) {
                 this.loadCommandsFromArray(data.commands);
                 showNotification(`${data.commands.length} comandos importados com sucesso!`, 'success');
@@ -491,7 +503,7 @@ Release 1808P35, H3C S12504
             showNotification(`Erro ao importar comandos: ${err.message}`, 'error');
         }
     }
-    
+
     /**
      * Load commands from array
      * @param {Array} commands - Array of commands
@@ -502,11 +514,11 @@ Release 1808P35, H3C S12504
             name: `Comando ${index + 1}`,
             command: cmd
         }));
-        
+
         ZABBIX_COMMAND_PROFILES['imported'] = profileCommands;
         this.loadCommandsForProfile('imported');
     }
-    
+
     /**
      * Get command execution statistics
      * @returns {Object} Statistics object
@@ -519,48 +531,48 @@ Release 1808P35, H3C S12504
             successRate: this.getSuccessRate()
         };
     }
-    
+
     /**
      * Get most used commands
      * @returns {Array} Array of most used commands
      */
     getMostUsedCommands() {
         const commandCounts = {};
-        
+
         this.commandHistory.forEach(entry => {
             entry.commands.forEach(cmd => {
                 commandCounts[cmd] = (commandCounts[cmd] || 0) + 1;
             });
         });
-        
+
         return Object.entries(commandCounts)
-            .sort(([,a], [,b]) => b - a)
+            .sort(([, a], [, b]) => b - a)
             .slice(0, 10)
             .map(([command, count]) => ({ command, count }));
     }
-    
+
     /**
      * Get average execution time
      * @returns {number} Average execution time in ms
      */
     getAverageExecutionTime() {
         if (this.commandHistory.length === 0) return 0;
-        
+
         const totalTime = this.commandHistory.reduce((sum, entry) => sum + entry.totalExecutionTime, 0);
         return totalTime / this.commandHistory.length;
     }
-    
+
     /**
      * Get success rate
      * @returns {number} Success rate percentage
      */
     getSuccessRate() {
         if (this.commandHistory.length === 0) return 100;
-        
+
         const successfulExecutions = this.commandHistory.filter(entry => {
             return entry.results && entry.results.commands.every(cmd => cmd.exitCode === 0);
         });
-        
+
         return (successfulExecutions.length / this.commandHistory.length) * 100;
     }
 }

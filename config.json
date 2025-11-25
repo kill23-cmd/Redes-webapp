@@ -2,13 +2,11 @@
   "zabbix": {
     "url": "https://zabbixbrasil.cencosud.corp/api_jsonrpc.php",
     "user": "reports",
-    "password": "a#Z2Y0b1c9P#",
-    "enabled": true
+    "password": "a#Z2Y0b1c9P#"
   },
   "ssh": {
     "user": "rfmelojr",
-    "password": "",
-    "enabled": false
+    "password": "09112019rGC@#"
   },
   "dashboard": {
     "refreshInterval": 30,
