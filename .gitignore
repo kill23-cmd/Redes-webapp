@@ -1,0 +1,7 @@
+config.json
+node_modules/
+__pycache__/
+*.log
+.env
+.vscode/
+.idea/

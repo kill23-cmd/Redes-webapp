@@ -4,6 +4,7 @@ class NetworkDashboard {
         this.currentSelectedHost = null;
         this.deviceType = 'default';
         this.storesData = [];
+        this.linksDashboard = null;
         this.initializeEventListeners();
         this.initializeDashboard();
     }
@@ -19,6 +20,10 @@ class NetworkDashboard {
         document.getElementById('deselect-all').addEventListener('click', () => this.deselectAllCommands());
         document.getElementById('connect-putty').addEventListener('click', () => this.connectPuTTY());
         document.getElementById('web-access').addEventListener('click', () => this.openWebAccess());
+        document.getElementById('btn-links-down').addEventListener('click', () => {
+            if (this.linksDashboard) this.linksDashboard.show();
+            else alert('Aguarde a conexão com o Zabbix...');
+        });
     }
 
     initializeDashboard() {
@@ -34,6 +39,7 @@ class NetworkDashboard {
         const config = configManager.config;
         this.zabbixClient = new ZabbixClient(config.zabbix.url, config.zabbix.user, config.zabbix.password);
         await this.zabbixClient.authenticate();
+        this.linksDashboard = new LinksDashboard(this.zabbixClient);
         await this.loadStoresData();
     }
 

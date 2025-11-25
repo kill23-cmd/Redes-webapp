@@ -77,6 +77,17 @@ class ZabbixClient {
         });
     }
 
+    async getAllProblems() {
+        return this.request('problem.get', {
+            output: 'extend',
+            selectTags: 'extend',
+            selectHosts: 'extend',
+            recent: 'true',
+            sortfield: ['eventid'],
+            sortorder: 'DESC'
+        });
+    }
+
     async getMockData() { return []; }
     async testConnection() { return { success: true, version: '7.0', message: 'OK' }; }
 }
