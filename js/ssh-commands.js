@@ -382,15 +382,25 @@ Release 1808P35, H3C S12504
      * Show execution results
      * @param {Object} results - Execution results
      */
+    /**
+     * Show execution results with Auto-Refresh support
+     * @param {Object} results - Execution results
+     */
+    /**
+     * Show execution results with Auto-Refresh support
+     * @param {Object} results - Execution results
+     */
     showExecutionResults(results) {
         const resultsWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
-        resultsWindow.document.write(`
+
+        const renderContent = (res) => `
             <html>
                 <head>
-                    <title>Resultados de Comandos - ${results.host}</title>
+                    <title>Resultados de Comandos - ${res.host}</title>
                     <style>
                         body { font-family: 'JetBrains Mono', monospace; margin: 20px; background: #141414; color: #e4e4e7; }
-                        .header { margin-bottom: 20px; padding: 15px; background: #27272a; border-radius: 8px; }
+                        .header { margin-bottom: 20px; padding: 15px; background: #27272a; border-radius: 8px; display: flex; justify-content: space-between; align-items: start; }
+                        .header-info h2 { margin: 0 0 10px 0; color: #38bdf8; }
                         .command-result { margin-bottom: 20px; padding: 15px; background: #27272a; border-radius: 8px; }
                         .command-title { font-weight: bold; color: #00b8d9; margin-bottom: 10px; }
                         .command-output { white-space: pre-wrap; line-height: 1.4; }
@@ -398,30 +408,182 @@ Release 1808P35, H3C S12504
                         .exit-code { float: right; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
                         .exit-code-0 { background: #22c55e20; color: #22c55e; }
                         .exit-code-error { background: #ef444420; color: #ef4444; }
+                        .controls { display: flex; align-items: center; gap: 10px; background: #3f3f46; padding: 8px 12px; border-radius: 6px; }
+                        .refresh-label { font-size: 14px; user-select: none; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+                        .refresh-spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #38bdf8; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
+                        .timestamp-banner { background: #000; color: #fff; padding: 5px 10px; margin-bottom: 15px; font-weight: bold; border-left: 3px solid #38bdf8; }
+                        select.interval-select { background: #27272a; color: #fff; border: 1px solid #52525b; padding: 2px 5px; border-radius: 4px; }
+                        @keyframes spin { to { transform: rotate(360deg); } }
                     </style>
                 </head>
                 <body>
                     <div class="header">
-                        <h2>Resultados de Execução</h2>
-                        <p><strong>Host:</strong> ${results.host}</p>
-                        <p><strong>Data/Hora:</strong> ${results.timestamp.toLocaleString()}</p>
-                        <p><strong>Tempo Total:</strong> ${results.totalExecutionTime.toFixed(0)}ms</p>
-                    </div>
-                    ${results.commands.map(cmd => `
-                        <div class="command-result">
-                            <div class="command-title">$ ${cmd.command}</div>
-                            <div class="command-output">${cmd.output}</div>
-                            <div class="execution-time">
-                                Tempo: ${cmd.executionTime.toFixed(0)}ms
-                                <span class="exit-code ${cmd.exitCode === 0 ? 'exit-code-0' : 'exit-code-error'}">
-                                    Exit Code: ${cmd.exitCode}
-                                </span>
-                            </div>
+                        <div class="header-info">
+                            <h2>Resultados de Execução</h2>
+                            <p><strong>Host:</strong> ${res.host}</p>
                         </div>
-                    `).join('')}
+                        <div class="controls">
+                            <label class="refresh-label">
+                                <input type="checkbox" id="auto-refresh"> Auto-Refresh
+                            </label>
+                            <select id="refresh-interval" class="interval-select">
+                                <option value="5000">5s</option>
+                                <option value="10000">10s</option>
+                                <option value="15000">15s</option>
+                                <option value="30000">30s</option>
+                                <option value="60000">60s</option>
+                            </select>
+                            <div id="spinner" class="refresh-spinner"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="timestamp-container">
+                        <div class="timestamp-banner">--- ATUALIZANDO (${res.timestamp.toLocaleString('pt-BR')}) ---</div>
+                    </div>
+
+                    <div id="results-container">
+                        ${res.commands.map(cmd => `
+                            <div class="command-result">
+                                <div class="command-title">$ ${cmd.command}</div>
+                                <div class="command-output">${cmd.output}</div>
+                                <div class="execution-time">
+                                    Tempo: ${cmd.executionTime ? cmd.executionTime.toFixed(0) : 0}ms
+                                    <span class="exit-code ${cmd.exitCode === 0 ? 'exit-code-0' : 'exit-code-error'}">
+                                        Exit Code: ${cmd.exitCode}
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <script>
+                        const checkbox = document.getElementById('auto-refresh');
+                        const intervalSelect = document.getElementById('refresh-interval');
+                        const spinner = document.getElementById('spinner');
+                        let intervalId;
+
+                        function startRefresh() {
+                            if (intervalId) clearInterval(intervalId);
+                            const ms = parseInt(intervalSelect.value);
+                            intervalId = setInterval(() => window.opener.sshCommandManager.refreshResults(window, '${res.host}'), ms);
+                            spinner.style.display = 'inline-block';
+                        }
+
+                        function stopRefresh() {
+                            if (intervalId) clearInterval(intervalId);
+                            intervalId = null;
+                            spinner.style.display = 'none';
+                        }
+
+                        checkbox.addEventListener('change', (e) => {
+                            if (e.target.checked) {
+                                startRefresh();
+                            } else {
+                                stopRefresh();
+                            }
+                        });
+
+                        intervalSelect.addEventListener('change', () => {
+                            if (checkbox.checked) {
+                                startRefresh(); // Restart with new interval
+                            }
+                        });
+                    </script>
                 </body>
             </html>
-        `);
+        `;
+
+        resultsWindow.document.write(renderContent(results));
+        resultsWindow.document.close();
+
+        // Store commands for refresh
+        this.lastExecutedCommands = results.commands.map(c => c.command);
+    }
+
+    async executeCommands(host, commands) {
+        const config = configManager.config;
+
+        try {
+            const response = await api.post('/api/ssh-execute', {
+                host: host.host, // Ensure we use the IP or hostname
+                username: config.ssh.user,
+                password: config.ssh.password,
+                commands: commands
+            });
+
+            // Handle new structured response or fallback to old string output
+            let commandResults = [];
+            if (response.results && Array.isArray(response.results)) {
+                commandResults = response.results.map(r => ({
+                    command: r.command,
+                    output: r.output,
+                    exitCode: r.success ? 0 : 1
+                }));
+            } else {
+                // Fallback for simulation or old backend
+                const fullOutput = response.output || '';
+                commandResults = commands.map(cmd => ({
+                    command: cmd,
+                    output: fullOutput, // This might duplicate if backend sends full log, but it's fallback
+                    exitCode: response.success ? 0 : 1
+                }));
+            }
+
+            return {
+                host: host.name,
+                commands: commandResults,
+                timestamp: new Date()
+            };
+        } catch (error) {
+            console.error('SSH Execution Error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Refresh results window content
+     * @param {Window} win - The results window object
+     * @param {string} hostName - Host name for display
+     */
+    async refreshResults(win, hostName) {
+        if (!win || win.closed) return;
+
+        try {
+            const currentHost = window.dashboard?.currentSelectedHost;
+            if (!currentHost || (currentHost.name !== hostName && currentHost.host !== hostName)) {
+                console.warn('Host changed or not found, stopping refresh');
+                return;
+            }
+
+            const results = await this.executeCommands(currentHost, this.lastExecutedCommands);
+
+            // Update DOM in the popup window
+            const container = win.document.getElementById('results-container');
+            const timestampContainer = win.document.getElementById('timestamp-container');
+
+            if (container && timestampContainer) {
+                timestampContainer.innerHTML = `<div class="timestamp-banner">--- ATUALIZANDO (${results.timestamp.toLocaleString('pt-BR')}) ---</div>`;
+
+                // Explicitly clear container first to avoid any appending issues
+                container.innerHTML = '';
+
+                container.innerHTML = results.commands.map(cmd => `
+                    <div class="command-result">
+                        <div class="command-title">$ ${cmd.command}</div>
+                        <div class="command-output">${cmd.output}</div>
+                        <div class="execution-time">
+                            <span class="exit-code ${cmd.exitCode === 0 ? 'exit-code-0' : 'exit-code-error'}">
+                                Exit Code: ${cmd.exitCode}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Ensure scroll is at top to prevent "lines coming from below" effect
+                // win.scrollTo(0, 0); // Optional: might be annoying if user wants to scroll down
+            }
+        } catch (err) {
+            console.error('Auto-refresh failed:', err);
+        }
     }
 
     /**

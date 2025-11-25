@@ -53,8 +53,6 @@ class ZabbixClient {
     async getHostsByGroupId(gid) { return this.request('host.get', { groupids: gid, output: ['hostid', 'host', 'name'], selectInterfaces: 'extend', selectInventory: 'extend' }); }
 
     async getItemsByNamePattern(hostId, namePattern) {
-        // Removemos o filtro search do lado servidor para garantir que pegamos tudo e filtramos no JS
-        // Isso resolve problemas com nomes complexos
         const items = await this.request('item.get', {
             hostids: hostId,
             output: ['itemid', 'name', 'key_', 'lastvalue', 'units']
@@ -79,7 +77,7 @@ class ZabbixClient {
         });
     }
 
-    async getMockData() { return []; } // Simplificado
+    async getMockData() { return []; }
     async testConnection() { return { success: true, version: '7.0', message: 'OK' }; }
 }
 
@@ -93,7 +91,6 @@ class ZabbixDataProcessor {
             if (Array.isArray(itemsData)) { source = {}; itemsData.forEach(i => source[i.name] = i); }
 
             for (const [name, item] of Object.entries(source)) {
-                // Busca flexível (case insensitive e parcial)
                 const nameLow = name.toLowerCase();
                 if (terms.every(term => nameLow.includes(term.toLowerCase()))) return item;
             }
@@ -131,7 +128,6 @@ class ZabbixDataProcessor {
         if (deviceType === 'fortinet_firewall') {
             const getVal = (keys) => { const i = find(keys); return i ? i.value : null; };
 
-            // Status mais inteligente (aceita '1', 'up', 'Up')
             const checkStatus = (val) => {
                 if (!val) return 'DOWN';
                 return (val == '1' || val.toLowerCase() == 'up') ? 'UP' : 'DOWN';
@@ -139,9 +135,6 @@ class ZabbixDataProcessor {
 
             dash.dynamic.wan1Status = checkStatus(getVal(['wan1', 'status']));
             dash.dynamic.wan1Speed = formatBandwidth(getVal(['wan1', 'speed']));
-
-            // Tenta várias chaves para tráfego
-            // Melhorando a busca para evitar pegar "discarded" ou "errors"
             dash.dynamic.wan1Upload = formatBandwidth(getVal(['wan1', 'bits sent']) || getVal(['wan1', 'out']) || getVal(['wan1', 'upload']));
             dash.dynamic.wan1Download = formatBandwidth(getVal(['wan1', 'bits received']) || getVal(['wan1', 'in']) || getVal(['wan1', 'download']));
 
@@ -168,33 +161,58 @@ class ZabbixDataProcessor {
 
 // PERFIS DE COMANDO ATUALIZADOS
 const ZABBIX_COMMAND_PROFILES = {
-    default: [],
-    fortinet_firewall: [
-        { name: 'Get System Status', command: 'get system status' },
-        { name: 'Get Interface', command: 'get system interface physical' },
-        { name: 'Tabela ARP', command: 'get sys arp' },
-        { name: 'Rotas', command: 'get router info routing-table all' },
-        { name: 'Sessões', command: 'get system session status' },
-        { name: 'Top System', command: 'diagnose sys top 5' }
-    ],
     cisco_router: [
-        { name: 'Show IP Int Brief', command: 'show ip interface brief' },
-        { name: 'Show Run', command: 'show running-config' },
-        { name: 'Show ARP', command: 'show ip arp' },
-        { name: 'Show Routes', command: 'show ip route' }
+        { name: 'Mostrar interfaces (brief)', command: 'show ip interface brief' },
+        { name: 'Mostrar vizinhos CDP', command: 'show cdp neighbors' },
+        { name: 'Mostrar config (running)', command: 'show running-config' },
+        { name: 'Mostrar pools DHCP', command: 'show ip dhcp pool' },
+        { name: 'Mostrar Uptime', command: 'show version | include uptime' },
+        { name: 'Mostrar tabela ARP', command: 'show ip arp' }
     ],
     cisco_switch: [
-        { name: 'Show Int Status', command: 'show interfaces status' },
-        { name: 'Show Mac Address', command: 'show mac address-table' },
-        { name: 'Show VLANs', command: 'show vlan brief' },
-        { name: 'Show Power Inline', command: 'show power inline' },
-        { name: 'Show Log', command: 'show logging | include %LINK' }
+        { name: 'Mostrar interfaces (brief)', command: 'show ip interface brief' },
+        { name: 'Mostrar vizinhos CDP', command: 'show cdp neighbors' },
+        { name: 'Mostrar config (running)', command: 'show running-config' },
+        { name: 'Mostrar consumo PoE', command: 'show power inline' },
+        { name: 'Mostrar descrição interfaces', command: 'show interfaces description' },
+        { name: 'Mostrar status interfaces', command: 'show interfaces status' },
+        { name: 'Mostrar vizinhos LLDP', command: 'show lldp neighbors' },
+        { name: 'Mostrar Uptime', command: 'show version | include uptime' },
+        { name: 'Mostrar VLANs', command: 'show vlan brief' },
+        { name: 'Mostrar interfaces Trunk', command: 'show interfaces trunk' },
+        { name: 'Mostrar tabela MAC', command: 'show mac address-table' },
+        { name: 'Mostrar contadores de erros', command: 'show interfaces counters errors' }
+    ],
+    fortinet_firewall: [
+        { name: 'Mostrar tabela ARP', command: 'get sys arp' },
+        { name: 'Mostrar ARP (WAN)', command: 'get sys arp | grep wan' },
+        { name: 'Listar túneis IPsec', command: 'get ipsec tunnel list' },
+        { name: 'Sumário túneis IPsec', command: 'get vpn ipsec tunnel summary' },
+        { name: 'Sumário BGP', command: 'get router info bgp summary' },
+        { name: 'Mostrar DHCP Server', command: 'show sys dhcp server' },
+        { name: 'Mostrar status sistema', command: 'get sys status' },
+        { name: 'Mostar Uptime', command: 'get system performance status | grep Uptime' },
+        { name: 'Mostrar Performance SLA', command: 'diagnose sys sdwan health-check' },
+        { name: 'Mostrar interfaces (WAN)', command: 'get sys interface | grep wan' },
+        { name: 'Mostrar quantidade de sessões', command: 'get system session status' },
+        { name: 'Limpar todas as sessões', command: 'diagnose sys session clear' }
+    ],
+    fortiswitch: [
+        { name: 'Mostrar vizinhos LLDP', command: 'get switch lldp neighbors-summary' },
+        { name: 'Mostrar consumo PoE', command: 'get switch poe inline' },
+        { name: 'Mostrar configuração das interfaces', command: 'show switch interface' },
+        { name: 'Mostar VLANs', command: 'diagnose switch vlan list' },
+        { name: 'Mostar Uptime', command: 'get system performance status | grep Uptime' },
+        { name: 'Mostrar status interfaces', command: 'diagnose switch physical-ports summary' },
+        { name: 'Mostrar contatdores de erros', command: 'diag switch physical-ports port-stats list' }
+    ],
+    huawei_switch: [
+        { name: 'Mostrar vizinhos LLDP', command: 'display lldp ne brief' }
     ],
     access_point: [
-        { name: 'Show CDP Neighbors', command: 'show cdp neighbors' },
-        { name: 'Show IP Int Brief', command: 'show ip interface brief' },
-        { name: 'Show Clients', command: 'show client summary' }
-    ]
+        { name: 'Mostrar vizinhos CDP', command: 'show cdp neighbors' }
+    ],
+    default: []
 };
 
 if (typeof module !== 'undefined') {

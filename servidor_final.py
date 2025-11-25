@@ -121,26 +121,28 @@ class APIHandler(http.server.SimpleHTTPRequestHandler):
             })
             return
 
-        output_log = ""
+        results = []
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         try:
             client.connect(host, username=username, password=password, timeout=10)
-            output_log += f"✅ Conectado a {host}\n"
             
             for cmd in commands:
-                output_log += f"\n> {cmd}\n"
                 stdin, stdout, stderr = client.exec_command(cmd)
-                output_log += stdout.read().decode('utf-8')
+                out = stdout.read().decode('utf-8')
                 err = stderr.read().decode('utf-8')
-                if err: output_log += f"ERRO: {err}\n"
+                results.append({
+                    "command": cmd,
+                    "output": out + (f"\nERRO: {err}" if err else ""),
+                    "success": not err
+                })
             
             client.close()
-            self.send_json(200, {"success": True, "output": output_log})
+            self.send_json(200, {"success": True, "results": results})
             
         except Exception as e:
-            self.send_json(200, {"success": False, "output": f"❌ Erro de conexão SSH: {str(e)}"})
+            self.send_json(200, {"success": False, "error": f"Erro de conexão SSH: {str(e)}", "results": []})
 
     def handle_store_search(self):
         query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get('q', [''])[0].lower()
