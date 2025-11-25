@@ -230,8 +230,11 @@ class SSHCommandManager {
         const config = configManager.config;
 
         try {
+            // Prioritize interface IP, fallback to host property
+            const targetHost = (host.interfaces && host.interfaces[0]) ? host.interfaces[0].ip : host.host;
+
             const response = await api.post('/api/ssh-execute', {
-                host: host.host, // Ensure we use the IP or hostname
+                host: targetHost,
                 username: config.ssh.user,
                 password: config.ssh.password,
                 commands: commands
@@ -389,9 +392,16 @@ Release 1808P35, H3C S12504
     /**
      * Show execution results with Auto-Refresh support
      * @param {Object} results - Execution results
+     * @param {Object} options - Options { autoRefresh: boolean, interval: number }
      */
-    showExecutionResults(results) {
+    showExecutionResults(results, options = {}) {
         const resultsWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
+        if (results.hostObject) {
+            resultsWindow.hostData = results.hostObject;
+        }
+
+        const autoRefresh = options.autoRefresh || false;
+        const interval = options.interval || 5000;
 
         const renderContent = (res) => `
             <html>
@@ -426,16 +436,16 @@ Release 1808P35, H3C S12504
                         </div>
                         <div class="controls">
                             <label class="refresh-label">
-                                <input type="checkbox" id="auto-refresh"> Auto-Refresh
+                                <input type="checkbox" id="auto-refresh" ${autoRefresh ? 'checked' : ''}> Auto-Refresh
                             </label>
                             <select id="refresh-interval" class="interval-select">
-                                <option value="5000">5s</option>
-                                <option value="10000">10s</option>
-                                <option value="15000">15s</option>
-                                <option value="30000">30s</option>
-                                <option value="60000">60s</option>
+                                <option value="5000" ${interval == 5000 ? 'selected' : ''}>5s</option>
+                                <option value="10000" ${interval == 10000 ? 'selected' : ''}>10s</option>
+                                <option value="15000" ${interval == 15000 ? 'selected' : ''}>15s</option>
+                                <option value="30000" ${interval == 30000 ? 'selected' : ''}>30s</option>
+                                <option value="60000" ${interval == 60000 ? 'selected' : ''}>60s</option>
                             </select>
-                            <div id="spinner" class="refresh-spinner"></div>
+                            <div id="spinner" class="refresh-spinner" style="display: ${autoRefresh ? 'inline-block' : 'none'}"></div>
                         </div>
                     </div>
                     
@@ -489,6 +499,11 @@ Release 1808P35, H3C S12504
                                 startRefresh(); // Restart with new interval
                             }
                         });
+                        
+                        // Start immediately if checked initially
+                        if (checkbox.checked) {
+                            startRefresh();
+                        }
                     </script>
                 </body>
             </html>
@@ -498,19 +513,47 @@ Release 1808P35, H3C S12504
         resultsWindow.document.close();
 
         // Store commands for refresh
-        this.lastExecutedCommands = results.commands.map(c => c.command);
+        this.lastExecutedCommands = results.originalCommands || results.commands.map(c => c.command);
     }
 
     async executeCommands(host, commands) {
         const config = configManager.config;
 
         try {
+            // Prioritize interface IP, fallback to host property
+            let targetHost = host.host;
+            if (host.interfaces && Array.isArray(host.interfaces) && host.interfaces.length > 0) {
+                // Try to find an interface with a valid IP (not loopback/empty)
+                const validInterface = host.interfaces.find(i => i.ip && i.ip !== '127.0.0.1' && i.ip !== '0.0.0.0');
+                if (validInterface) {
+                    targetHost = validInterface.ip;
+                } else {
+                    targetHost = host.interfaces[0].ip || host.host;
+                }
+            }
+
+            console.log(`[SSH] Executing on ${host.name}. Target: ${targetHost} (Original: ${host.host})`);
+
             const response = await api.post('/api/ssh-execute', {
-                host: host.host, // Ensure we use the IP or hostname
+                host: targetHost,
                 username: config.ssh.user,
                 password: config.ssh.password,
                 commands: commands
             });
+
+            // Check for explicit error from backend
+            if (response.success === false && response.error) {
+                return {
+                    host: host.name,
+                    originalCommands: commands,
+                    commands: [{
+                        command: 'Connection Error',
+                        output: `Failed to connect to ${targetHost}\n${response.error}`,
+                        exitCode: 1
+                    }],
+                    timestamp: new Date()
+                };
+            }
 
             // Handle new structured response or fallback to old string output
             let commandResults = [];
@@ -532,6 +575,8 @@ Release 1808P35, H3C S12504
 
             return {
                 host: host.name,
+                hostObject: host, // Return full host object for persistence
+                originalCommands: commands,
                 commands: commandResults,
                 timestamp: new Date()
             };
@@ -550,9 +595,20 @@ Release 1808P35, H3C S12504
         if (!win || win.closed) return;
 
         try {
-            const currentHost = window.dashboard?.currentSelectedHost;
-            if (!currentHost || (currentHost.name !== hostName && currentHost.host !== hostName)) {
-                console.warn('Host changed or not found, stopping refresh');
+
+            // Use stored host object if available, otherwise fallback to dashboard selection
+            const currentHost = win.hostData || window.dashboard?.currentSelectedHost;
+
+            if (!currentHost) {
+                console.warn('Host context lost, stopping refresh');
+                if (win.stopRefresh) win.stopRefresh();
+                return;
+            }
+
+            // If using dashboard selection (legacy), verify name match
+            if (!win.hostData && (currentHost.name !== hostName && currentHost.host !== hostName)) {
+                console.warn('Host changed, stopping refresh');
+                if (win.stopRefresh) win.stopRefresh();
                 return;
             }
 

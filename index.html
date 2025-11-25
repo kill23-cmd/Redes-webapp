@@ -193,6 +193,22 @@
                     </div>
                     <div id="commands-list" class="commands-grid">
                     </div>
+                    <div class="execution-controls"
+                        style="display: flex; gap: 15px; margin-bottom: 10px; align-items: center; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
+                        <label
+                            style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-main);">
+                            <input type="checkbox" id="loop-execution">
+                            <span>Executar em Loop</span>
+                        </label>
+                        <select id="loop-interval" class="form-input"
+                            style="width: auto; padding: 5px 10px; height: 32px;">
+                            <option value="5000">5s</option>
+                            <option value="10000">10s</option>
+                            <option value="15000">15s</option>
+                            <option value="30000">30s</option>
+                            <option value="60000">60s</option>
+                        </select>
+                    </div>
                     <button id="run-commands" class="btn-primary btn-block">
                         <i data-lucide="play"></i> Executar Comandos
                     </button>

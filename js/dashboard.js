@@ -297,24 +297,26 @@ class NetworkDashboard {
         if (cmds.length === 0) return alert("Selecione comandos!");
 
         const host = this.currentSelectedHost;
-        const ip = (host.interfaces && host.interfaces[0]) ? host.interfaces[0].ip : host.host;
-        const config = configManager.config;
+
+        // Get loop settings
+        const loopExecution = document.getElementById('loop-execution')?.checked || false;
+        const loopInterval = parseInt(document.getElementById('loop-interval')?.value || 5000);
 
         try {
-            const res = await fetch('/api/ssh-execute', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    host: ip,
-                    username: config.ssh.user,
-                    password: config.ssh.password,
-                    commands: cmds
-                })
+            if (!window.sshCommandManager) {
+                throw new Error("SSH Command Manager not initialized");
+            }
+
+            // Use SSHCommandManager
+            const results = await window.sshCommandManager.executeCommands(host, cmds);
+            window.sshCommandManager.showExecutionResults(results, {
+                autoRefresh: loopExecution,
+                interval: loopInterval
             });
-            const result = await res.json();
-            const win = window.open('', '_blank', 'width=800,height=600');
-            win.document.write(`<body style="background:#111;color:#0f0;font-family:monospace;white-space:pre-wrap">${result.output}</body>`);
-        } catch (e) { alert("Erro SSH: " + e); }
+        } catch (e) {
+            console.error(e);
+            alert("Erro SSH: " + (e.message || e));
+        }
     }
 
     clearSearch() {
