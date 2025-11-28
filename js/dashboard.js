@@ -14,6 +14,7 @@ class NetworkDashboard {
         document.getElementById('circuit-search').addEventListener('input', debounce(() => this.performSearch(), 300));
         document.getElementById('clear-search').addEventListener('click', () => this.clearSearch());
         document.getElementById('store-select').addEventListener('change', (e) => this.onStoreSelect(e.target.value));
+        document.getElementById('btn-backup-config').addEventListener('click', () => this.downloadRunningConfig());
 
         document.getElementById('run-commands').addEventListener('click', () => this.runSelectedCommands());
         document.getElementById('select-all').addEventListener('click', () => this.selectAllCommands());
@@ -87,6 +88,9 @@ class NetworkDashboard {
         if (!storeId) return;
         this.updateLinkInfo(storeId);
 
+        const btnBackup = document.getElementById('btn-backup-config'); // <-- ADICIONADO
+        if (btnBackup) btnBackup.style.display = 'none';                // <-- ADICIONADO
+
         let hosts = [];
         if (this.zabbixClient && this.zabbixClient.isAuthenticated) {
             try {
@@ -124,15 +128,29 @@ class NetworkDashboard {
 
     async onHostSelect(host) {
         this.currentSelectedHost = host;
+        
+        // 1. Determina o tipo de dispositivo PRIMEIRO
         this.deviceType = this.determineDeviceType(host);
 
+        // 2. Lógica do Botão de Backup
+        const btnBackup = document.getElementById('btn-backup-config');
+        if (btnBackup) {
+            // Se for Access Point, ESCONDE. Caso contrário, MOSTRA.
+            if (this.deviceType === 'access_point') {
+                btnBackup.style.display = 'none';
+            } else {
+                btnBackup.style.display = 'inline-flex';
+            }
+        }
+
+        // 3. Atualiza a UI padrão
         document.getElementById('device-name').textContent = host.name;
         const ip = (host.interfaces && host.interfaces[0]) ? host.interfaces[0].ip : host.host;
         document.getElementById('device-ip').textContent = ip;
         document.getElementById('device-type-badge').textContent = this.deviceType.replace('_', ' ').toUpperCase();
 
         this.updateLayoutByDeviceType(this.deviceType);
-        this.loadCommandsForDevice(); // CORREÇÃO: Carrega comandos aqui!
+        this.loadCommandsForDevice();
 
         this.showLoading('Atualizando...');
         try {
@@ -342,6 +360,80 @@ class NetworkDashboard {
         if (os.includes('cisco') || name.includes('rt')) return 'cisco_router';
         return 'default';
     }
+
+
+    async downloadRunningConfig() {
+    // 1. Validações iniciais
+    if (!this.currentSelectedHost) {
+        showNotification('Selecione um dispositivo primeiro', 'warning');
+        return;
+    }
+
+    if (!confirm(`Deseja baixar a configuração atual de ${this.currentSelectedHost.name}?`)) {
+        return;
+    }
+
+    this.showLoading('Extraindo configuração via SSH...');
+
+    try {
+        // 2. Definir o comando correto baseado no tipo de dispositivo
+        let command = '';
+        const type = this.deviceType; // Já determinado no onHostSelect
+
+        if (type === 'fortinet_firewall') {
+            command = 'show'; // Ou apenas 'show' dependendo da permissão
+        } else if (type.includes('cisco')) {
+            command = 'show running-config';
+        } else if (type === 'huawei_switch') {
+            command = 'display current-configuration';
+        } else {
+            // Fallback padrão
+            command = 'show running-config';
+        }
+
+        // 3. Executar o comando usando o SSH Manager (reutilizando a lógica existente)
+        // Precisamos garantir que o sshCommandManager esteja disponível
+        if (!window.sshCommandManager) {
+            throw new Error('SSH Manager não inicializado');
+        }
+
+        // Executa o comando (retorna um objeto com resultados)
+        const result = await window.sshCommandManager.executeCommands(
+            this.currentSelectedHost, 
+            [command]
+        );
+
+        // 4. Processar o resultado
+        // O result.commands é um array, pegamos o primeiro (e único) comando
+        const cmdResult = result.commands[0];
+
+        if (cmdResult.exitCode !== 0) {
+            throw new Error('Falha na execução do comando SSH');
+        }
+
+        const configContent = cmdResult.output;
+        
+        if (!configContent || configContent.length < 50) {
+            throw new Error('O dispositivo retornou uma configuração vazia ou inválida.');
+        }
+
+        // 5. Gerar o arquivo .txt
+        // Usa o nome do host + data para o arquivo
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        const filename = `${this.currentSelectedHost.name}_config_${timestamp}.txt`;
+
+        // Usa a função utilitária já existente no seu projeto (js/utils.js)
+        downloadFile(configContent, filename, 'text/plain');
+
+        showNotification('Configuração salva com sucesso!', 'success');
+
+    } catch (error) {
+        console.error('Erro ao salvar config:', error);
+        showNotification(`Erro ao salvar configuração: ${error.message || error}`, 'error');
+    } finally {
+        this.hideLoading();
+    }
+}
 }
 
 document.addEventListener('DOMContentLoaded', () => { window.dashboard = new NetworkDashboard(); });
