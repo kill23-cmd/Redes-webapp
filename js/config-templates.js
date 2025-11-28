@@ -214,6 +214,11 @@ class ConfigTemplateManager {
         document.getElementById('template-select').addEventListener('change', (e) => this.onTemplateSelect(e.target.value));
         document.getElementById('apply-config-btn').addEventListener('click', () => this.applyConfiguration());
 
+        // Interface fetch events
+        document.getElementById('fetch-interfaces-btn').addEventListener('click', () => this.fetchInterfaces());
+        document.getElementById('select-all-interfaces').addEventListener('click', () => this.toggleAllInterfaces(true));
+        document.getElementById('deselect-all-interfaces').addEventListener('click', () => this.toggleAllInterfaces(false));
+
         // Close modal events
         document.querySelectorAll('.modal-close, .close-modal-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -222,12 +227,143 @@ class ConfigTemplateManager {
         });
     }
 
+    async fetchInterfaces() {
+        if (!window.dashboard || !window.dashboard.currentSelectedHost) {
+            alert("Nenhum dispositivo selecionado!");
+            return;
+        }
+
+        const host = window.dashboard.currentSelectedHost;
+        const btn = document.getElementById('fetch-interfaces-btn');
+        const list = document.getElementById('interfaces-list');
+
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Buscando...';
+        list.innerHTML = '<div style="color: #888; padding: 10px;">Conectando ao dispositivo...</div>';
+
+        try {
+            // Determine command based on device type
+            let command = 'show ip interface brief'; // Cisco default
+            if (this.currentDeviceType === 'huawei_switch') command = 'display interface description';
+            if (this.currentDeviceType === 'fortiswitch') command = 'show switch interface';
+            if (this.currentDeviceType === 'fortinet_firewall') command = 'get system interface physical';
+
+            // Execute command via SSH
+            const ip = (host.interfaces && host.interfaces[0]) ? host.interfaces[0].ip : host.host;
+            const appConfig = configManager.config;
+
+            const res = await fetch('/api/ssh-execute', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    host: ip,
+                    username: appConfig.ssh.user,
+                    password: appConfig.ssh.password,
+                    commands: [command]
+                })
+            });
+
+            const result = await res.json();
+
+            if (result.error) throw new Error(result.error);
+
+            // Parse interfaces (simple regex for common patterns)
+            const output = result.output || '';
+            const interfaces = this.parseInterfaces(output, this.currentDeviceType);
+
+            if (interfaces.length === 0) {
+                list.innerHTML = '<div style="color: orange; padding: 10px;">Nenhuma interface encontrada ou formato desconhecido.</div>';
+            } else {
+                this.renderInterfacesList(interfaces);
+            }
+
+        } catch (err) {
+            console.error(err);
+            list.innerHTML = `<div style="color: red; padding: 10px;">Erro: ${err.message}</div>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="refresh-cw"></i> Buscar Interfaces';
+            lucide.createIcons();
+        }
+    }
+
+    parseInterfaces(output, type) {
+        const lines = output.split('\n');
+        const interfaces = [];
+
+        lines.forEach(line => {
+            line = line.trim();
+            if (!line || line.includes('Interface') || line.includes('Physical') || line.startsWith('NAME')) return;
+
+            let match = null;
+            // Cisco / General: Gi1/0/1 ... or Fa0/1 ...
+            if (type.includes('cisco') || type === 'default') {
+                match = line.match(/^([A-Za-z]+[\d\/]+)/);
+            }
+            // Huawei: GE1/0/1 ...
+            else if (type.includes('huawei')) {
+                match = line.match(/^([A-Za-z]+[\d\/]+)/);
+            }
+            // FortiSwitch: port1 ...
+            else if (type.includes('forti')) {
+                match = line.match(/^(port\d+|wan\d+|internal|dmz)/);
+            }
+
+            if (match) {
+                interfaces.push(match[1]);
+            }
+        });
+
+        return [...new Set(interfaces)]; // Unique
+    }
+
+    renderInterfacesList(interfaces) {
+        const list = document.getElementById('interfaces-list');
+        list.innerHTML = '';
+
+        interfaces.forEach(iface => {
+            const label = document.createElement('label');
+            label.className = 'interface-item';
+            label.style.display = 'flex';
+            label.style.alignItems = 'center';
+            label.style.gap = '5px';
+            label.style.background = '#222';
+            label.style.padding = '4px 8px';
+            label.style.borderRadius = '4px';
+            label.style.cursor = 'pointer';
+            label.style.fontSize = '0.85rem';
+
+            label.innerHTML = `
+                <input type="checkbox" value="${iface}" class="interface-checkbox">
+                <span>${iface}</span>
+            `;
+
+            // Re-trigger preview update on change
+            label.querySelector('input').addEventListener('change', () => {
+                const templateName = document.getElementById('template-select').value;
+                const templates = VENDOR_CONFIG_SNIPPETS[this.currentDeviceType] || {};
+                if (templates[templateName]) {
+                    this.updatePreview(templates[templateName]);
+                }
+            });
+
+            list.appendChild(label);
+        });
+    }
+
+    toggleAllInterfaces(selected) {
+        document.querySelectorAll('.interface-checkbox').forEach(cb => {
+            cb.checked = selected;
+            cb.dispatchEvent(new Event('change')); // Trigger update
+        });
+    }
+
     createModal() {
         const modal = document.createElement('div');
         modal.id = 'advanced-config-modal';
         modal.className = 'modal';
         modal.innerHTML = `
-            <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-content" style="max-width: 700px;">
                 <div class="modal-header">
                     <h3>Configuração Avançada</h3>
                     <button class="modal-close"><i data-lucide="x"></i></button>
@@ -238,6 +374,20 @@ class ConfigTemplateManager {
                         <select id="template-select" class="form-input">
                             <option value="">-- Selecione um template --</option>
                         </select>
+                    </div>
+
+                    <div id="interface-selector-container" class="form-group" style="display:none; border: 1px solid #333; padding: 10px; border-radius: 4px; background: #1a1a1a;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <label style="margin:0"><i data-lucide="network"></i> Interfaces Alvo:</label>
+                            <button id="fetch-interfaces-btn" class="btn-small"><i data-lucide="refresh-cw"></i> Buscar Interfaces</button>
+                        </div>
+                        <div id="interfaces-list" style="max-height: 150px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 5px;">
+                            <span style="color: #666; font-size: 0.9rem;">Selecione um template com {INTERFACE} para habilitar.</span>
+                        </div>
+                        <div style="margin-top: 5px; font-size: 0.8rem; color: #888;">
+                            <button id="select-all-interfaces" class="btn-ghost" style="padding: 2px 5px;">Todos</button>
+                            <button id="deselect-all-interfaces" class="btn-ghost" style="padding: 2px 5px;">Nenhum</button>
+                        </div>
                     </div>
 
                     <div id="template-variables" class="form-group" style="display:none;">
@@ -307,11 +457,22 @@ class ConfigTemplateManager {
         const container = document.getElementById('variables-container');
         container.innerHTML = '';
 
+        // Handle Interface Selector Visibility
+        const interfaceSelector = document.getElementById('interface-selector-container');
+        if (content.includes('{INTERFACE}')) {
+            interfaceSelector.style.display = 'block';
+        } else {
+            interfaceSelector.style.display = 'none';
+        }
+
         if (variables) {
             document.getElementById('template-variables').style.display = 'block';
             const uniqueVars = [...new Set(variables)]; // Remove duplicates
 
             uniqueVars.forEach(v => {
+                // Skip {INTERFACE} as it's handled by the selector
+                if (v === '{INTERFACE}') return;
+
                 const varName = v.replace(/[\{\}]/g, '');
                 const div = document.createElement('div');
                 div.className = 'variable-input';
@@ -333,17 +494,31 @@ class ConfigTemplateManager {
     }
 
     updatePreview(content) {
-        let finalConfig = content;
+        let baseConfig = content;
         const inputs = document.querySelectorAll('.template-var');
 
+        // 1. Replace standard variables (except INTERFACE)
         inputs.forEach(input => {
             const variable = input.dataset.var;
             const value = input.value;
-            // Replace all occurrences
-            finalConfig = finalConfig.split(variable).join(value || variable);
+            baseConfig = baseConfig.split(variable).join(value || variable);
         });
 
-        document.getElementById('config-preview').value = finalConfig;
+        // 2. Handle Interface Expansion
+        let finalConfig = '';
+        const selectedInterfaces = Array.from(document.querySelectorAll('.interface-checkbox:checked')).map(cb => cb.value);
+
+        if (baseConfig.includes('{INTERFACE}') && selectedInterfaces.length > 0) {
+            // Repeat config for each interface
+            selectedInterfaces.forEach(iface => {
+                finalConfig += baseConfig.split('{INTERFACE}').join(iface) + '\n\n';
+            });
+        } else {
+            // No interface selected or not needed, just show base config (with {INTERFACE} placeholder if applicable)
+            finalConfig = baseConfig;
+        }
+
+        document.getElementById('config-preview').value = finalConfig.trim();
     }
 
     async applyConfiguration() {
