@@ -81,6 +81,12 @@ const VENDOR_CONFIG_SNIPPETS = {
             " switchport voice vlan 50\n" +
             " spanning-tree portfast\n" +
             "end",
+        "Interface: PC (VLAN 80)":
+            "conf t\n" +
+            "interface {INTERFACE}\n" +
+            " switchport access vlan 80\n" +
+            " spanning-tree portfast\n" +
+            "end",
         "Interface: PDV (VLAN 95)":
             "conf t\n" +
             "interface {INTERFACE}\n" +

@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 import uvicorn
 import httpx
 import paramiko
@@ -269,6 +269,7 @@ class AIAnalysisRequest(BaseModel):
     context_ports_down: Optional[str] = None
     available_commands: Optional[List[str]] = None
     config_templates: Optional[Dict[str, str]] = None
+    knowledge_base: Optional[Dict[str, Any]] = None
 
 @app.post("/api/ai-analyze")
 async def ai_analyze(req: AIAnalysisRequest):
@@ -298,6 +299,21 @@ async def ai_analyze(req: AIAnalysisRequest):
             system_context += f"Command: {cmd.get('command')}\nOutput:\n{cmd.get('output')}\n\n"
         system_context += "--- FIM DOS OUTPUTS ---\n\n"
 
+        # Add Knowledge Base (Advanced Commands & Troubleshooting)
+        if req.knowledge_base:
+            system_context += "BASE DE CONHECIMENTO (COMANDOS AVANÇADOS E DICAS):\n"
+            
+            if 'advanced_commands' in req.knowledge_base:
+                system_context += "Comandos Avançados:\n"
+                for cmd in req.knowledge_base['advanced_commands']:
+                    system_context += f"- {cmd.get('description')}: {cmd.get('command')}\n"
+            
+            if 'troubleshooting_guides' in req.knowledge_base:
+                system_context += "\nGuias de Troubleshooting:\n"
+                for issue, steps in req.knowledge_base['troubleshooting_guides'].items():
+                    system_context += f"- {issue}: {steps}\n"
+            system_context += "\n"
+
         # Add Knowledge about Templates and Commands
         if req.config_templates:
             system_context += "TEMPLATES DE CONFIGURAÇÃO DISPONÍVEIS:\n"
@@ -307,7 +323,7 @@ async def ai_analyze(req: AIAnalysisRequest):
 
         if req.available_commands:
             system_context += f"\nCOMANDOS DISPONÍVEIS NO SISTEMA: {', '.join(req.available_commands[:100])}...\n"
-            system_context += "IMPORTANTE: Você SÓ pode sugerir comandos que estejam nesta lista acima. NÃO invente comandos.\n"
+            system_context += "IMPORTANTE: Você SÓ pode sugerir comandos que estejam nesta lista acima OU na Base de Conhecimento. NÃO invente comandos.\n"
             system_context += "Se o usuário pedir algo que não está na lista, explique que o comando não está disponível no perfil do dispositivo.\n"
 
         system_context += (

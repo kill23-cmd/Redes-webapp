@@ -750,6 +750,7 @@ Release 1808P35, H3C S12504
         let contextPortsDown = '0';
         let configTemplates = {};
         let availableCommands = [];
+        let knowledgeBase = {};
 
         try {
             if (window.opener) {
@@ -776,11 +777,17 @@ Release 1808P35, H3C S12504
                 const cmds = profiles[deviceType] || [];
                 availableCommands = cmds.map(c => c.name + ": " + c.command);
 
+                // Knowledge Base (Advanced Commands & Troubleshooting)
+                if (window.opener.AI_KNOWLEDGE_BASE && window.opener.AI_KNOWLEDGE_BASE[deviceType]) {
+                    knowledgeBase = window.opener.AI_KNOWLEDGE_BASE[deviceType];
+                }
+
                 console.log("AI Context Gathered:", {
                     alerts: contextAlerts,
                     portsDown: contextPortsDown,
                     templates: Object.keys(configTemplates),
-                    commands: availableCommands
+                    commands: availableCommands,
+                    kb: Object.keys(knowledgeBase)
                 });
             } else {
                 console.warn("Window.opener not found!");
@@ -800,7 +807,8 @@ Release 1808P35, H3C S12504
                 context_alerts: contextAlerts,
                 context_ports_down: contextPortsDown,
                 config_templates: configTemplates,
-                available_commands: availableCommands
+                available_commands: availableCommands,
+                knowledge_base: knowledgeBase
             });
 
             if (response.success) {
