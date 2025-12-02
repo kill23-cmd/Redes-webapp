@@ -272,7 +272,18 @@ class SSHCommandManager {
 
         try {
             // Prioritize interface IP, fallback to host property
-            const targetHost = (host.interfaces && host.interfaces[0]) ? host.interfaces[0].ip : host.host;
+            let targetHost = host.host;
+            if (host.interfaces && Array.isArray(host.interfaces) && host.interfaces.length > 0) {
+                // Try to find an interface with a valid IP (not loopback/empty)
+                const validInterface = host.interfaces.find(i => i.ip && i.ip !== '127.0.0.1' && i.ip !== '0.0.0.0');
+                if (validInterface) {
+                    targetHost = validInterface.ip;
+                } else {
+                    targetHost = host.interfaces[0].ip || host.host;
+                }
+            }
+
+            console.log(`[SSH] Executing on ${host.name}. Target: ${targetHost} (Original: ${host.host})`);
 
             const response = await api.post('/api/ssh-execute', {
                 host: targetHost,
@@ -281,13 +292,43 @@ class SSHCommandManager {
                 commands: commands
             });
 
+            // Check for explicit error from backend
+            if (response.success === false && response.error) {
+                return {
+                    host: host.name,
+                    originalCommands: commands,
+                    commands: [{
+                        command: 'Connection Error',
+                        output: `Failed to connect to ${targetHost}\n${response.error}`,
+                        exitCode: 1
+                    }],
+                    timestamp: new Date()
+                };
+            }
+
+            // Handle new structured response or fallback to old string output
+            let commandResults = [];
+            if (response.results && Array.isArray(response.results)) {
+                commandResults = response.results.map(r => ({
+                    command: r.command,
+                    output: r.output,
+                    exitCode: r.success ? 0 : 1
+                }));
+            } else {
+                // Fallback for simulation or old backend
+                const fullOutput = response.output || '';
+                commandResults = commands.map(cmd => ({
+                    command: cmd,
+                    output: fullOutput, // This might duplicate if backend sends full log, but it's fallback
+                    exitCode: response.success ? 0 : 1
+                }));
+            }
+
             return {
                 host: host.name,
-                commands: commands.map(cmd => ({
-                    command: cmd,
-                    output: response.output || '',
-                    exitCode: response.success ? 0 : 1
-                })),
+                hostObject: host, // Return full host object for persistence
+                originalCommands: commands,
+                commands: commandResults,
                 timestamp: new Date()
             };
         } catch (error) {
@@ -357,7 +398,7 @@ Port   : 000c.2944.8000
 PortDesc: GigabitEthernet0/0
 SystemDesc: H3C Comware Platform Software, Software Version 5.20.99, 
 Release 1808P35, H3C S12504 
-```
+`
         };
 
         // Return specific output if available, otherwise generate generic output
@@ -500,10 +541,34 @@ Release 1808P35, H3C S12504
                             </select>
                             <div id="spinner" class="refresh-spinner" style="display: ${autoRefresh ? 'inline-block' : 'none'}"></div>
                         </div>
+                        <button onclick="window.opener.sshCommandManager.analyzeWithAI(window)" class="btn-ai" style="background: #8b5cf6; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-left: 10px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path><path d="M12 12 2.1 12a10 10 0 0 1 17.8-6"></path><path d="M21.9 12h-9.9"></path></svg>
+                            Analise com IA
+                        </button>
                     </div>
                     
                     <div id="timestamp-container">
                         <div class="timestamp-banner">--- ATUALIZANDO (${res.timestamp.toLocaleString('pt-BR')}) ---</div>
+                    </div>
+
+                    <div id="ai-analysis-container" style="display: none; margin-bottom: 20px; background: #2e1065; border-radius: 8px; border: 1px solid #8b5cf6; overflow: hidden;">
+                        <div style="background: #4c1d95; padding: 10px 15px; border-bottom: 1px solid #8b5cf6; display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="color: #c4b5fd; margin: 0; font-size: 1rem;">🤖 Assistente de Troubleshooting (IA)</h3>
+                            <span style="font-size: 0.8rem; color: #a78bfa;">GPT-4o Mini</span>
+                        </div>
+                        
+                        <div id="chat-messages" style="height: 300px; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px;">
+                            <!-- Messages will appear here -->
+                        </div>
+
+                        <div style="padding: 10px; background: #1e1b4b; border-top: 1px solid #4c1d95; display: flex; gap: 10px;">
+                            <input type="text" id="chat-input" placeholder="Faça uma pergunta sobre os logs..." 
+                                style="flex: 1; background: #2e1065; border: 1px solid #4c1d95; color: #e4e4e7; padding: 8px 12px; border-radius: 6px; outline: none;">
+                            <button onclick="window.opener.sshCommandManager.sendAIMessage(window)" 
+                                style="background: #8b5cf6; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
+                                Enviar
+                            </button>
+                        </div>
                     </div>
 
                     <div id="results-container">
@@ -512,7 +577,6 @@ Release 1808P35, H3C S12504
                                 <div class="command-title">$ ${cmd.command}</div>
                                 <div class="command-output">${cmd.output}</div>
                                 <div class="execution-time">
-                                    Tempo: ${cmd.executionTime ? cmd.executionTime.toFixed(0) : 0}ms
                                     <span class="exit-code ${cmd.exitCode === 0 ? 'exit-code-0' : 'exit-code-error'}">
                                         Exit Code: ${cmd.exitCode}
                                     </span>
@@ -524,7 +588,15 @@ Release 1808P35, H3C S12504
                         const checkbox = document.getElementById('auto-refresh');
                         const intervalSelect = document.getElementById('refresh-interval');
                         const spinner = document.getElementById('spinner');
+                        const chatInput = document.getElementById('chat-input');
                         let intervalId;
+
+                        // Handle Enter key in chat
+                        chatInput.addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter') {
+                                window.opener.sshCommandManager.sendAIMessage(window);
+                            }
+                        });
 
                         function startRefresh() {
                             if (intervalId) clearInterval(intervalId);
@@ -567,75 +639,117 @@ Release 1808P35, H3C S12504
 
         // Store commands for refresh
         this.lastExecutedCommands = results.originalCommands || results.commands.map(c => c.command);
+        // Store results for AI analysis
+        resultsWindow.lastResults = results;
+        resultsWindow.chatHistory = []; // Initialize chat history
     }
 
-    async executeCommands(host, commands) {
-        const config = configManager.config;
+    /**
+     * Add message to chat UI
+     */
+    addChatMessage(win, role, text) {
+        const chatContainer = win.document.getElementById('chat-messages');
+        if (!chatContainer) return;
+
+        const msgDiv = win.document.createElement('div');
+        msgDiv.style.cssText = `
+            padding: 10px; 
+            border-radius: 8px; 
+            max-width: 85%; 
+            line-height: 1.5;
+            font-size: 0.9rem;
+        `;
+
+        if (role === 'user') {
+            msgDiv.style.background = '#4c1d95';
+            msgDiv.style.color = '#fff';
+            msgDiv.style.alignSelf = 'flex-end';
+            msgDiv.style.borderBottomRightRadius = '2px';
+        } else {
+            msgDiv.style.background = '#3f3f46';
+            msgDiv.style.color = '#e4e4e7';
+            msgDiv.style.alignSelf = 'flex-start';
+            msgDiv.style.borderBottomLeftRadius = '2px';
+        }
+
+        // Format HTML for AI responses
+        if (role === 'assistant') {
+            let html = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/### (.*?)\n/g, '<h4>$1</h4>')
+                .replace(/- (.*?)\n/g, '<li>$1</li>')
+                .replace(/\n/g, '<br>');
+            msgDiv.innerHTML = html;
+        } else {
+            msgDiv.textContent = text;
+        }
+
+        chatContainer.appendChild(msgDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    /**
+     * Start AI Analysis (Initial Chat)
+     */
+    async analyzeWithAI(win) {
+        if (!win || !win.lastResults) return;
+
+        const container = win.document.getElementById('ai-analysis-container');
+        if (!container) return;
+
+        // Show container if hidden
+        if (container.style.display === 'none') {
+            container.style.display = 'block';
+            // Send initial analysis request
+            this.sendAIMessage(win, true);
+        }
+    }
+
+    /**
+     * Send message to AI
+     * @param {Window} win - Results window
+     * @param {boolean} isInitial - Is this the initial analysis?
+     */
+    async sendAIMessage(win, isInitial = false) {
+        const input = win.document.getElementById('chat-input');
+        const userText = input ? input.value.trim() : '';
+
+        if (!isInitial && !userText) return;
+
+        // Add User Message to UI and History
+        if (!isInitial) {
+            this.addChatMessage(win, 'user', userText);
+            win.chatHistory.push({ role: 'user', content: userText });
+            input.value = '';
+        } else {
+            this.addChatMessage(win, 'assistant', '<em>Iniciando análise dos logs... aguarde...</em>');
+        }
 
         try {
-            // Prioritize interface IP, fallback to host property
-            let targetHost = host.host;
-            if (host.interfaces && Array.isArray(host.interfaces) && host.interfaces.length > 0) {
-                // Try to find an interface with a valid IP (not loopback/empty)
-                const validInterface = host.interfaces.find(i => i.ip && i.ip !== '127.0.0.1' && i.ip !== '0.0.0.0');
-                if (validInterface) {
-                    targetHost = validInterface.ip;
-                } else {
-                    targetHost = host.interfaces[0].ip || host.host;
-                }
-            }
-
-            console.log(`[SSH] Executing on ${host.name}. Target: ${targetHost} (Original: ${host.host})`);
-
-            const response = await api.post('/api/ssh-execute', {
-                host: targetHost,
-                username: config.ssh.user,
-                password: config.ssh.password,
-                commands: commands
+            const response = await api.post('/api/ai-analyze', {
+                host: win.lastResults.host,
+                commands: win.lastResults.commands.map(c => ({
+                    command: c.command,
+                    output: c.output
+                })),
+                messages: isInitial ? null : win.chatHistory
             });
 
-            // Check for explicit error from backend
-            if (response.success === false && response.error) {
-                return {
-                    host: host.name,
-                    originalCommands: commands,
-                    commands: [{
-                        command: 'Connection Error',
-                        output: `Failed to connect to ${targetHost}\n${response.error}`,
-                        exitCode: 1
-                    }],
-                    timestamp: new Date()
-                };
-            }
+            if (response.success) {
+                // Remove loading message if initial
+                if (isInitial) {
+                    const chatContainer = win.document.getElementById('chat-messages');
+                    chatContainer.innerHTML = ''; // Clear "loading"
+                }
 
-            // Handle new structured response or fallback to old string output
-            let commandResults = [];
-            if (response.results && Array.isArray(response.results)) {
-                commandResults = response.results.map(r => ({
-                    command: r.command,
-                    output: r.output,
-                    exitCode: r.success ? 0 : 1
-                }));
+                this.addChatMessage(win, 'assistant', response.analysis);
+                win.chatHistory.push({ role: 'assistant', content: response.analysis });
             } else {
-                // Fallback for simulation or old backend
-                const fullOutput = response.output || '';
-                commandResults = commands.map(cmd => ({
-                    command: cmd,
-                    output: fullOutput, // This might duplicate if backend sends full log, but it's fallback
-                    exitCode: response.success ? 0 : 1
-                }));
+                this.addChatMessage(win, 'assistant', `❌ Erro: ${response.error}`);
             }
-
-            return {
-                host: host.name,
-                hostObject: host, // Return full host object for persistence
-                originalCommands: commands,
-                commands: commandResults,
-                timestamp: new Date()
-            };
-        } catch (error) {
-            console.error('SSH Execution Error:', error);
-            throw error;
+        } catch (err) {
+            console.error('AI Chat failed:', err);
+            this.addChatMessage(win, 'assistant', `❌ Erro de conexão: ${err.message}`);
         }
     }
 

@@ -182,6 +182,67 @@ async def ssh_execute(req: SSHCommandRequest):
             return {"success": False, "error": f"Connection lost: {str(e)}", "results": results}
         return {"success": False, "error": f"Connection failed: {str(e)}", "results": []}
 
+class AIAnalysisRequest(BaseModel):
+    host: str
+    commands: List[dict] # List of {command: str, output: str}
+    messages: Optional[List[dict]] = None # Chat history [{role: str, content: str}]
+
+@app.post("/api/ai-analyze")
+async def ai_analyze(req: AIAnalysisRequest):
+    if not settings.OPENAI_API_KEY:
+        raise HTTPException(status_code=400, detail="OpenAI API Key not configured")
+
+    try:
+        import httpx
+        
+        # Construct System Context with Command Outputs
+        system_context = f"Você é um especialista em engenharia de redes. Analise os outputs de comando SSH abaixo para o host {req.host}.\n"
+        system_context += "Identifique problemas, erros ou anomalias. Forneça um resumo de troubleshooting conciso.\n"
+        system_context += "Responda SEMPRE em Português do Brasil.\n\n"
+        system_context += "--- OUTPUTS DOS COMANDOS ---\n"
+        
+        for cmd in req.commands:
+            system_context += f"Command: {cmd.get('command')}\nOutput:\n{cmd.get('output')}\n\n"
+            
+        system_context += "--- FIM DOS OUTPUTS ---\n"
+
+        # Prepare messages for OpenAI
+        api_messages = [{"role": "system", "content": system_context}]
+        
+        if req.messages:
+            # Append chat history
+            api_messages.extend(req.messages)
+        else:
+            # Initial analysis request
+            api_messages.append({"role": "user", "content": "Por favor, faça uma análise técnica detalhada dos logs acima."})
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "gpt-4o-mini",
+                    "messages": api_messages,
+                    "max_tokens": 1000
+                },
+                timeout=60.0
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, detail=f"OpenAI API Error: {response.text}")
+                
+            data = response.json()
+            analysis = data['choices'][0]['message']['content']
+            
+            return {"success": True, "analysis": analysis}
+            
+    except Exception as e:
+        print(f"AI Analysis Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/stores/search")
 async def search_stores(q: str = ""):
     lojas = carregar_lojas_excel()

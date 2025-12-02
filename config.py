@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     ZABBIX_PASSWORD: Optional[str] = None
     SSH_USER: Optional[str] = None
     SSH_PASSWORD: Optional[str] = None
+    OPENAI_API_KEY: Optional[str] = None
 
     class Config:
         env_file = ".env"
