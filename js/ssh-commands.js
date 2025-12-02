@@ -186,17 +186,42 @@ class SSHCommandManager {
             throw new Error('Configurações SSH não encontradas');
         }
 
-        try {
-            // Show execution dialog
-            const executionDialog = this.createExecutionDialog(host, selectedCommands);
-            document.body.appendChild(executionDialog);
+        // Open window IMMEDIATELY to avoid popup blockers
+        const resultsWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
 
+        if (!resultsWindow) {
+            alert('Por favor, permita popups para visualizar os resultados.');
+            return;
+        }
+
+        // Show loading state in the new window
+        resultsWindow.document.write(`
+            <html>
+                <head>
+                    <title>Executando...</title>
+                    <style>
+                        body { background: #141414; color: #e4e4e7; font-family: 'JetBrains Mono', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+                        .spinner { width: 40px; height: 40px; border: 4px solid #3f3f46; border-top-color: #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+                        @keyframes spin { to { transform: rotate(360deg); } }
+                        h2 { color: #38bdf8; margin-bottom: 10px; }
+                        p { color: #a1a1aa; }
+                    </style>
+                </head>
+                <body>
+                    <div class="spinner"></div>
+                    <h2>Executando Comandos</h2>
+                    <p>Conectando a ${host.name}...</p>
+                    <p>Isso pode levar alguns segundos.</p>
+                </body>
+            </html>
+        `);
+
+        try {
             // Execute commands via API
             const results = await this.executeCommands(host, selectedCommands);
 
-            // Remove dialog and show results
-            executionDialog.remove();
-            this.showExecutionResults(results);
+            // Show results in the ALREADY OPEN window
+            this.showExecutionResults(results, { window: resultsWindow });
 
             // Add to history
             this.addToHistory({
@@ -210,6 +235,22 @@ class SSHCommandManager {
 
         } catch (err) {
             console.error('Command execution failed:', err);
+            // Show error in the popup if it's still open
+            if (resultsWindow && !resultsWindow.closed) {
+                try {
+                    resultsWindow.document.body.innerHTML = `
+                        <div style="text-align:center; color: #ef4444;">
+                            <h2>Erro na Execução</h2>
+                            <p>${err.message}</p>
+                            <button onclick="window.close()" style="padding: 8px 16px; background: #3f3f46; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px;">Fechar</button>
+                        </div>
+                    `;
+                } catch (e) {
+                    console.error('Error writing to popup:', e);
+                }
+            } else {
+                alert(`Erro na execução: ${err.message}`);
+            }
             throw err;
         }
     }
@@ -395,9 +436,21 @@ Release 1808P35, H3C S12504
      * @param {Object} options - Options { autoRefresh: boolean, interval: number }
      */
     showExecutionResults(results, options = {}) {
-        const resultsWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
-        if (results.hostObject) {
-            resultsWindow.hostData = results.hostObject;
+        // Use existing window if provided, otherwise open new one
+        let resultsWindow = options.window;
+
+        if (!resultsWindow || resultsWindow.closed) {
+            resultsWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
+        }
+
+        if (!resultsWindow) return; // Blocked
+
+        try {
+            if (results.hostObject && !resultsWindow.closed) {
+                resultsWindow.hostData = results.hostObject;
+            }
+        } catch (e) {
+            console.warn('Could not set hostData on results window:', e);
         }
 
         const autoRefresh = options.autoRefresh || false;

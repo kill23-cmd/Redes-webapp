@@ -264,18 +264,207 @@
                 <button id="save-settings" class="btn-primary">Salvar</button>
                 <button id="cancel-settings" class="btn-small">Cancelar</button>
             </div>
+            <button id="web-access" class="btn-icon" title="Acesso Web (HTTPS)"><i data-lucide="globe"></i></button>
+            <button id="btn-backup-config" class="btn-icon" title="Salvar Configuração" style="display: none;">
+                <i data-lucide="save"></i>
+            </button>
+            <button id="btn-advanced-config" class="btn-icon" title="Configuração Avançada"><i
+                    data-lucide="sliders"></i></button>
+            <button id="btn-links-down" class="btn-icon" title="Links Offline"><i data-lucide="activity"></i></button>
+            <button id="settings-btn" class="btn-icon" title="Configurações"><i data-lucide="settings"></i></button>
+        </div>
+        </header>
+
+        <div class="dashboard-scroll">
+            <div class="kpi-grid">
+                <div class="card kpi-card">
+                    <div class="kpi-header">
+                        <span>Disponibilidade</span>
+                        <div class="status-dot" id="card-status-indicator"></div>
+                    </div>
+                    <div class="kpi-value" id="card-uptime">--</div>
+                    <div class="kpi-sub">
+                        <span>Perda: <b id="card-loss">--%</b></span>
+                        <span>Latência: <b id="card-latency">--</b></span>
+                    </div>
+                </div>
+
+                <div class="card gauge-card">
+                    <span>CPU</span>
+                    <div class="gauge-wrapper">
+                        <canvas id="cpu-gauge"></canvas>
+                        <div class="gauge-text" id="cpu-gauge-value">--</div>
+                    </div>
+                </div>
+
+                <div class="card gauge-card">
+                    <span>Memória</span>
+                    <div class="gauge-wrapper">
+                        <canvas id="memory-gauge"></canvas>
+                        <div class="gauge-text" id="memory-gauge-value">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-wan" class="dynamic-section" style="display:none;">
+                <h3 class="section-title"><i data-lucide="router"></i> Interfaces WAN</h3>
+                <div class="wan-grid">
+                    <div class="card wan-card">
+                        <div class="wan-header">
+                            <span>WAN1</span>
+                            <span class="status-badge" id="card-wan1-status">--</span>
+                        </div>
+                        <div class="wan-speed" id="card-wan1-speed">--</div>
+                        <div class="wan-stats">
+                            <div><i data-lucide="arrow-up"></i> <span id="card-wan1-upload">--</span></div>
+                            <div><i data-lucide="arrow-down"></i> <span id="card-wan1-download">--</span></div>
+                        </div>
+                        <div class="wan-meta">
+                            <div style="font-size: 0.85rem; color: var(--text-main);">
+                                <i data-lucide="file-text" style="width:12px"></i> Contratado: <b id="wan1-banda">--</b>
+                            </div>
+                            <span id="wan1-op">Operadora</span> • <span id="wan1-circ">Circuito</span>
+                        </div>
+                        <div class="chart-mini-wrapper"><canvas id="wan1-traffic-chart"></canvas></div>
+                    </div>
+
+                    <div class="card wan-card">
+                        <div class="wan-header">
+                            <span>WAN2</span>
+                            <span class="status-badge" id="card-wan2-status">--</span>
+                        </div>
+                        <div class="wan-speed" id="card-wan2-speed">--</div>
+                        <div class="wan-stats">
+                            <div><i data-lucide="arrow-up"></i> <span id="card-wan2-upload">--</span></div>
+                            <div><i data-lucide="arrow-down"></i> <span id="card-wan2-download">--</span></div>
+                        </div>
+                        <div class="wan-meta">
+                            <div style="font-size: 0.85rem; color: var(--text-main);">
+                                <i data-lucide="file-text" style="width:12px"></i> Contratado: <b id="wan2-banda">--</b>
+                            </div>
+                            <span id="wan2-op">Operadora</span> • <span id="wan2-circ">Circuito</span>
+                        </div>
+                        <div class="chart-mini-wrapper"><canvas id="wan2-traffic-chart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-switch" class="dynamic-section" style="display:none;">
+                <h3 class="section-title"><i data-lucide="server"></i> Status do Switch</h3>
+                <div class="switch-grid">
+                    <div class="card alert-card">
+                        <div class="alert-icon"><i data-lucide="alert-triangle"></i></div>
+                        <div class="alert-info">
+                            <h4>Interfaces com Problema</h4>
+                            <span class="alert-value" id="switch-interfaces-down">0</span>
+                            <div id="switch-problems-list" style="font-size: 0.8rem; margin-top: 5px; color: #ccc;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-ap" class="dynamic-section" style="display:none;">
+                <h3 class="section-title"><i data-lucide="wifi"></i> Qualidade Wi-Fi</h3>
+                <div class="kpi-grid">
+                    <div class="card kpi-card">
+                        <div class="kpi-header"><span>Latência Média</span></div>
+                        <div class="kpi-value" id="ap-latency">--</div>
+                    </div>
+                    <div class="card kpi-card">
+                        <div class="kpi-header"><span>Perda de Pacotes</span></div>
+                        <div class="kpi-value" id="ap-loss">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card commands-section">
+                <div class="commands-header">
+                    <h3><i data-lucide="terminal"></i> Comandos Remotos</h3>
+                    <div class="cmd-actions">
+                        <button id="select-all" class="btn-small">Todos</button>
+                        <button id="deselect-all" class="btn-small">Nenhum</button>
+                    </div>
+                </div>
+                <div id="commands-list" class="commands-grid">
+                </div>
+                <div class="execution-controls"
+                    style="display: flex; gap: 15px; margin-bottom: 10px; align-items: center; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
+                    <label
+                        style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-main);">
+                        <input type="checkbox" id="loop-execution">
+                        <span>Executar em Loop</span>
+                    </label>
+                    <select id="loop-interval" class="form-input" style="width: auto; padding: 5px 10px; height: 32px;">
+                        <option value="5000">5s</option>
+                        <option value="10000">10s</option>
+                        <option value="15000">15s</option>
+                        <option value="30000">30s</option>
+                        <option value="60000">60s</option>
+                    </select>
+                </div>
+                <button id="run-commands" class="btn-primary btn-block">
+                    <i data-lucide="play"></i> Executar Comandos
+                </button>
+            </div>
+        </div>
+        </main>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configurações</h3>
+                <button class="modal-close"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>Zabbix</h4>
+                    <div class="form-group">
+                        <label>URL:</label>
+                        <input type="url" id="zabbix-url" class="form-input" placeholder="https://zabbix...">
+                    </div>
+                    <div class="form-group">
+                        <label>Usuário:</label>
+                        <input type="text" id="zabbix-user" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha:</label>
+                        <input type="password" id="zabbix-pass" class="form-input">
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h4>SSH</h4>
+                    <div class="form-group">
+                        <label>Usuário SSH:</label>
+                        <input type="text" id="ssh-user" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha SSH:</label>
+                        <input type="password" id="ssh-pass" class="form-input">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-settings" class="btn-primary">Salvar</button>
+                <button id="cancel-settings" class="btn-small">Cancelar</button>
+            </div>
         </div>
     </div>
 
-    <script src="js/utils.js"></script>
-    <script src="js/config-manager.js"></script>
-    <script src="js/zabbix-client.js"></script>
-    <script src="js/config-templates.js"></script>
-    <script src="js/links-dashboard.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/charts.js"></script>
-    <script src="js/ssh-commands.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/utils.js?v=2"></script>
+    <script src="js/config-manager.js?v=2"></script>
+    <script src="js/zabbix-client.js?v=2"></script>
+    <script src="js/config-templates.js?v=2"></script>
+    <script src="js/links-dashboard.js?v=2"></script>
+    <script src="js/dashboard.js?v=2"></script>
+    <script src="js/charts.js?v=2"></script>
+    <script src="js/ssh-commands.js?v=2"></script>
+    <script src="js/main.js?v=2"></script>
 </body>
 
 </html>
