@@ -679,9 +679,29 @@ Release 1808P35, H3C S12504
                 .replace(/### (.*?)\n/g, '<h4>$1</h4>')
                 .replace(/- (.*?)\n/g, '<li>$1</li>')
                 .replace(/\n/g, '<br>');
+
+            // Parse Execution Blocks
+            const execRegex = /:::EXECUTION([\s\S]*?):::/g;
+            html = html.replace(execRegex, (match, commands) => {
+                // Sanitize commands: remove <br> tags introduced by previous replace, split by newline, trim
+                const cleanCommands = commands.replace(/<br>/g, '\n').trim();
+                const cmdList = cleanCommands.split('\n').map(c => c.trim()).filter(c => c);
+                const cmdString = JSON.stringify(cmdList).replace(/"/g, '&quot;');
+
+                return `
+                    <div class="exec-card">
+                        <div style="font-weight:bold; color:#a1a1aa; margin-bottom:5px;">Comandos Propostos:</div>
+                        <div style="color:#10b981; white-space: pre-wrap;">${commands.trim()}</div>
+                        <button class="exec-btn" onclick="window.opener.sshCommandManager.executeChatCommand(window, ${cmdString})">
+                            ▶️ Executar Comandos
+                        </button>
+                    </div>
+                `;
+            });
+
             msgDiv.innerHTML = html;
         } else {
-            msgDiv.textContent = text;
+            msgDiv.innerHTML = text.replace(/\n/g, '<br>'); // Allow newlines in system messages
         }
 
         chatContainer.appendChild(msgDiv);
@@ -725,6 +745,50 @@ Release 1808P35, H3C S12504
             this.addChatMessage(win, 'assistant', '<em>Iniciando análise dos logs... aguarde...</em>');
         }
 
+        // Gather Context from Opener (Dashboard)
+        let contextAlerts = [];
+        let contextPortsDown = '0';
+        let configTemplates = {};
+        let availableCommands = [];
+
+        try {
+            if (window.opener) {
+                // Zabbix Alerts
+                const problemsList = window.opener.document.getElementById('switch-problems-list');
+                if (problemsList) {
+                    contextAlerts = Array.from(problemsList.children).map(div => div.textContent.replace('• ', '').trim());
+                }
+
+                // Ports Down
+                const portsDownEl = window.opener.document.getElementById('switch-interfaces-down');
+                if (portsDownEl) {
+                    contextPortsDown = portsDownEl.textContent;
+                }
+
+                // Config Templates
+                const deviceType = (window.opener.dashboard && window.opener.dashboard.deviceType) ? window.opener.dashboard.deviceType : 'default';
+                const templates = (window.opener.VENDOR_CONFIG_SNIPPETS && window.opener.VENDOR_CONFIG_SNIPPETS[deviceType]) ? window.opener.VENDOR_CONFIG_SNIPPETS[deviceType] : {};
+                // Send full content so AI knows what commands to use
+                configTemplates = templates;
+
+                // Available Commands
+                const profiles = window.opener.ZABBIX_COMMAND_PROFILES || {};
+                const cmds = profiles[deviceType] || [];
+                availableCommands = cmds.map(c => c.name + ": " + c.command);
+
+                console.log("AI Context Gathered:", {
+                    alerts: contextAlerts,
+                    portsDown: contextPortsDown,
+                    templates: Object.keys(configTemplates),
+                    commands: availableCommands
+                });
+            } else {
+                console.warn("Window.opener not found!");
+            }
+        } catch (e) {
+            console.warn('Failed to gather context for AI:', e);
+        }
+
         try {
             const response = await api.post('/api/ai-analyze', {
                 host: win.lastResults.host,
@@ -732,7 +796,11 @@ Release 1808P35, H3C S12504
                     command: c.command,
                     output: c.output
                 })),
-                messages: isInitial ? null : win.chatHistory
+                messages: isInitial ? null : win.chatHistory,
+                context_alerts: contextAlerts,
+                context_ports_down: contextPortsDown,
+                config_templates: configTemplates,
+                available_commands: availableCommands
             });
 
             if (response.success) {
@@ -947,6 +1015,86 @@ Release 1808P35, H3C S12504
 
         const totalTime = this.commandHistory.reduce((sum, entry) => sum + entry.totalExecutionTime, 0);
         return totalTime / this.commandHistory.length;
+    }
+
+    /**
+     * Open Direct Chat Window
+     */
+    openDirectChatWindow(host, ip) {
+        const win = window.open('', `chat-${host.name}`, 'width=900,height=700');
+        if (!win) return;
+
+        // Reuse the same HTML structure as showExecutionResults but simplified
+        const html = `
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <title>Chat com IA - ${host.name}</title>
+                <style>
+                    body { background: #18181b; color: #e4e4e7; font-family: 'Inter', sans-serif; padding: 20px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; margin: 0; }
+                    .chat-container { flex: 1; overflow-y: auto; background: #27272a; border-radius: 8px; padding: 15px; margin-bottom: 15px; border: 1px solid #3f3f46; }
+                    .input-group { display: flex; gap: 10px; }
+                    input { flex: 1; padding: 12px; border-radius: 6px; border: 1px solid #3f3f46; background: #18181b; color: #fff; }
+                    button { padding: 12px 24px; border-radius: 6px; border: none; background: #7c3aed; color: white; cursor: pointer; font-weight: 600; }
+                    button:hover { background: #6d28d9; }
+                    .ai-msg { background: #3f3f46; padding: 10px; border-radius: 8px; margin-bottom: 10px; max-width: 85%; align-self: flex-start; }
+                    .user-msg { background: #4c1d95; padding: 10px; border-radius: 8px; margin-bottom: 10px; max-width: 85%; align-self: flex-end; color: white; margin-left: auto; }
+                    .exec-card { background: #000; border: 1px solid #333; border-radius: 6px; padding: 10px; margin-top: 10px; font-family: monospace; }
+                    .exec-btn { background: #10b981; margin-top: 5px; font-size: 0.8rem; padding: 6px 12px; }
+                    .exec-btn:hover { background: #059669; }
+                </style>
+            </head>
+            <body>
+                <div id="chat-messages" class="chat-container"></div>
+                <div class="input-group">
+                    <input type="text" id="chat-input" placeholder="Digite sua mensagem..." onkeypress="if(event.key==='Enter') window.opener.sshCommandManager.sendDirectMessage(window)">
+                    <button onclick="window.opener.sshCommandManager.sendDirectMessage(window)">Enviar</button>
+                </div>
+            </body>
+            </html>
+        `;
+
+        win.document.write(html);
+        win.document.close();
+
+        // Initialize state
+        win.lastResults = { host: host.host, commands: [] }; // Mock results for context
+        win.chatHistory = [];
+
+        // Initial Greeting
+        setTimeout(() => {
+            this.addChatMessage(win, 'assistant', `Olá! Sou seu assistente de rede. Estou conectado ao <strong>${host.name}</strong> (${ip}).<br>Como posso ajudar?`);
+        }, 500);
+    }
+
+    async sendDirectMessage(win) {
+        this.sendAIMessage(win, false);
+    }
+
+    async executeChatCommand(win, commands) {
+        const btn = win.document.activeElement;
+        if (btn) { btn.disabled = true; btn.textContent = 'Executando...'; }
+
+        this.addChatMessage(win, 'system', `🚀 Executando ${commands.length} comando(s)...`);
+
+        try {
+            const host = window.dashboard.currentSelectedHost; // Get from dashboard context
+            const results = await this.executeCommands(host, commands);
+
+            let outputText = '';
+            results.commands.forEach(r => {
+                outputText += `<strong>$ ${r.command}</strong>\n<pre>${r.output}</pre>\n`;
+            });
+
+            this.addChatMessage(win, 'system', outputText);
+
+            // Update context for next AI turn
+            win.lastResults.commands = [...win.lastResults.commands, ...results.commands];
+
+        } catch (e) {
+            this.addChatMessage(win, 'system', `❌ Erro na execução: ${e.message}`);
+        }
     }
 
     /**

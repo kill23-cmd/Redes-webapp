@@ -128,14 +128,13 @@ class NetworkDashboard {
 
     async onHostSelect(host) {
         this.currentSelectedHost = host;
-        
+
         // 1. Determina o tipo de dispositivo PRIMEIRO
         this.deviceType = this.determineDeviceType(host);
 
         // 2. Lógica do Botão de Backup
         const btnBackup = document.getElementById('btn-backup-config');
         if (btnBackup) {
-            // Se for Access Point, ESCONDE. Caso contrário, MOSTRA.
             if (this.deviceType === 'access_point') {
                 btnBackup.style.display = 'none';
             } else {
@@ -143,9 +142,16 @@ class NetworkDashboard {
             }
         }
 
+        const btnChat = document.getElementById('btn-direct-chat');
+        if (btnChat) {
+            btnChat.style.display = 'inline-flex';
+            btnChat.onclick = () => this.openDirectChat();
+        }
+
         // 3. Atualiza a UI padrão
         document.getElementById('device-name').textContent = host.name;
         const ip = (host.interfaces && host.interfaces[0]) ? host.interfaces[0].ip : host.host;
+
         document.getElementById('device-ip').textContent = ip;
         document.getElementById('device-type-badge').textContent = this.deviceType.replace('_', ' ').toUpperCase();
 
@@ -303,8 +309,8 @@ class NetworkDashboard {
     }
 
     updateElement(id, val) { const el = document.getElementById(id); if (el) el.textContent = val || '--'; }
-    showLoading(msg) { document.getElementById('loading-overlay')?.classList.add('show'); }
-    hideLoading() { document.getElementById('loading-overlay')?.classList.remove('show'); }
+    showLoading(msg) { const el = document.getElementById('loading-overlay'); if (el) el.classList.add('show'); }
+    hideLoading() { const el = document.getElementById('loading-overlay'); if (el) el.classList.remove('show'); }
     selectAllCommands() { document.querySelectorAll('.cmd-chk').forEach(c => c.checked = true); }
     deselectAllCommands() { document.querySelectorAll('.cmd-chk').forEach(c => c.checked = false); }
 
@@ -323,8 +329,8 @@ class NetworkDashboard {
         const host = this.currentSelectedHost;
 
         // Get loop settings
-        const loopExecution = document.getElementById('loop-execution')?.checked || false;
-        const loopInterval = parseInt(document.getElementById('loop-interval')?.value || 5000);
+        const loopExecution = (document.getElementById('loop-execution') ? document.getElementById('loop-execution').checked : false) || false;
+        const loopInterval = parseInt((document.getElementById('loop-interval') ? document.getElementById('loop-interval').value : 5000) || 5000);
 
         try {
             if (!window.sshCommandManager) {
@@ -352,7 +358,7 @@ class NetworkDashboard {
     connectPuTTY() { alert("Abrindo PuTTY..."); }
 
     determineDeviceType(host) {
-        const os = (host.inventory?.os || '').toLowerCase();
+        const os = (host.inventory && host.inventory.os ? host.inventory.os : '').toLowerCase();
         const name = host.name.toLowerCase();
         if (os.includes('fort') || name.includes('fw')) return 'fortinet_firewall';
         if (os.includes('cisco') && name.includes('sw')) return 'cisco_switch';
@@ -363,77 +369,104 @@ class NetworkDashboard {
 
 
     async downloadRunningConfig() {
-    // 1. Validações iniciais
-    if (!this.currentSelectedHost) {
-        showNotification('Selecione um dispositivo primeiro', 'warning');
-        return;
+        // 1. Validações iniciais
+        if (!this.currentSelectedHost) {
+            showNotification('Selecione um dispositivo primeiro', 'warning');
+            return;
+        }
+
+        if (!confirm(`Deseja baixar a configuração atual de ${this.currentSelectedHost.name}?`)) {
+            return;
+        }
+
+        this.showLoading('Extraindo configuração via SSH...');
+
+        try {
+            // 2. Definir o comando correto baseado no tipo de dispositivo
+            let command = '';
+            const type = this.deviceType; // Já determinado no onHostSelect
+
+            if (type === 'fortinet_firewall') {
+                command = 'show'; // Ou apenas 'show' dependendo da permissão
+            } else if (type.includes('cisco')) {
+                command = 'show running-config';
+            } else if (type === 'huawei_switch') {
+                command = 'display current-configuration';
+            } else {
+                // Fallback padrão
+                command = 'show running-config';
+            }
+
+            // 3. Executar o comando usando o SSH Manager (reutilizando a lógica existente)
+            // Precisamos garantir que o sshCommandManager esteja disponível
+            if (!window.sshCommandManager) {
+                throw new Error('SSH Manager não inicializado');
+            }
+
+            // Executa o comando (retorna um objeto com resultados)
+            const result = await window.sshCommandManager.executeCommands(
+                this.currentSelectedHost,
+                [command]
+            );
+
+            // 4. Processar o resultado
+            // O result.commands é um array, pegamos o primeiro (e único) comando
+            const cmdResult = result.commands[0];
+
+            if (cmdResult.exitCode !== 0) {
+                throw new Error('Falha na execução do comando SSH');
+            }
+
+            const configContent = cmdResult.output;
+
+            if (!configContent || configContent.length < 50) {
+                throw new Error('O dispositivo retornou uma configuração vazia ou inválida.');
+            }
+
+            // 5. Gerar o arquivo .txt
+            // Usa o nome do host + data para o arquivo
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const filename = `${this.currentSelectedHost.name}_config_${timestamp}.txt`;
+
+            // Usa a função utilitária já existente no seu projeto (js/utils.js)
+            downloadFile(configContent, filename, 'text/plain');
+
+            showNotification('Configuração salva com sucesso!', 'success');
+
+        } catch (error) {
+            console.error('Erro ao salvar config:', error);
+            showNotification(`Erro ao salvar configuração: ${error.message || error}`, 'error');
+        } finally {
+            this.hideLoading();
+        }
     }
 
-    if (!confirm(`Deseja baixar a configuração atual de ${this.currentSelectedHost.name}?`)) {
-        return;
+
+    openDirectChat() {
+        if (!this.currentSelectedHost) return;
+
+        const host = this.currentSelectedHost;
+        const ip = (host.interfaces && host.interfaces[0]) ? host.interfaces[0].ip : host.host;
+
+        // Open window with special flag
+        const win = window.open('', `chat-${host.name}`, 'width=900,height=700');
+
+        if (win) {
+            // If already open, just focus
+            if (win.document.getElementById('chat-messages')) {
+                win.focus();
+                return;
+            }
+
+            // Write initial HTML structure (simplified from ssh-commands.js logic)
+            // Actually, we can rely on sshCommandManager to initialize it if we call a method
+            // But sshCommandManager expects "results". Let's create a "Direct Mode" initialization.
+
+            if (window.sshCommandManager) {
+                window.sshCommandManager.openDirectChatWindow(host, ip);
+            }
+        }
     }
-
-    this.showLoading('Extraindo configuração via SSH...');
-
-    try {
-        // 2. Definir o comando correto baseado no tipo de dispositivo
-        let command = '';
-        const type = this.deviceType; // Já determinado no onHostSelect
-
-        if (type === 'fortinet_firewall') {
-            command = 'show'; // Ou apenas 'show' dependendo da permissão
-        } else if (type.includes('cisco')) {
-            command = 'show running-config';
-        } else if (type === 'huawei_switch') {
-            command = 'display current-configuration';
-        } else {
-            // Fallback padrão
-            command = 'show running-config';
-        }
-
-        // 3. Executar o comando usando o SSH Manager (reutilizando a lógica existente)
-        // Precisamos garantir que o sshCommandManager esteja disponível
-        if (!window.sshCommandManager) {
-            throw new Error('SSH Manager não inicializado');
-        }
-
-        // Executa o comando (retorna um objeto com resultados)
-        const result = await window.sshCommandManager.executeCommands(
-            this.currentSelectedHost, 
-            [command]
-        );
-
-        // 4. Processar o resultado
-        // O result.commands é um array, pegamos o primeiro (e único) comando
-        const cmdResult = result.commands[0];
-
-        if (cmdResult.exitCode !== 0) {
-            throw new Error('Falha na execução do comando SSH');
-        }
-
-        const configContent = cmdResult.output;
-        
-        if (!configContent || configContent.length < 50) {
-            throw new Error('O dispositivo retornou uma configuração vazia ou inválida.');
-        }
-
-        // 5. Gerar o arquivo .txt
-        // Usa o nome do host + data para o arquivo
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-        const filename = `${this.currentSelectedHost.name}_config_${timestamp}.txt`;
-
-        // Usa a função utilitária já existente no seu projeto (js/utils.js)
-        downloadFile(configContent, filename, 'text/plain');
-
-        showNotification('Configuração salva com sucesso!', 'success');
-
-    } catch (error) {
-        console.error('Erro ao salvar config:', error);
-        showNotification(`Erro ao salvar configuração: ${error.message || error}`, 'error');
-    } finally {
-        this.hideLoading();
-    }
-}
 }
 
 document.addEventListener('DOMContentLoaded', () => { window.dashboard = new NetworkDashboard(); });

@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict
 import uvicorn
 import httpx
 import paramiko
@@ -88,12 +88,81 @@ async def ssh_execute(req: SSHCommandRequest):
     pwd = req.password or settings.SSH_PASSWORD
     
     # Simulation Mode (No credentials)
+    # Simulation Mode (No credentials)
     if not user or not pwd:
         results = []
         for cmd in req.commands:
+            output = f"[SIMULATION] Output for: {cmd}\n> Command executed successfully."
+            
+            # Mock Data for specific commands
+            if "running-config" in cmd or "current-configuration" in cmd:
+                output = """
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname Switch-Loja-001
+!
+interface GigabitEthernet1/0/1
+ description Link_WAN_Vivo
+ switchport mode access
+ switchport access vlan 10
+!
+interface GigabitEthernet1/0/2
+ description Link_WAN_Claro
+ switchport mode access
+ switchport access vlan 20
+!
+interface GigabitEthernet1/0/3
+ description PC_Caixa_01
+ switchport mode access
+ switchport access vlan 80
+!
+interface GigabitEthernet1/0/4
+ description PC_Gerencia
+ switchport mode access
+ switchport access vlan 80
+ shutdown
+!
+interface GigabitEthernet1/0/48
+ description Uplink_Core
+ switchport mode trunk
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan100
+ description Management
+ ip address 192.168.1.254 255.255.255.0
+!
+ip default-gateway 192.168.1.1
+!
+end
+"""
+            elif "show interfaces status" in cmd:
+                output = """
+Port      Name               Status       Vlan       Duplex  Speed Type
+Gi1/0/1   Link_WAN_Vivo      connected    10         a-full  a-1000 10/100/1000BaseTX
+Gi1/0/2   Link_WAN_Claro     connected    20         a-full  a-1000 10/100/1000BaseTX
+Gi1/0/3   PC_Caixa_01        connected    80         a-full  a-1000 10/100/1000BaseTX
+Gi1/0/4   PC_Gerencia        disabled     80           auto    auto 10/100/1000BaseTX
+Gi1/0/5                      notconnect   1            auto    auto 10/100/1000BaseTX
+Gi1/0/48  Uplink_Core        connected    trunk      a-full  a-1000 10/100/1000BaseTX
+"""
+            elif "show ip interface brief" in cmd:
+                output = """
+Interface              IP-Address      OK? Method Status                Protocol
+GigabitEthernet1/0/1   unassigned      YES unset  up                    up      
+GigabitEthernet1/0/2   unassigned      YES unset  up                    up      
+Vlan1                  unassigned      YES unset  administratively down down    
+Vlan100                192.168.1.254   YES manual up                    up      
+"""
+            
             results.append({
                 "command": cmd,
-                "output": f"[SIMULATION] Output for: {cmd}\n> Command executed successfully.",
+                "output": output,
                 "success": True
             })
         return {"success": True, "results": results}
@@ -128,7 +197,12 @@ async def ssh_execute(req: SSHCommandRequest):
             print(f"[{i+1}/{len(req.commands)}] Executing: {cmd}")
             
             # Send command
-            chan.send(f"{cmd}\n")
+            # Encode to latin-1 to avoid character corruption on legacy devices
+            try:
+                chan.send(cmd.encode('latin-1') + b"\n")
+            except UnicodeEncodeError:
+                # Fallback to utf-8 if latin-1 fails (unlikely for standard chars, but possible for emojis etc)
+                chan.send(cmd.encode('utf-8') + b"\n")
             
             # Read output
             output_buffer = b""
@@ -162,6 +236,11 @@ async def ssh_execute(req: SSHCommandRequest):
             # Remove the echoed command from the output
             clean_output = full_output.replace(f"{cmd}\r\n", "").replace(f"{cmd}\n", "").strip()
             
+            # Remove artifacts like 'rminal length 0' or similar if they appear at the start
+            if "terminal length 0" in clean_output or "rminal length 0" in clean_output:
+                lines = clean_output.splitlines()
+                clean_output = "\n".join([l for l in lines if "terminal length 0" not in l and "rminal length 0" not in l]).strip()
+
             # Remove the trailing prompt if present (heuristic: ends with # or >)
             lines = clean_output.splitlines()
             if lines and (lines[-1].strip().endswith('#') or lines[-1].strip().endswith('>')):
@@ -184,8 +263,12 @@ async def ssh_execute(req: SSHCommandRequest):
 
 class AIAnalysisRequest(BaseModel):
     host: str
-    commands: List[dict] # List of {command: str, output: str}
-    messages: Optional[List[dict]] = None # Chat history [{role: str, content: str}]
+    commands: List[Dict[str, str]]
+    messages: Optional[List[Dict[str, str]]] = None
+    context_alerts: Optional[List[str]] = None
+    context_ports_down: Optional[str] = None
+    available_commands: Optional[List[str]] = None
+    config_templates: Optional[Dict[str, str]] = None
 
 @app.post("/api/ai-analyze")
 async def ai_analyze(req: AIAnalysisRequest):
@@ -195,26 +278,68 @@ async def ai_analyze(req: AIAnalysisRequest):
     try:
         import httpx
         
-        # Construct System Context with Command Outputs
-        system_context = f"Você é um especialista em engenharia de redes. Analise os outputs de comando SSH abaixo para o host {req.host}.\n"
-        system_context += "Identifique problemas, erros ou anomalias. Forneça um resumo de troubleshooting conciso.\n"
-        system_context += "Responda SEMPRE em Português do Brasil.\n\n"
-        system_context += "--- OUTPUTS DOS COMANDOS ---\n"
+        # Construct System Context with Persona and Data
+        system_context = (
+            "Você é um engenheiro de redes sênior, muito amigável e prestativo. "
+            "Sua personalidade é colaborativa, evitando termos robóticos. "
+            "Você adora ajudar a resolver problemas e sugerir melhorias.\n\n"
+            f"Estou analisando o host: {req.host}\n"
+        )
+
+        # Add Context Data if available
+        if req.context_ports_down and req.context_ports_down != '0':
+            system_context += f"⚠️ ALERTA: Existem {req.context_ports_down} interfaces DOWN neste switch!\n"
         
+        if req.context_alerts and len(req.context_alerts) > 0:
+            system_context += "⚠️ ALERTAS DO ZABBIX:\n" + "\n".join([f"- {a}" for a in req.context_alerts]) + "\n"
+
+        system_context += "\n--- OUTPUTS DOS COMANDOS ---\n"
         for cmd in req.commands:
             system_context += f"Command: {cmd.get('command')}\nOutput:\n{cmd.get('output')}\n\n"
-            
-        system_context += "--- FIM DOS OUTPUTS ---\n"
+        system_context += "--- FIM DOS OUTPUTS ---\n\n"
+
+        # Add Knowledge about Templates and Commands
+        if req.config_templates:
+            system_context += "TEMPLATES DE CONFIGURAÇÃO DISPONÍVEIS:\n"
+            for name, content in req.config_templates.items():
+                system_context += f"- {name}:\n{content}\n"
+            system_context += "Se o usuário pedir para configurar algo (como PC, CFTV, AP), sugira o template exato, substituindo os placeholders (ex: {INTERFACE}) pelos valores corretos.\n"
+
+        if req.available_commands:
+            system_context += f"\nCOMANDOS DISPONÍVEIS NO SISTEMA: {', '.join(req.available_commands[:100])}...\n"
+            system_context += "IMPORTANTE: Você SÓ pode sugerir comandos que estejam nesta lista acima. NÃO invente comandos.\n"
+            system_context += "Se o usuário pedir algo que não está na lista, explique que o comando não está disponível no perfil do dispositivo.\n"
+
+        system_context += (
+            "\nDIRETRIZES:\n"
+            "1. Responda SEMPRE em Português do Brasil.\n"
+            "2. Seja direto mas muito educado.\n"
+            "3. Se houver portas down ou alertas, mencione-os como possíveis causas.\n"
+            "4. Se o usuário pedir para configurar algo OU para verificar algo (show commands), forneça os comandos dentro de um bloco de execução.\n"
+            "5. Use o formato :::EXECUTION ... ::: para comandos que devem ser rodados.\n"
+            "   Exemplo:\n"
+            "   Para verificar as interfaces, rode:\n"
+            "   :::EXECUTION\n"
+            "   show ip int brief\n"
+            "   :::\n"
+            "   Ou para configurar:\n"
+            "   :::EXECUTION\n"
+            "   conf t\n"
+            "   interface Gi1/0/1\n"
+            "   desc PC\n"
+            "   end\n"
+            "   :::\n"
+            "6. Use formatação Markdown para deixar a resposta bonita.\n"
+            "7. CRÍTICO: NÃO sugira comandos como 'show logging' ou 'show spanning-tree' se eles não estiverem na lista de COMANDOS DISPONÍVEIS.\n"
+        )
 
         # Prepare messages for OpenAI
         api_messages = [{"role": "system", "content": system_context}]
         
         if req.messages:
-            # Append chat history
             api_messages.extend(req.messages)
         else:
-            # Initial analysis request
-            api_messages.append({"role": "user", "content": "Por favor, faça uma análise técnica detalhada dos logs acima."})
+            api_messages.append({"role": "user", "content": "Por favor, analise esses logs e me diga se está tudo bem."})
 
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -226,7 +351,8 @@ async def ai_analyze(req: AIAnalysisRequest):
                 json={
                     "model": "gpt-4o-mini",
                     "messages": api_messages,
-                    "max_tokens": 1000
+                    "max_tokens": 1000,
+                    "temperature": 0.7 
                 },
                 timeout=60.0
             )

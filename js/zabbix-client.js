@@ -130,7 +130,19 @@ class ZabbixClient {
         }
     }
 
-    async getMockData() { return []; }
+    async getMockData(method, params) {
+        if (method === 'problem.get') {
+            return [
+                { eventid: '1001', name: 'Interface Gi1/0/48 down', severity: '4', clock: Math.floor(Date.now() / 1000) - 3600 },
+                { eventid: '1002', name: 'High CPU utilization (90%)', severity: '3', clock: Math.floor(Date.now() / 1000) - 7200 }
+            ];
+        }
+        if (method === 'item.get') {
+            // Return some mock items if needed, or empty
+            return [];
+        }
+        return [];
+    }
     async testConnection() { return { success: true, version: '7.0', message: 'OK' }; }
 }
 
@@ -234,7 +246,12 @@ const ZABBIX_COMMAND_PROFILES = {
         { name: 'Mostrar VLANs', command: 'show vlan brief' },
         { name: 'Mostrar interfaces Trunk', command: 'show interfaces trunk' },
         { name: 'Mostrar tabela MAC', command: 'show mac address-table' },
-        { name: 'Mostrar contadores de erros', command: 'show interfaces counters errors' }
+        { name: 'Mostrar contadores de erros', command: 'show interfaces counters errors' },
+        { name: 'Mostrar Logs', command: 'show logging' },
+        { name: 'Mostrar Spanning Tree', command: 'show spanning-tree' },
+        { name: 'Mostrar Etherchannel', command: 'show etherchannel summary' },
+        { name: 'Mostrar Inventário', command: 'show inventory' },
+        { name: 'Mostrar Environment', command: 'show env all' }
     ],
     fortinet_firewall: [
         { name: 'Mostrar tabela ARP', command: 'get sys arp' },

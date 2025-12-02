@@ -401,16 +401,56 @@
             <div class="spinner"></div>
         </div>
 
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Configurações</h3>
+                    <button class="modal-close"><i data-lucide="x"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-section">
+                        <h4>Zabbix</h4>
+                        <div class="form-group">
+                            <label>URL:</label>
+                            <input type="url" id="zabbix-url" class="form-input" placeholder="https://zabbix...">
+                        </div>
+                        <div class="form-group">
+                            <label>Usuário:</label>
+                            <input type="text" id="zabbix-user" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Senha:</label>
+                            <input type="password" id="zabbix-pass" class="form-input">
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h4>SSH</h4>
+                        <div class="form-group">
+                            <label>Usuário SSH:</label>
+                            <input type="text" id="ssh-user" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Senha SSH:</label>
+                            <input type="password" id="ssh-pass" class="form-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="save-settings" class="btn-primary">Salvar</button>
+                    <button id="cancel-settings" class="btn-small">Cancelar</button>
+                </div>
+            </div>
+        </div>
 
-        <script src="js/utils.js?v=3"></script>
-        <script src="js/config-manager.js?v=3"></script>
-        <script src="js/zabbix-client.js?v=5"></script>
-        <script src="js/config-templates.js?v=3"></script>
-        <script src="js/links-dashboard.js?v=3"></script>
-        <script src="js/dashboard.js?v=4"></script>
-        <script src="js/charts.js?v=3"></script>
-        <script src="js/ssh-commands.js?v=9"></script>
-        <script src="js/main.js?v=3"></script>
+        <script src="js/utils.js?v=2"></script>
+        <script src="js/config-manager.js?v=2"></script>
+        <script src="js/zabbix-client.js?v=3"></script>
+        <script src="js/config-templates.js?v=2"></script>
+        <script src="js/links-dashboard.js?v=2"></script>
+        <script src="js/dashboard.js?v=2"></script>
+        <script src="js/charts.js?v=2"></script>
+        <script src="js/ssh-commands.js?v=6"></script>
+        <script src="js/main.js?v=2"></script>
 </body>
 
 </html>

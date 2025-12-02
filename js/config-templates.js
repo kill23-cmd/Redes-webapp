@@ -193,6 +193,9 @@ const VENDOR_CONFIG_SNIPPETS = {
     default: {}
 };
 
+// Expose to window for AI context
+window.VENDOR_CONFIG_SNIPPETS = VENDOR_CONFIG_SNIPPETS;
+
 class ConfigTemplateManager {
     constructor() {
         this.currentDeviceType = 'default';
