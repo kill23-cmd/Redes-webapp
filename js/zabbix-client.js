@@ -348,7 +348,8 @@ const ZABBIX_COMMAND_PROFILES = {
         { name: 'Mostrar config (running)', command: 'show running-config' },
         { name: 'Mostrar pools DHCP', command: 'show ip dhcp pool' },
         { name: 'Mostrar Uptime', command: 'show version | include uptime' },
-        { name: 'Mostrar tabela ARP', command: 'show ip arp' }
+        { name: 'Mostrar tabela ARP', command: 'show ip arp' },
+        { name: 'Mostrar erros nas interfaces', command: 'show interfaces | include line protocol|input errors|output errors'}
     ],
     cisco_switch: [
         { name: 'Mostrar interfaces (brief)', command: 'show ip interface brief' },
@@ -381,7 +382,9 @@ const ZABBIX_COMMAND_PROFILES = {
         { name: 'Mostrar Performance SLA', command: 'diagnose sys sdwan health-check' },
         { name: 'Mostrar interfaces (WAN)', command: 'get sys interface | grep wan' },
         { name: 'Mostrar quantidade de sessões', command: 'get system session status' },
-        { name: 'Limpar todas as sessões', command: 'diagnose sys session clear' }
+        { name: 'Limpar todas as sessões', command: 'diagnose sys session clear' },
+        { name: 'Mostrar status interfaces WAN', command: 'diagnose netlink device list | grep wan' },
+        { name: 'Mostrar clientes conectados na rede Clientes', command: 'diagnose wireless-controller wlac -d sta | grep ip=192.168.200' }
     ],
     fortiswitch: [
         { name: 'Mostrar vizinhos LLDP', command: 'get switch lldp neighbors-summary' },
