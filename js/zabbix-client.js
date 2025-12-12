@@ -399,7 +399,6 @@ const ZABBIX_COMMAND_PROFILES = {
         { name: 'Mostrar vizinhos LLDP', command: 'display lldp ne brief' }
     ],
     access_point: [
-        { name: 'Mostrar vizinhos CDP', command: 'show cdp neighbors' }
     ],
     default: []
 };
