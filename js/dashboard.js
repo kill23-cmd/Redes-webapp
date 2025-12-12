@@ -41,6 +41,7 @@ class NetworkDashboard {
         this.zabbixClient = new ZabbixClient(config.zabbix.url, config.zabbix.user, config.zabbix.password);
         await this.zabbixClient.authenticate();
         this.linksDashboard = new LinksDashboard(this.zabbixClient);
+        window.linksDashboard = this.linksDashboard;
         await this.loadStoresData();
     }
 

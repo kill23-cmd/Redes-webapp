@@ -1,5 +1,6 @@
 class ZabbixClient {
     constructor(baseUrl, username, password) {
+        console.log('ZabbixClient v6 Initializing...');
         this.baseUrl = baseUrl.replace(/\/$/, '');
         this.username = username;
         this.password = password;
@@ -33,9 +34,15 @@ class ZabbixClient {
             throw new Error('Not authenticated');
         }
         try {
+            // Only add output: 'extend' if method ends with .get and output is not specified
+            const finalParams = { ...params };
+            if (method.endsWith('.get') && !finalParams.output) {
+                finalParams.output = 'extend';
+            }
+
             const payload = {
                 jsonrpc: '2.0', method,
-                params: { ...params, output: params.output || 'extend' },
+                params: finalParams,
                 auth: this.authToken, id: 1
             };
             if (method.toLowerCase() === 'apiinfo.version') { delete payload.auth; payload.params = []; }
@@ -130,16 +137,125 @@ class ZabbixClient {
         }
     }
 
+    async getLinkProblems(groupId) {
+        console.log('getLinkProblems called', groupId);
+        // 1. Get Problems (to get eventid and ack status)
+        // problem.get does NOT support selectHosts, so we fetch it later
+        const problemParams = {
+            output: 'extend',
+            selectTags: 'extend',
+            selectAcknowledges: 'extend',
+            sortfield: 'eventid',
+            sortorder: 'DESC'
+        };
+        if (groupId) {
+            problemParams.groupids = Array.isArray(groupId) ? groupId : [groupId];
+        }
+
+        const problems = await this.request('problem.get', problemParams);
+
+        if (!problems || problems.length === 0) return [];
+
+        // 2. Get Triggers for these problems to get Hosts
+        const triggerIds = problems.map(p => p.objectid);
+        // Unique IDs
+        const uniqueTriggerIds = [...new Set(triggerIds)];
+
+        const triggerParams = {
+            triggerids: uniqueTriggerIds,
+            output: ['triggerid'],
+            selectHosts: ['name', 'hostid', 'host', 'status']
+        };
+
+        const triggers = await this.request('trigger.get', triggerParams);
+
+        // 3. Create a map of triggerId -> host
+        const triggerHostMap = {};
+        if (triggers) {
+            triggers.forEach(t => {
+                if (t.hosts && t.hosts.length > 0) {
+                    triggerHostMap[t.triggerid] = t.hosts;
+                }
+            });
+        }
+
+        // 4. Attach hosts and filter disabled ones
+        return problems.filter(p => {
+            if (triggerHostMap[p.objectid]) {
+                p.hosts = triggerHostMap[p.objectid];
+                // Filter out if all hosts are disabled (status '1')
+                // Zabbix host status: 0 - monitored, 1 - unmonitored
+                return p.hosts.some(h => h.status !== '1');
+            }
+            return true; // Keep if no host info (fallback)
+        });
+    }
+
+    async acknowledgeEvent(eventId, message, action = 6) {
+        return this.request('event.acknowledge', {
+            eventids: Array.isArray(eventId) ? eventId : [eventId], // Ensure array
+            action: action,
+            message: message
+        });
+    }
+
     async getMockData(method, params) {
+        if (method === 'event.acknowledge') {
+            console.log('Mock Ack:', params);
+            return { eventids: [params.eventids] };
+        }
         if (method === 'problem.get') {
             return [
-                { eventid: '1001', name: 'Interface Gi1/0/48 down', severity: '4', clock: Math.floor(Date.now() / 1000) - 3600 },
-                { eventid: '1002', name: 'High CPU utilization (90%)', severity: '3', clock: Math.floor(Date.now() / 1000) - 7200 }
+                {
+                    eventid: '1001',
+                    name: 'Interface Gi1/0/48 down',
+                    severity: '4',
+                    clock: Math.floor(Date.now() / 1000) - 3600,
+                    acknowledged: "0",
+                    objectid: "42349",
+                    tags: [{ tag: "Service", value: "Link" }]
+                },
+                {
+                    eventid: '1002',
+                    name: 'High CPU utilization (90%)',
+                    severity: '3',
+                    clock: Math.floor(Date.now() / 1000) - 7200,
+                    acknowledged: "1",
+                    objectid: "108318",
+                    tags: [{ tag: "Service", value: "Link" }]
+                }
             ];
         }
         if (method === 'item.get') {
             // Return some mock items if needed, or empty
             return [];
+        }
+        if (method === 'trigger.get') {
+            console.log('Returning MOCK data for trigger.get');
+            return [
+                {
+                    triggerid: "42349",
+                    description: "Não disponível por Ping ICMP",
+                    priority: "4",
+                    lastchange: Math.floor(Date.now() / 1000) - 3600,
+                    value: "1",
+                    comments: "Last value: Down (0).\r\nLast three attempts returned timeout.",
+                    hosts: [{ hostid: "11531", name: "BT541 - Link Algar", host: "BT541 - Link Algar", status: "0" }],
+                    tags: [{ tag: "Service", value: "Link" }],
+                    lastEvent: { eventid: "99901", acknowledged: "0" }
+                },
+                {
+                    triggerid: "108318",
+                    description: "Não disponível por Ping ICMP",
+                    priority: "4",
+                    lastchange: Math.floor(Date.now() / 1000) - 7200,
+                    value: "1",
+                    comments: "Last value: Down (0).",
+                    hosts: [{ hostid: "12194", name: "PZ734 - Link Algar", host: "PZ734 - Link Algar", status: "1" }],
+                    tags: [{ tag: "Service", value: "Link" }],
+                    lastEvent: { eventid: "99902", acknowledged: "1" }
+                }
+            ];
         }
         return [];
     }

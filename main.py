@@ -77,9 +77,17 @@ async def zabbix_proxy(request: Request):
         async with httpx.AsyncClient(verify=False) as client:
             response = await client.post(target_url, json=body, timeout=10.0)
             return response.json()
+    except httpx.ConnectError as e:
+        print(f"Zabbix Connection Error: {e}")
+        raise HTTPException(status_code=502, detail=f"Failed to connect to Zabbix: {str(e)}")
+    except httpx.TimeoutException as e:
+        print(f"Zabbix Timeout: {e}")
+        raise HTTPException(status_code=504, detail="Zabbix connection timed out")
     except Exception as e:
-        print(f"Proxy Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        print(f"Proxy Error accessing {target_url}: {repr(e)}")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Proxy Error: {str(e)}")
 
 @app.post("/api/ssh-execute")
 async def ssh_execute(req: SSHCommandRequest):
