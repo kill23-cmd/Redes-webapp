@@ -25,6 +25,9 @@ class NetworkDashboard {
             if (this.linksDashboard) this.linksDashboard.show();
             else alert('Aguarde a conexão com o Zabbix...');
         });
+        document.getElementById('btn-open-map').addEventListener('click', () => {
+            if (this.currentMapUrl) window.open(this.currentMapUrl, '_blank');
+        });
     }
 
     initializeDashboard() {
@@ -89,15 +92,28 @@ class NetworkDashboard {
         if (!storeId) return;
         this.updateLinkInfo(storeId);
 
-        const btnBackup = document.getElementById('btn-backup-config'); // <-- ADICIONADO
-        if (btnBackup) btnBackup.style.display = 'none';                // <-- ADICIONADO
+        const btnBackup = document.getElementById('btn-backup-config');
+        if (btnBackup) btnBackup.style.display = 'none';
+
+        // Reset Map Button
+        const btnMap = document.getElementById('btn-open-map');
+        if (btnMap) btnMap.style.display = 'none';
+        this.currentMapUrl = null;
 
         let hosts = [];
         if (this.zabbixClient && this.zabbixClient.isAuthenticated) {
             try {
+                // 1. Fetch Hosts
                 const groups = await this.zabbixClient.getHostGroups();
                 const group = groups.find(g => g.name.toLowerCase().includes(storeId.toLowerCase()));
                 if (group) hosts = await this.zabbixClient.getHostsByGroupId(group.groupid);
+
+                // 2. Fetch Map
+                const mapId = await this.zabbixClient.getMapId(storeId);
+                if (mapId) {
+                    this.currentMapUrl = `${this.zabbixClient.baseUrl}/zabbix.php?action=map.view&sysmapid=${mapId}`;
+                    if (btnMap) btnMap.style.display = 'inline-flex';
+                }
             } catch (e) { console.warn(e); }
         }
 
