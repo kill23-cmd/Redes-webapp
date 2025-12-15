@@ -361,19 +361,28 @@ class NetworkDashboard {
     determineDeviceType(host) {
         const os = (host.inventory && host.inventory.os ? host.inventory.os : '').toLowerCase();
         const name = host.name.toLowerCase();
+        
+        // Verifica TAGS (Prioridade para Huawei)
+        // O Zabbix retorna tags como um array: [{tag: "HUAWEI", value: ""}, ...]
+        const tags = host.tags || [];
+        const isHuawei = tags.some(t => t.tag.toUpperCase() === 'HUAWEI');
 
-        // --- CORREÇÃO AQUI ---
-        // Verifica se é FortiSwitch ANTES de verificar se é Fortinet genérico (Firewall)
-        // Critério: Ter 'fort' no OS e ('sw' no nome OU 'switch' no OS)
+        // 1. FortiSwitch (Prioridade Alta)
         if (os.includes('fort') && (name.includes('sw') || os.includes('switch'))) {
             return 'fortiswitch';
         }
-        // ---------------------
 
+        // 2. Huawei Switch (Baseado em TAG)
+        if (isHuawei) {
+            return 'huawei_switch';
+        }
+
+        // 3. Demais Dispositivos (Lógica Padrão)
         if (os.includes('fort') || name.includes('fw')) return 'fortinet_firewall';
         if (os.includes('cisco') && name.includes('sw')) return 'cisco_switch';
         if (name.includes('ap')) return 'access_point';
         if (os.includes('cisco') || name.includes('rt')) return 'cisco_router';
+        
         return 'default';
     }
 
