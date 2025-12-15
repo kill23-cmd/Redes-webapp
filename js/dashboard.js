@@ -361,6 +361,15 @@ class NetworkDashboard {
     determineDeviceType(host) {
         const os = (host.inventory && host.inventory.os ? host.inventory.os : '').toLowerCase();
         const name = host.name.toLowerCase();
+
+        // --- CORREÇÃO AQUI ---
+        // Verifica se é FortiSwitch ANTES de verificar se é Fortinet genérico (Firewall)
+        // Critério: Ter 'fort' no OS e ('sw' no nome OU 'switch' no OS)
+        if (os.includes('fort') && (name.includes('sw') || os.includes('switch'))) {
+            return 'fortiswitch';
+        }
+        // ---------------------
+
         if (os.includes('fort') || name.includes('fw')) return 'fortinet_firewall';
         if (os.includes('cisco') && name.includes('sw')) return 'cisco_switch';
         if (name.includes('ap')) return 'access_point';
