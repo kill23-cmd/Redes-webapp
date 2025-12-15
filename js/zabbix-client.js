@@ -384,7 +384,8 @@ const ZABBIX_COMMAND_PROFILES = {
         { name: 'Mostrar quantidade de sessões', command: 'get system session status' },
         { name: 'Limpar todas as sessões', command: 'diagnose sys session clear' },
         { name: 'Mostrar status interfaces WAN', command: 'diagnose netlink device list | grep wan' },
-        { name: 'Mostrar clientes conectados na rede Clientes', command: 'diagnose wireless-controller wlac -d sta | grep ip=192.168.200' }
+        { name: 'Mostrar clientes conectados na rede Clientes', command: 'diagnose wireless-controller wlac -d sta | grep ip=192.168.' },
+        { name: 'Diagnosticar interfaces', command: 'diagnose netlink device list' }
     ],
     fortiswitch: [
         { name: 'Mostrar vizinhos LLDP', command: 'get switch lldp neighbors-summary' },
