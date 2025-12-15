@@ -16,6 +16,13 @@ class NetworkDashboard {
         document.getElementById('store-select').addEventListener('change', (e) => this.onStoreSelect(e.target.value));
         document.getElementById('btn-backup-config').addEventListener('click', () => this.downloadRunningConfig());
 
+        document.getElementById('store-search').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Evita submit de form se houver
+                this.selectAndLoadFirstResult();
+            }
+        });
+
         document.getElementById('run-commands').addEventListener('click', () => this.runSelectedCommands());
         document.getElementById('select-all').addEventListener('click', () => this.selectAllCommands());
         document.getElementById('deselect-all').addEventListener('click', () => this.deselectAllCommands());
@@ -25,6 +32,60 @@ class NetworkDashboard {
             if (this.linksDashboard) this.linksDashboard.show();
             else alert('Aguarde a conexão com o Zabbix...');
         });
+    }
+
+    selectAndLoadFirstResult() {
+        const select = document.getElementById('store-select');
+        const searchInput = document.getElementById('store-search');
+        const term = searchInput.value.trim();
+
+        if (!term) return;
+
+        // 1. Regex Específica para as Lojas (GG, GB, PZ, BT, MR, PR + Números)
+        // Isso evita pegar "OG903" de "BRSPOG903..."
+        const storeIdMatch = term.match(/((?:GG|GB|PZ|BT|MR|PR|SP)\d{3,4})/i);
+        
+        let targetStoreId = null;
+
+        // Cenário A: Encontrou um ID de loja dentro do texto (Ex: BRSPOGG902 -> GG902)
+        if (storeIdMatch) {
+            targetStoreId = storeIdMatch[1].toUpperCase();
+        } 
+        // Cenário B: O texto digitado JÁ É o ID da loja (Ex: "PZ750")
+        else if (term.length <= 6) {
+             targetStoreId = term.toUpperCase();
+        }
+
+        // Se identificamos uma loja possível, verificamos se ela existe na base
+        if (targetStoreId) {
+            const storeExists = this.storesData.find(s => s.id === targetStoreId);
+            
+            if (storeExists) {
+                // 1. Define o valor no campo de busca para filtrar o dropdown visualmente
+                // searchInput.value = targetStoreId; // Opcional: descomente se quiser limpar o hostname da tela
+                
+                // 2. Filtra o dropdown
+                this.performSearch(); 
+                
+                // 3. Seleciona a loja e passa o termo original (hostname) para selecionar o host
+                setTimeout(() => {
+                    select.value = targetStoreId;
+                    // Passamos o 'term' (hostname completo) para que o onStoreSelect ache o dispositivo
+                    this.onStoreSelect(targetStoreId, term); 
+                }, 50);
+                
+                return; // Encerra aqui pois achamos a loja pelo ID
+            }
+        }
+
+        // Cenário C: Fallback - Se não achou loja pelo ID, tenta pegar o primeiro item da lista filtrada
+        // Útil se você digitou apenas "Loja tal" e a busca funcionou
+        if (select.options.length > 1) {
+            const firstOption = select.options[1];
+            select.value = firstOption.value;
+            this.onStoreSelect(firstOption.value, term);
+            searchInput.blur();
+        }
     }
 
     initializeDashboard() {
@@ -70,44 +131,99 @@ class NetworkDashboard {
     performSearch() {
         const qStore = document.getElementById('store-search').value.toLowerCase();
         const qCirc = document.getElementById('circuit-search').value.toLowerCase();
-        const options = Array.from(document.querySelectorAll('#store-select option')).slice(1);
 
-        options.forEach(opt => {
-            const storeData = this.storesData.find(s => s.id === opt.value);
-            const matchStore = !qStore || opt.textContent.toLowerCase().includes(qStore);
+        // 1. Filtra o array de dados original (Solução compatível com Chrome/Edge)
+            const filteredStores = this.storesData.filter(s => {
+            // Monta o texto de busca igual ao que aparece na opção
+            const text = `${s.id} - ${s.nome}`.toLowerCase();
+            
+            // Verifica match com o nome/id da loja
+            const matchStore = !qStore || text.includes(qStore);
+            
+            // Verifica match com o circuito (se houver busca de circuito)
             let matchCirc = true;
-            if (qCirc && storeData) {
-                const w1 = (storeData.circuito_wan1 || '').toLowerCase();
-                const w2 = (storeData.circuito_wan2 || '').toLowerCase();
+            if (qCirc) {
+                const w1 = (s.circuito_wan1 || '').toLowerCase();
+                const w2 = (s.circuito_wan2 || '').toLowerCase();
                 matchCirc = w1.includes(qCirc) || w2.includes(qCirc);
             }
-            opt.style.display = (matchStore && matchCirc) ? 'block' : 'none';
+            
+            return matchStore && matchCirc;
         });
+
+        // 2. Salva a seleção atual para tentar mantê-la após o refresh
+        const selectEl = document.getElementById('store-select');
+        const currentVal = selectEl.value;
+
+        // 3. Reconstrói o dropdown com os dados filtrados
+        this.populateStoreSelect(filteredStores);
+
+        // 4. Se a loja que estava selecionada ainda existe na busca, seleciona ela de volta
+        if (currentVal && filteredStores.find(s => s.id === currentVal)) {
+            selectEl.value = currentVal;
+        }
     }
 
-    async onStoreSelect(storeId) {
-        if (!storeId) return;
-        this.updateLinkInfo(storeId);
+  // Adicionado parâmetro opcional targetHostName
+  async onStoreSelect(storeId, targetHostName = null) {
+    if (!storeId) return;
+    this.updateLinkInfo(storeId);
 
-        const btnBackup = document.getElementById('btn-backup-config'); // <-- ADICIONADO
-        if (btnBackup) btnBackup.style.display = 'none';                // <-- ADICIONADO
-
-        let hosts = [];
-        if (this.zabbixClient && this.zabbixClient.isAuthenticated) {
-            try {
-                const groups = await this.zabbixClient.getHostGroups();
-                const group = groups.find(g => g.name.toLowerCase().includes(storeId.toLowerCase()));
-                if (group) hosts = await this.zabbixClient.getHostsByGroupId(group.groupid);
-            } catch (e) { console.warn(e); }
-        }
-
-        if (hosts.length === 0) {
-            hosts = [{ hostid: 'sim', name: `Simulado-${storeId}`, host: '192.168.1.1', inventory: { os: 'FortiOS' } }];
-        }
-
-        this.populateHostsList(hosts);
-        if (hosts.length > 0) this.onHostSelect(hosts[0]);
+    // ... (código de busca de grupo e hosts Zabbix igual ao anterior) ...
+    
+    // --- TRECHO IMPORTANTE DO ZABBIX ---
+    let hosts = [];
+    if (this.zabbixClient && this.zabbixClient.isAuthenticated) {
+        try {
+            const groups = await this.zabbixClient.getHostGroups();
+            // Busca Exata ou Aproximada do Grupo
+            let group = groups.find(g => g.name.trim() === storeId.trim());
+            if (!group) {
+                const candidates = groups.filter(g => g.name.toLowerCase().includes(storeId.toLowerCase()));
+                candidates.sort((a, b) => a.name.length - b.name.length);
+                group = candidates[0];
+            }
+            if (group) hosts = await this.zabbixClient.getHostsByGroupId(group.groupid);
+        } catch (e) { console.warn(e); }
     }
+    // ------------------------------------
+
+    if (hosts.length === 0) {
+        hosts = [{ hostid: 'sim', name: `Simulado-${storeId}`, host: '192.168.1.1', inventory: { os: 'FortiOS' } }];
+    }
+
+    this.populateHostsList(hosts);
+
+    // --- CORREÇÃO DA SELEÇÃO DO HOST ---
+    if (hosts.length > 0) {
+        let hostToSelect = hosts[0];
+
+        if (targetHostName) {
+            // Remove espaços e deixa minúsculo para comparar
+            const cleanTarget = targetHostName.trim().toLowerCase();
+            
+            // Procura um host que CONTENHA o texto digitado
+            const found = hosts.find(h => h.name.toLowerCase().includes(cleanTarget));
+            
+            if (found) hostToSelect = found;
+        }
+
+        this.onHostSelect(hostToSelect);
+
+        // Scroll visual até o item
+        setTimeout(() => {
+            const listItems = document.querySelectorAll('.host-item');
+            listItems.forEach(item => {
+                if (item.textContent.trim().includes(hostToSelect.name)) {
+                    item.classList.add('selected');
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }, 200); // Aumentei o tempo para garantir que a lista renderizou
+    }
+}
 
     populateHostsList(hosts) {
         const list = document.getElementById('hosts-list');
