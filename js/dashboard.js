@@ -26,11 +26,78 @@ class NetworkDashboard {
             else alert('Aguarde a conexão com o Zabbix...');
         });
         document.getElementById('btn-open-map').addEventListener('click', () => {
-            if (this.currentMapUrl) window.open(this.currentMapUrl, '_blank');
+            console.log('Open Map button clicked. URL:', this.currentMapUrl);
+            if (this.currentMapUrl) {
+                const modal = document.getElementById('map-modal');
+                const img = document.getElementById('map-image');
+                const loader = document.getElementById('map-loading');
+                const btnNewTab = document.getElementById('open-map-new-tab');
+
+                console.log('Opening modal with URL:', this.currentMapUrl);
+
+                // Extract Map ID
+                try {
+                    const urlObj = new URL(this.currentMapUrl);
+                    const mapId = urlObj.searchParams.get('sysmapid');
+                    const proxyUrl = `/api/zabbix-map-image?sysmapid=${mapId}&t=${Date.now()}`;
+
+                    // Show loader, hide image
+                    img.style.display = 'none';
+                    loader.style.display = 'block';
+
+                    img.onload = () => {
+                        loader.style.display = 'none';
+                        img.style.display = 'block';
+                    };
+
+                    img.onerror = () => {
+                        loader.style.display = 'none';
+                        console.error('Failed to load map image');
+                        // Optional: Show error message
+                    };
+
+                    img.src = proxyUrl;
+                } catch (e) {
+                    console.error('Error parsing map URL:', e);
+                }
+
+                if (btnNewTab) btnNewTab.href = this.currentMapUrl;
+
+                // Force visibility via inline styles to bypass CSS issues
+                modal.classList.add('show');
+                modal.style.display = 'flex';
+                modal.style.zIndex = '20000';
+                modal.style.opacity = '1';
+                modal.style.visibility = 'visible';
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.width = '100vw';
+                modal.style.height = '100vh';
+                modal.style.background = ''; // Clear debug background
+                modal.style.border = ''; // Clear debug border
+
+                // Ensure it's the last element in body
+                document.body.appendChild(modal);
+
+                console.log('Modal opened');
+            } else {
+                console.warn('Map URL is missing!');
+            }
+        });
+
+        document.getElementById('close-map-modal').addEventListener('click', () => {
+            const modal = document.getElementById('map-modal');
+            const img = document.getElementById('map-image');
+            modal.classList.remove('show');
+            modal.style.display = 'none'; // Explicitly hide
+            if (img) img.src = ''; // Stop loading
         });
     }
 
-    initializeDashboard() {
+    async initializeDashboard() {
+        if (configManager.ready) await configManager.ready;
+
         if (configManager.getSummary().zabbixConfigured) {
             this.initializeZabbixClient();
         } else {
@@ -89,6 +156,7 @@ class NetworkDashboard {
     }
 
     async onStoreSelect(storeId) {
+        console.log('onStoreSelect called for:', storeId);
         if (!storeId) return;
         this.updateLinkInfo(storeId);
 
@@ -109,9 +177,13 @@ class NetworkDashboard {
                 if (group) hosts = await this.zabbixClient.getHostsByGroupId(group.groupid);
 
                 // 2. Fetch Map
+                console.log('Fetching map for:', storeId);
                 const mapId = await this.zabbixClient.getMapId(storeId);
+                console.log('Map ID found:', mapId);
                 if (mapId) {
-                    this.currentMapUrl = `${this.zabbixClient.baseUrl}/zabbix.php?action=map.view&sysmapid=${mapId}`;
+                    const frontendUrl = this.zabbixClient.baseUrl.replace('/api_jsonrpc.php', '');
+                    this.currentMapUrl = `${frontendUrl}/zabbix.php?action=map.view&sysmapid=${mapId}`;
+                    console.log('Map URL set to:', this.currentMapUrl);
                     if (btnMap) btnMap.style.display = 'inline-flex';
                 }
             } catch (e) { console.warn(e); }

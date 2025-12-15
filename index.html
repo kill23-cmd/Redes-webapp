@@ -8,8 +8,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="styles/main.css?v=2">
-    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/main.css?v=3">
+    <link rel="stylesheet" href="styles/components.css?v=2">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -392,30 +392,18 @@
                         </select>
                     </div>
                     <button id="run-commands" class="btn-primary btn-block">
-                        <i data-lucide="play"></i> Executar Comandos
-                    </button>
+                        <option value="10000">10s</option>
+                        <option value="15000">15s</option>
+                        <option value="30000">30s</option>
+                        <option value="60000">60s</option>
+                        </select>
                 </div>
+                <button id="run-commands" class="btn-primary btn-block">
+                    <i data-lucide="play"></i> Executar Comandos
+                </button>
             </div>
-            </main>
         </div>
-
-        <div id="loading-overlay" class="loading-overlay">
-            <div class="spinner"></div>
-            </label>
-            <select id="loop-interval" class="form-input" style="width: auto; padding: 5px 10px; height: 32px;">
-                <option value="5000">5s</option>
-                <option value="10000">10s</option>
-                <option value="15000">15s</option>
-                <option value="30000">30s</option>
-                <option value="60000">60s</option>
-            </select>
-        </div>
-        <button id="run-commands" class="btn-primary btn-block">
-            <i data-lucide="play"></i> Executar Comandos
-        </button>
-    </div>
-    </div>
-    </main>
+        </main>
     </div>
 
     <div id="loading-overlay" class="loading-overlay">
@@ -590,24 +578,67 @@
                     </button>
                 </div>
             </div>
-            </main>
-        </div>
 
-        <div id="loading-overlay" class="loading-overlay">
-            <div class="spinner"></div>
-        </div>
+            <div id="map-modal-old" class="modal-overlay" style="display: none;">
+                <div class="modal-content full-screen">
+                    <div class="modal-header">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <h2>Mapa da Loja</h2>
+                            <a id="open-map-new-tab-old" href="#" target="_blank" class="btn-small"
+                                style="text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                                <i data-lucide="external-link" style="width: 14px;"></i> Nova Aba
+                            </a>
+                        </div>
+                        <button id="close-map-modal-old" class="close-btn">&times;</button>
+                    </div>
+                    <div class="modal-body" style="padding: 0;">
+                        <div id="map-loading"
+                            style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            <div class="spinner"></div>
+                        </div>
+                        <img id="map-image" style="width: 100%; height: 100%; object-fit: contain; display: none;"
+                            alt="Mapa Zabbix">
+                    </div>
+                </div>
+            </div>
+
+            <div id="loading-overlay" class="loading-overlay">
+                <div class="spinner"></div>
+            </div>
 
 
-        <script src="js/utils.js?v=3"></script>
-        <script src="js/config-manager.js?v=3"></script>
-        <script src="js/zabbix-client.js?v=6"></script>
-        <script src="js/ai-knowledge-base.js?v=2"></script>
-        <script src="js/config-templates.js?v=3"></script>
-        <script src="js/links-dashboard.js?v=4"></script>
-        <script src="js/dashboard.js?v=5"></script>
-        <script src="js/charts.js?v=3"></script>
-        <script src="js/ssh-commands.js?v=9"></script>
-        <script src="js/main.js?v=3"></script>
+            <script src="js/utils.js?v=3"></script>
+            <script src="js/config-manager.js?v=3"></script>
+            <script src="js/zabbix-client.js?v=6"></script>
+            <script src="js/ai-knowledge-base.js?v=2"></script>
+            <script src="js/config-templates.js?v=3"></script>
+            <script src="js/links-dashboard.js?v=4"></script>
+            <script src="js/dashboard.js?v=17"></script>
+            <script src="js/charts.js?v=3"></script>
+            <script src="js/ssh-commands.js?v=9"></script>
+            <script src="js/main.js?v=3"></script>
+            <div id="map-modal" class="modal-overlay" style="display: none;">
+                <div class="modal-content full-screen">
+                    <div class="modal-header">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <h2>Mapa da Loja</h2>
+                            <a id="open-map-new-tab" href="#" target="_blank" class="btn-small"
+                                style="text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                                <i data-lucide="external-link" style="width: 14px;"></i> Nova Aba
+                            </a>
+                        </div>
+                        <button id="close-map-modal" class="close-btn">&times;</button>
+                    </div>
+                    <div class="modal-body" style="padding: 0;">
+                        <div id="map-loading"
+                            style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            <div class="spinner"></div>
+                        </div>
+                        <img id="map-image" style="width: 100%; height: 100%; object-fit: contain; display: none;"
+                            alt="Mapa Zabbix">
+                    </div>
+                </div>
+            </div>
 </body>
 
 </html>

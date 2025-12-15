@@ -25,8 +25,13 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
@@ -45,6 +50,7 @@
     transform: translateY(-20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -155,7 +161,7 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.8);
-  z-index: 9999;
+  z-index: 9000;
   align-items: center;
   justify-content: center;
   flex-direction: column;
@@ -176,8 +182,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
@@ -190,25 +201,65 @@
    UTILITY CLASSES
 ============================================ */
 
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
+.text-center {
+  text-align: center;
+}
 
-.font-mono { font-family: var(--font-mono); }
+.text-left {
+  text-align: left;
+}
 
-.text-success { color: var(--success); }
-.text-error { color: var(--error); }
-.text-warning { color: var(--warning); }
-.text-primary { color: var(--primary-500); }
-.text-muted { color: var(--neutral-400); }
+.text-right {
+  text-align: right;
+}
 
-.bg-success { background-color: var(--success); }
-.bg-error { background-color: var(--error); }
-.bg-warning { background-color: var(--warning); }
-.bg-primary { background-color: var(--primary-500); }
+.font-mono {
+  font-family: var(--font-mono);
+}
 
-.hidden { display: none; }
-.visible { display: block; }
+.text-success {
+  color: var(--success);
+}
+
+.text-error {
+  color: var(--error);
+}
+
+.text-warning {
+  color: var(--warning);
+}
+
+.text-primary {
+  color: var(--primary-500);
+}
+
+.text-muted {
+  color: var(--neutral-400);
+}
+
+.bg-success {
+  background-color: var(--success);
+}
+
+.bg-error {
+  background-color: var(--error);
+}
+
+.bg-warning {
+  background-color: var(--warning);
+}
+
+.bg-primary {
+  background-color: var(--primary-500);
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
 
 .sr-only {
   position: absolute;
@@ -401,6 +452,7 @@
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -412,6 +464,7 @@
     transform: translateY(-20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -423,6 +476,7 @@
     transform: scale(0.9);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -457,6 +511,7 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -464,7 +519,7 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   .status-indicator.down {
     animation: none;
   }
@@ -472,6 +527,7 @@
 
 /* Print styles */
 @media print {
+
   .app-header,
   .left-panel,
   .ssh-panel,
@@ -479,21 +535,21 @@
   .loading-overlay {
     display: none !important;
   }
-  
+
   .main-content {
     grid-template-columns: 1fr;
     gap: 0;
   }
-  
+
   .collapsible-content {
     display: block !important;
   }
-  
+
   body {
     background: white !important;
     color: black !important;
   }
-  
+
   .status-card,
   .wan-status-card,
   .traffic-chart-card {

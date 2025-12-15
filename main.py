@@ -67,6 +67,50 @@ def carregar_lojas_excel():
         return []
 
 # Routes
+@app.get("/api/zabbix-map-image")
+async def zabbix_map_image(sysmapid: str):
+    try:
+        # Construct URLs
+        base_url = settings.ZABBIX_URL.replace("api_jsonrpc.php", "")
+        login_url = f"{base_url}index.php"
+        map_url = f"{base_url}map.php?sysmapid={sysmapid}"
+        
+        async with httpx.AsyncClient(verify=False) as client:
+            # 1. Login to get session cookie
+            login_data = {
+                "name": settings.ZABBIX_USER,
+                "password": settings.ZABBIX_PASSWORD,
+                "enter": "Sign in",
+                "autologin": "1"
+            }
+            
+            # First GET to get any cookies/tokens if needed (optional but good practice)
+            await client.get(login_url)
+            
+            # POST to login
+            login_response = await client.post(login_url, data=login_data)
+            
+            if "zbx_session" not in login_response.cookies and "zbx_sessionid" not in login_response.cookies:
+                 # Try JSON RPC login if form login fails (fallback, but map.php needs cookie)
+                 # Actually map.php usually requires the PHP session cookie, not just API token.
+                 # If this fails, we might need to debug the login form fields.
+                 print("Warning: No session cookie found after login attempt.")
+
+            # 2. Fetch Map Image
+            # map.php returns the image directly
+            map_response = await client.get(map_url)
+            
+            if map_response.status_code != 200:
+                raise HTTPException(status_code=map_response.status_code, detail="Failed to fetch map image")
+                
+            # Return image
+            from fastapi.responses import Response
+            return Response(content=map_response.content, media_type="image/png")
+
+    except Exception as e:
+        print(f"Error fetching map image: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/zabbix-proxy")
 async def zabbix_proxy(request: Request):
     try:
