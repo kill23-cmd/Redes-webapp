@@ -26,7 +26,7 @@ class ConfigManager {
             }
         };
 
-        this.loadConfig();
+        this.ready = this.loadConfig();
     }
 
     /**

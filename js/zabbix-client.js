@@ -145,6 +145,21 @@ class ZabbixClient {
         }
     }
 
+    async getMapId(name) {
+        try {
+            const params = {
+                output: ['sysmapid', 'name'],
+                search: { name: name },
+                limit: 1
+            };
+            const maps = await this.request('map.get', params);
+            return maps && maps.length > 0 ? maps[0].sysmapid : null;
+        } catch (e) {
+            console.error('Error fetching map:', e);
+            return null;
+        }
+    }
+
     async getLinkProblems(groupId) {
         console.log('getLinkProblems called', groupId);
         // 1. Get Problems (to get eventid and ack status)
