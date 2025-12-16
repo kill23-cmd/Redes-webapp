@@ -16,6 +16,13 @@ class NetworkDashboard {
         document.getElementById('store-select').addEventListener('change', (e) => this.onStoreSelect(e.target.value));
         document.getElementById('btn-backup-config').addEventListener('click', () => this.downloadRunningConfig());
 
+        document.getElementById('store-search').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Evita submit de form se houver
+                this.selectAndLoadFirstResult();
+            }
+        });
+
         document.getElementById('run-commands').addEventListener('click', () => this.runSelectedCommands());
         document.getElementById('select-all').addEventListener('click', () => this.selectAllCommands());
         document.getElementById('deselect-all').addEventListener('click', () => this.deselectAllCommands());
@@ -45,6 +52,7 @@ document.getElementById('close-map-modal').addEventListener('click', () => {
 });
     }
 
+<<<<<<< HEAD
     async initializeDashboard() {
     if (configManager.ready) await configManager.ready;
 
@@ -52,6 +60,69 @@ document.getElementById('close-map-modal').addEventListener('click', () => {
         this.initializeZabbixClient();
     } else {
         this.loadStoresData();
+=======
+    selectAndLoadFirstResult() {
+        const select = document.getElementById('store-select');
+        const searchInput = document.getElementById('store-search');
+        const term = searchInput.value.trim();
+
+        if (!term) return;
+
+        // 1. Regex Específica para as Lojas (GG, GB, PZ, BT, MR, PR + Números)
+        // Isso evita pegar "OG903" de "BRSPOG903..."
+        const storeIdMatch = term.match(/((?:GG|GB|PZ|BT|MR|PR|SP)\d{3,4})/i);
+        
+        let targetStoreId = null;
+
+        // Cenário A: Encontrou um ID de loja dentro do texto (Ex: BRSPOGG902 -> GG902)
+        if (storeIdMatch) {
+            targetStoreId = storeIdMatch[1].toUpperCase();
+        } 
+        // Cenário B: O texto digitado JÁ É o ID da loja (Ex: "PZ750")
+        else if (term.length <= 6) {
+             targetStoreId = term.toUpperCase();
+        }
+
+        // Se identificamos uma loja possível, verificamos se ela existe na base
+        if (targetStoreId) {
+            const storeExists = this.storesData.find(s => s.id === targetStoreId);
+            
+            if (storeExists) {
+                // 1. Define o valor no campo de busca para filtrar o dropdown visualmente
+                // searchInput.value = targetStoreId; // Opcional: descomente se quiser limpar o hostname da tela
+                
+                // 2. Filtra o dropdown
+                this.performSearch(); 
+                
+                // 3. Seleciona a loja e passa o termo original (hostname) para selecionar o host
+                setTimeout(() => {
+                    select.value = targetStoreId;
+                    // Passamos o 'term' (hostname completo) para que o onStoreSelect ache o dispositivo
+                    this.onStoreSelect(targetStoreId, term); 
+                }, 50);
+                
+                return; // Encerra aqui pois achamos a loja pelo ID
+            }
+        }
+
+        // Cenário C: Fallback - Se não achou loja pelo ID, tenta pegar o primeiro item da lista filtrada
+        // Útil se você digitou apenas "Loja tal" e a busca funcionou
+        if (select.options.length > 1) {
+            const firstOption = select.options[1];
+            select.value = firstOption.value;
+            this.onStoreSelect(firstOption.value, term);
+            searchInput.blur();
+        }
+    }
+
+    initializeDashboard() {
+        if (configManager.getSummary().zabbixConfigured) {
+            this.initializeZabbixClient();
+        } else {
+            this.loadStoresData();
+        }
+        lucide.createIcons();
+>>>>>>> 61f353d0713a67a3254cd69a390f726d10d768f9
     }
     lucide.createIcons();
 }
@@ -87,6 +158,7 @@ populateStoreSelect(stores) {
     });
 }
 
+<<<<<<< HEAD
 performSearch() {
     const qStore = document.getElementById('store-search').value.toLowerCase();
     const qCirc = document.getElementById('circuit-search').value.toLowerCase();
@@ -136,8 +208,104 @@ performSearch() {
                 console.log('Map URL set to:', this.currentMapUrl);
                 if (btnMap) btnMap.style.display = 'inline-flex';
             }
+=======
+    performSearch() {
+        const qStore = document.getElementById('store-search').value.toLowerCase();
+        const qCirc = document.getElementById('circuit-search').value.toLowerCase();
+
+        // 1. Filtra o array de dados original (Solução compatível com Chrome/Edge)
+            const filteredStores = this.storesData.filter(s => {
+            // Monta o texto de busca igual ao que aparece na opção
+            const text = `${s.id} - ${s.nome}`.toLowerCase();
+            
+            // Verifica match com o nome/id da loja
+            const matchStore = !qStore || text.includes(qStore);
+            
+            // Verifica match com o circuito (se houver busca de circuito)
+            let matchCirc = true;
+            if (qCirc) {
+                const w1 = (s.circuito_wan1 || '').toLowerCase();
+                const w2 = (s.circuito_wan2 || '').toLowerCase();
+                matchCirc = w1.includes(qCirc) || w2.includes(qCirc);
+            }
+            
+            return matchStore && matchCirc;
+        });
+
+        // 2. Salva a seleção atual para tentar mantê-la após o refresh
+        const selectEl = document.getElementById('store-select');
+        const currentVal = selectEl.value;
+
+        // 3. Reconstrói o dropdown com os dados filtrados
+        this.populateStoreSelect(filteredStores);
+
+        // 4. Se a loja que estava selecionada ainda existe na busca, seleciona ela de volta
+        if (currentVal && filteredStores.find(s => s.id === currentVal)) {
+            selectEl.value = currentVal;
+        }
+    }
+
+  // Adicionado parâmetro opcional targetHostName
+  async onStoreSelect(storeId, targetHostName = null) {
+    if (!storeId) return;
+    this.updateLinkInfo(storeId);
+
+    // ... (código de busca de grupo e hosts Zabbix igual ao anterior) ...
+    
+    // --- TRECHO IMPORTANTE DO ZABBIX ---
+    let hosts = [];
+    if (this.zabbixClient && this.zabbixClient.isAuthenticated) {
+        try {
+            const groups = await this.zabbixClient.getHostGroups();
+            // Busca Exata ou Aproximada do Grupo
+            let group = groups.find(g => g.name.trim() === storeId.trim());
+            if (!group) {
+                const candidates = groups.filter(g => g.name.toLowerCase().includes(storeId.toLowerCase()));
+                candidates.sort((a, b) => a.name.length - b.name.length);
+                group = candidates[0];
+            }
+            if (group) hosts = await this.zabbixClient.getHostsByGroupId(group.groupid);
+>>>>>>> 61f353d0713a67a3254cd69a390f726d10d768f9
         } catch (e) { console.warn(e); }
     }
+    // ------------------------------------
+
+    if (hosts.length === 0) {
+        hosts = [{ hostid: 'sim', name: `Simulado-${storeId}`, host: '192.168.1.1', inventory: { os: 'FortiOS' } }];
+    }
+
+    this.populateHostsList(hosts);
+
+    // --- CORREÇÃO DA SELEÇÃO DO HOST ---
+    if (hosts.length > 0) {
+        let hostToSelect = hosts[0];
+
+        if (targetHostName) {
+            // Remove espaços e deixa minúsculo para comparar
+            const cleanTarget = targetHostName.trim().toLowerCase();
+            
+            // Procura um host que CONTENHA o texto digitado
+            const found = hosts.find(h => h.name.toLowerCase().includes(cleanTarget));
+            
+            if (found) hostToSelect = found;
+        }
+
+        this.onHostSelect(hostToSelect);
+
+        // Scroll visual até o item
+        setTimeout(() => {
+            const listItems = document.querySelectorAll('.host-item');
+            listItems.forEach(item => {
+                if (item.textContent.trim().includes(hostToSelect.name)) {
+                    item.classList.add('selected');
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }, 200); // Aumentei o tempo para garantir que a lista renderizou
+    }
+}
 
     if (hosts.length === 0) {
         hosts = [{ hostid: 'sim', name: `Simulado-${storeId}`, host: '192.168.1.1', inventory: { os: 'FortiOS' } }];
@@ -256,6 +424,7 @@ updateDashboardUI(data) {
         this.updateElement('ap-loss', data.loss);
     }
 
+<<<<<<< HEAD
     if (this.deviceType === 'fortinet_firewall') {
         const dyn = data.dynamic;
         this.updateElement('card-wan1-status', dyn.wan1Status);
@@ -266,6 +435,251 @@ updateDashboardUI(data) {
         this.updateElement('card-wan2-speed', dyn.wan2Speed);
         this.updateElement('card-wan2-upload', dyn.wan2Upload);
         this.updateElement('card-wan2-download', dyn.wan2Download);
+=======
+    async updateCharts(hostId, itemsData) {
+        if (!window.dashboardCharts || !this.zabbixClient) return;
+
+        // Função de busca flexível para achar os IDs corretos
+        const findId = (terms) => {
+            for (const [name, item] of Object.entries(itemsData)) {
+                const n = name.toLowerCase();
+                if (terms.every(k => n.includes(k))) return item.itemid;
+            }
+            return null;
+        };
+
+        // Tenta achar IDs de tráfego (WAN1)
+        // Usando termos mais específicos para evitar 'discarded' ou 'errors'
+        const w1In = findId(['wan1', 'bits received']);
+        const w1Out = findId(['wan1', 'bits sent']);
+
+        // Tenta achar IDs de tráfego (WAN2)
+        const w2In = findId(['wan2', 'bits received']);
+        const w2Out = findId(['wan2', 'bits sent']);
+
+        // Atualiza WAN 1
+        if (w1In && w1Out) {
+            const histIn = await this.zabbixClient.getItemHistory(w1In, 1);
+            const histOut = await this.zabbixClient.getItemHistory(w1Out, 1);
+            // Divide por 1 milhão para Mbps
+            const fmt = (h) => h.map(p => ({ x: new Date(p.clock * 1000), y: (parseFloat(p.value) / 1000000) }));
+            window.dashboardCharts.chartManager.updateTrafficChart('wan1-traffic-chart', fmt(histOut), fmt(histIn));
+        }
+
+        // Atualiza WAN 2
+        if (w2In && w2Out) {
+            const histIn = await this.zabbixClient.getItemHistory(w2In, 1);
+            const histOut = await this.zabbixClient.getItemHistory(w2Out, 1);
+            const fmt = (h) => h.map(p => ({ x: new Date(p.clock * 1000), y: (parseFloat(p.value) / 1000000) }));
+            window.dashboardCharts.chartManager.updateTrafficChart('wan2-traffic-chart', fmt(histOut), fmt(histIn));
+        }
+    }
+
+    loadCommandsForDevice() {
+        const list = document.getElementById('commands-list');
+        if (!list) return;
+        list.innerHTML = '';
+
+        // Garante que os perfis foram carregados do ZabbixClient
+        const profiles = window.ZABBIX_COMMAND_PROFILES || {};
+        let cmds = profiles[this.deviceType];
+
+        // Fallback se não encontrar exato (ex: 'cisco_switch' vs 'default')
+        if (!cmds) cmds = profiles['default'] || [];
+
+        if (cmds.length === 0) {
+            list.innerHTML = '<div style="color:#666; padding:10px; text-align:center">Sem comandos disponíveis</div>';
+            return;
+        }
+
+        cmds.forEach((c, i) => {
+            const div = document.createElement('div');
+            div.className = 'command-item';
+            div.innerHTML = `
+                <input type="checkbox" id="cmd-${i}" class="cmd-chk" data-cmd="${c.command}">
+                <label for="cmd-${i}">${c.name}</label>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    updateElement(id, val) { const el = document.getElementById(id); if (el) el.textContent = val || '--'; }
+    showLoading(msg) { const el = document.getElementById('loading-overlay'); if (el) el.classList.add('show'); }
+    hideLoading() { const el = document.getElementById('loading-overlay'); if (el) el.classList.remove('show'); }
+    selectAllCommands() { document.querySelectorAll('.cmd-chk').forEach(c => c.checked = true); }
+    deselectAllCommands() { document.querySelectorAll('.cmd-chk').forEach(c => c.checked = false); }
+
+    openWebAccess() {
+        const host = this.currentSelectedHost;
+        if (!host) return;
+        const ip = (host.interfaces && host.interfaces[0]) ? host.interfaces[0].ip : host.host;
+        window.open(`https://${ip}`, '_blank');
+    }
+
+    async runSelectedCommands() {
+        const cmds = [];
+        document.querySelectorAll('.cmd-chk:checked').forEach(c => cmds.push(c.dataset.cmd));
+        if (cmds.length === 0) return alert("Selecione comandos!");
+
+        const host = this.currentSelectedHost;
+
+        // Get loop settings
+        const loopExecution = (document.getElementById('loop-execution') ? document.getElementById('loop-execution').checked : false) || false;
+        const loopInterval = parseInt((document.getElementById('loop-interval') ? document.getElementById('loop-interval').value : 5000) || 5000);
+
+        try {
+            if (!window.sshCommandManager) {
+                throw new Error("SSH Command Manager not initialized");
+            }
+
+            // Use SSHCommandManager
+            const results = await window.sshCommandManager.executeCommands(host, cmds);
+            window.sshCommandManager.showExecutionResults(results, {
+                autoRefresh: loopExecution,
+                interval: loopInterval
+            });
+        } catch (e) {
+            console.error(e);
+            alert("Erro SSH: " + (e.message || e));
+        }
+    }
+
+    clearSearch() {
+        document.getElementById('store-search').value = '';
+        document.getElementById('circuit-search').value = '';
+        this.performSearch();
+    }
+
+    connectPuTTY() { alert("Abrindo PuTTY..."); }
+
+    determineDeviceType(host) {
+        const os = (host.inventory && host.inventory.os ? host.inventory.os : '').toLowerCase();
+        const name = host.name.toLowerCase();
+        
+        // Verifica TAGS (Prioridade para Huawei)
+        // O Zabbix retorna tags como um array: [{tag: "HUAWEI", value: ""}, ...]
+        const tags = host.tags || [];
+        const isHuawei = tags.some(t => t.tag.toUpperCase() === 'HUAWEI');
+
+        // 1. FortiSwitch (Prioridade Alta)
+        if (os.includes('fort') && (name.includes('sw') || os.includes('switch'))) {
+            return 'fortiswitch';
+        }
+
+        // 2. Huawei Switch (Baseado em TAG)
+        if (isHuawei) {
+            return 'huawei_switch';
+        }
+
+        // 3. Demais Dispositivos (Lógica Padrão)
+        if (os.includes('fort') || name.includes('fw')) return 'fortinet_firewall';
+        if (os.includes('cisco') && name.includes('sw')) return 'cisco_switch';
+        if (name.includes('ap')) return 'access_point';
+        if (os.includes('cisco') || name.includes('rt')) return 'cisco_router';
+        
+        return 'default';
+    }
+
+
+    async downloadRunningConfig() {
+        // 1. Validações iniciais
+        if (!this.currentSelectedHost) {
+            showNotification('Selecione um dispositivo primeiro', 'warning');
+            return;
+        }
+
+        if (!confirm(`Deseja baixar a configuração atual de ${this.currentSelectedHost.name}?`)) {
+            return;
+        }
+
+        this.showLoading('Extraindo configuração via SSH...');
+
+        try {
+            // 2. Definir o comando correto baseado no tipo de dispositivo
+            let command = '';
+            const type = this.deviceType; // Já determinado no onHostSelect
+
+            if (type === 'fortinet_firewall') {
+                command = 'show'; // Ou apenas 'show' dependendo da permissão
+            } else if (type.includes('cisco')) {
+                command = 'show running-config';
+            } else if (type === 'huawei_switch') {
+                command = 'display current-configuration';
+            } else {
+                // Fallback padrão
+                command = 'show running-config';
+            }
+
+            // 3. Executar o comando usando o SSH Manager (reutilizando a lógica existente)
+            // Precisamos garantir que o sshCommandManager esteja disponível
+            if (!window.sshCommandManager) {
+                throw new Error('SSH Manager não inicializado');
+            }
+
+            // Executa o comando (retorna um objeto com resultados)
+            const result = await window.sshCommandManager.executeCommands(
+                this.currentSelectedHost,
+                [command]
+            );
+
+            // 4. Processar o resultado
+            // O result.commands é um array, pegamos o primeiro (e único) comando
+            const cmdResult = result.commands[0];
+
+            if (cmdResult.exitCode !== 0) {
+                throw new Error('Falha na execução do comando SSH');
+            }
+
+            const configContent = cmdResult.output;
+
+            if (!configContent || configContent.length < 50) {
+                throw new Error('O dispositivo retornou uma configuração vazia ou inválida.');
+            }
+
+            // 5. Gerar o arquivo .txt
+            // Usa o nome do host + data para o arquivo
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const filename = `${this.currentSelectedHost.name}_config_${timestamp}.txt`;
+
+            // Usa a função utilitária já existente no seu projeto (js/utils.js)
+            downloadFile(configContent, filename, 'text/plain');
+
+            showNotification('Configuração salva com sucesso!', 'success');
+
+        } catch (error) {
+            console.error('Erro ao salvar config:', error);
+            showNotification(`Erro ao salvar configuração: ${error.message || error}`, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+
+    openDirectChat() {
+        if (!this.currentSelectedHost) return;
+
+        const host = this.currentSelectedHost;
+        const ip = (host.interfaces && host.interfaces[0]) ? host.interfaces[0].ip : host.host;
+
+        // Open window with special flag
+        const win = window.open('', `chat-${host.name}`, 'width=900,height=700');
+
+        if (win) {
+            // If already open, just focus
+            if (win.document.getElementById('chat-messages')) {
+                win.focus();
+                return;
+            }
+
+            // Write initial HTML structure (simplified from ssh-commands.js logic)
+            // Actually, we can rely on sshCommandManager to initialize it if we call a method
+            // But sshCommandManager expects "results". Let's create a "Direct Mode" initialization.
+
+            if (window.sshCommandManager) {
+                window.sshCommandManager.openDirectChatWindow(host, ip);
+            }
+        }
+>>>>>>> 61f353d0713a67a3254cd69a390f726d10d768f9
     }
 }
 

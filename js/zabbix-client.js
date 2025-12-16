@@ -57,8 +57,16 @@ class ZabbixClient {
     }
 
     async getHostGroups() { return this.request('hostgroup.get', { output: ['groupid', 'name'] }); }
-    async getHostsByGroupId(gid) { return this.request('host.get', { groupids: gid, output: ['hostid', 'host', 'name'], selectInterfaces: 'extend', selectInventory: 'extend' }); }
-
+    
+    async getHostsByGroupId(gid) { 
+        return this.request('host.get', { 
+            groupids: gid, 
+            output: ['hostid', 'host', 'name'], 
+            selectInterfaces: 'extend', 
+            selectInventory: 'extend',
+            selectTags: 'extend' // <--- ADICIONADO PARA LER AS TAGS
+        }); 
+    }
     async getItemsByNamePattern(hostId, namePattern) {
         const items = await this.request('item.get', {
             hostids: hostId,

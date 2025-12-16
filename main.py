@@ -196,6 +196,10 @@ Vlan100                192.168.1.254   YES manual up                    up
         # Disable paging - Send ONLY 'terminal length 0' as it's standard for Cisco IOS
         chan.send("terminal length 0\n")
         time.sleep(0.2)
+
+        # --- ADICIONADO: Desabilitar paginação para Huawei (VRP) ---
+        chan.send("screen-length 0 temporary\n")
+        time.sleep(0.2)
             
         # Clear output from paging commands
         while chan.recv_ready():
