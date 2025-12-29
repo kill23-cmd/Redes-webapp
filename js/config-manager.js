@@ -23,6 +23,10 @@ class ConfigManager {
                 autoRefresh: true,
                 showNotifications: true,
                 compactMode: false
+            },
+            notifications: {
+                enabled: false,
+                webhook_url: ''
             }
         };
 
@@ -50,6 +54,7 @@ class ConfigManager {
                 if (serverConfig.ssh) this.config.ssh = { ...this.config.ssh, ...serverConfig.ssh };
                 if (serverConfig.dashboard) this.config.dashboard = { ...this.config.dashboard, ...serverConfig.dashboard };
                 if (serverConfig.ui) this.config.ui = { ...this.config.ui, ...serverConfig.ui };
+                if (serverConfig.notifications) this.config.notifications = { ...this.config.notifications, ...serverConfig.notifications };
 
                 // Update UI if settings modal is open or just to be safe
                 if (window.settingsUI) {
@@ -171,6 +176,10 @@ class ConfigManager {
                 autoRefresh: true,
                 showNotifications: true,
                 compactMode: false
+            },
+            notifications: {
+                enabled: false,
+                webhook_url: ''
             }
         };
         storage.remove('network-monitor-config');
@@ -362,10 +371,25 @@ class SettingsUI {
         // Auto-save on input change (with debounce)
         const debouncedSave = debounce(() => this.autoSave(), 1000);
 
-        ['zabbix-url', 'zabbix-user', 'zabbix-pass', 'ssh-user', 'ssh-pass'].forEach(id => {
+        ['zabbix-url', 'zabbix-user', 'zabbix-pass', 'ssh-user', 'ssh-pass', 'webhook-url'].forEach(id => {
             const element = document.getElementById(id);
             if (element) {
                 element.addEventListener('input', debouncedSave);
+            }
+        });
+
+        // Test Notification
+        document.getElementById('test-notification')?.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/notifications/test', { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    showNotification('Notificação de teste enviada!', 'success');
+                } else {
+                    showNotification('Falha ao enviar teste.', 'error');
+                }
+            } catch (e) {
+                showNotification('Erro ao testar notificação: ' + e.message, 'error');
             }
         });
     }
@@ -416,6 +440,13 @@ class SettingsUI {
 
         if (sshUser) sshUser.value = config.ssh.user || '';
         if (sshPass) sshPass.value = config.ssh.password || '';
+
+        // Notification settings
+        const webhookUrl = document.getElementById('webhook-url');
+        const notificationsEnabled = document.getElementById('notifications-enabled');
+
+        if (webhookUrl) webhookUrl.value = config.notifications?.webhook_url || '';
+        if (notificationsEnabled) notificationsEnabled.checked = config.notifications?.enabled || false;
     }
 
     /**
@@ -428,6 +459,8 @@ class SettingsUI {
         const zabbixPass = document.getElementById('zabbix-pass').value;
         const sshUser = document.getElementById('ssh-user').value.trim();
         const sshPass = document.getElementById('ssh-pass').value;
+        const webhookUrl = document.getElementById('webhook-url').value.trim();
+        const notificationsEnabled = document.getElementById('notifications-enabled').checked;
 
         // Update configuration
         this.configManager.set('zabbix.url', zabbixUrl);
@@ -435,6 +468,8 @@ class SettingsUI {
         this.configManager.set('zabbix.password', zabbixPass);
         this.configManager.set('ssh.user', sshUser);
         this.configManager.set('ssh.password', sshPass);
+        this.configManager.set('notifications.webhook_url', webhookUrl);
+        this.configManager.set('notifications.enabled', notificationsEnabled);
 
         // Validate
         const validation = this.configManager.validate();
@@ -457,12 +492,16 @@ class SettingsUI {
         const zabbixPass = document.getElementById('zabbix-pass').value;
         const sshUser = document.getElementById('ssh-user').value.trim();
         const sshPass = document.getElementById('ssh-pass').value;
+        const webhookUrl = document.getElementById('webhook-url').value.trim();
+        const notificationsEnabled = document.getElementById('notifications-enabled').checked;
 
         this.configManager.set('zabbix.url', zabbixUrl);
         this.configManager.set('zabbix.user', zabbixUser);
         this.configManager.set('zabbix.password', zabbixPass);
         this.configManager.set('ssh.user', sshUser);
         this.configManager.set('ssh.password', sshPass);
+        this.configManager.set('notifications.webhook_url', webhookUrl);
+        this.configManager.set('notifications.enabled', notificationsEnabled);
 
         // Save to localStorage
         this.configManager.saveConfig();

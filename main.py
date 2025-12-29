@@ -12,8 +12,19 @@ import os
 import json
 import time
 from config import settings
+from services.scheduler import start_scheduler, stop_scheduler
+from services.notifications import notification_service
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="Network Monitor API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    start_scheduler()
+    yield
+    # Shutdown
+    stop_scheduler()
+
+app = FastAPI(title="Network Monitor API", lifespan=lifespan)
 
 # CORS
 app.add_middleware(
@@ -34,6 +45,7 @@ class SSHCommandRequest(BaseModel):
 class ConfigUpdate(BaseModel):
     zabbix: Optional[dict] = None
     ssh: Optional[dict] = None
+    notifications: Optional[dict] = None
 
 # Global Cache
 LOJAS_CACHE = None
@@ -95,7 +107,6 @@ async def ssh_execute(req: SSHCommandRequest):
     user = req.username or settings.SSH_USER
     pwd = req.password or settings.SSH_PASSWORD
     
-    # Simulation Mode (No credentials)
     # Simulation Mode (No credentials)
     if not user or not pwd:
         results = []
@@ -408,24 +419,31 @@ async def search_stores(q: str = ""):
 async def get_config():
     # Return config but mask passwords if needed, or just return what we have
     # For now, returning structure compatible with frontend
+    
+    # Load current config from file to get notifications if not in settings
+    notif_config = {}
+    if os.path.exists("config.json"):
+        try:
+            with open("config.json", "r") as f:
+                data = json.load(f)
+                notif_config = data.get("notifications", {})
+        except: pass
+
     return {
         "zabbix": {
             "url": settings.ZABBIX_URL,
             "user": settings.ZABBIX_USER,
-            "password": settings.ZABBIX_PASSWORD # In a real app, don't return this!
+            "password": settings.ZABBIX_PASSWORD 
         },
         "ssh": {
             "user": settings.SSH_USER,
-            "password": settings.SSH_PASSWORD # In a real app, don't return this!
-        }
+            "password": settings.SSH_PASSWORD 
+        },
+        "notifications": notif_config
     }
 
 @app.post("/api/config")
 async def save_config(config: ConfigUpdate):
-    # This is tricky. We want to save to .env or config.json.
-    # For now, let's save to config.json to maintain compatibility with existing logic
-    # But also warn or try to update .env if we could.
-    
     data = {}
     if os.path.exists("config.json"):
         with open("config.json", "r") as f:
@@ -437,11 +455,58 @@ async def save_config(config: ConfigUpdate):
         data["zabbix"] = config.zabbix
     if config.ssh:
         data["ssh"] = config.ssh
+    if config.notifications:
+        data["notifications"] = config.notifications
         
     with open("config.json", "w") as f:
         json.dump(data, f, indent=2)
         
+    # Reload notification service to pick up new URL
+    if config.notifications:
+        notification_service.reload_config()
+        
     return {"status": "ok", "message": "Configuration saved to config.json"}
+
+@app.post("/api/config/notifications")
+async def save_notification_config(config: dict):
+    """
+    Save notification settings (webhook_url, enabled)
+    """
+    try:
+        current_data = {}
+        if os.path.exists("config.json"):
+            with open("config.json", "r") as f:
+                current_data = json.load(f)
+        
+        if "notifications" not in current_data:
+            current_data["notifications"] = {}
+            
+        current_data["notifications"].update(config)
+        
+        with open("config.json", "w") as f:
+            json.dump(current_data, f, indent=2)
+            
+        # Reload service
+        notification_service.reload_config()
+        
+        return {"success": True, "message": "Notification settings saved"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/notifications/test")
+async def test_notification():
+    """
+    Send a test notification
+    """
+    success = notification_service.send_notification(
+        "Teste de Notificação",
+        "Se você está vendo isso, o Webhook está funcionando corretamente! 🚀",
+        "info"
+    )
+    if success:
+        return {"success": True, "message": "Test notification sent"}
+    else:
+        raise HTTPException(status_code=500, detail="Failed to send notification. Check logs/URL.")
 
 # Static Files - Mount LAST to avoid conflicts
 app.mount("/", StaticFiles(directory=".", html=True), name="static")
