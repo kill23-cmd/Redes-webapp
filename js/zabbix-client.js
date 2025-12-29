@@ -408,7 +408,12 @@ const ZABBIX_COMMAND_PROFILES = {
         { name: 'Limpar todas as sessões', command: 'diagnose sys session clear' },
         { name: 'Mostrar status interfaces WAN', command: 'diagnose netlink device list | grep wan' },
         { name: 'Mostrar clientes conectados na rede Clientes', command: 'diagnose wireless-controller wlac -d sta | grep ip=192.168.' },
-        { name: 'Diagnosticar interfaces', command: 'diagnose netlink device list' }
+        { name: 'Diagnosticar interfaces', command: 'diagnose netlink device list' },
+        { name: 'Mostrar configuração interface cswlan11 e 12', command: 'show system interface | grep -f VLAN_WLAN2' },
+        { name: 'Mostrar configuração de DHCP Server cswlan11 e 12', command: 'show sys dhcp server | grep -f VLAN_WLAN2' },
+        { name: 'Mostrar configuração do Radius', command: 'show user radius' },
+        { name: 'Mostrar configuração DHCP VLAN16', command: 'show sys dhcp server | grep -f VLAN16' },
+        { name: 'Mostrar configuração interface VLAN16', command: 'get system interface | grep -f VLAN16' }
     ],
     fortiswitch: [
         { name: 'Mostrar vizinhos LLDP', command: 'get switch lldp neighbors-summary' },
