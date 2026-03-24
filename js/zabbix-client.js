@@ -16,15 +16,26 @@ class ZabbixClient {
                 jsonrpc: '2.0', method: 'user.login',
                 params: { username: this.username, password: this.password }, id: 1
             });
+
+            console.log('[ZabbixAuth] Resposta do servidor:', JSON.stringify(response));
+
             if (response.result) {
                 this.authToken = response.result;
                 this.isAuthenticated = true;
                 this.isSimulated = false;
+                console.log('[ZabbixAuth] ✅ Autenticado com sucesso. Token:', this.authToken.substring(0, 8) + '...');
                 return true;
             }
-            this.isSimulated = true; return false;
+
+            // Erro retornado pelo Zabbix (ex: credenciais inválidas)
+            const errMsg = response.error ? `${response.error.code}: ${response.error.data}` : 'Sem token na resposta';
+            console.warn('[ZabbixAuth] ❌ Falha na autenticação:', errMsg);
+            this.isSimulated = true;
+            return false;
         } catch (err) {
-            this.isSimulated = true; return false;
+            console.error('[ZabbixAuth] ❌ Exceção na autenticação:', err.message || err);
+            this.isSimulated = true;
+            return false;
         }
     }
 
@@ -34,7 +45,6 @@ class ZabbixClient {
             throw new Error('Not authenticated');
         }
         try {
-            // Only add output: 'extend' if method ends with .get and output is not specified
             const finalParams = { ...params };
             if (method.endsWith('.get') && !finalParams.output) {
                 finalParams.output = 'extend';
@@ -48,10 +58,14 @@ class ZabbixClient {
             if (method.toLowerCase() === 'apiinfo.version') { delete payload.auth; payload.params = []; }
 
             const response = await api.post(this.proxyUrl, payload);
-            if (response.error) throw new Error(response.error.message);
+            if (response.error) {
+                console.error(`[Zabbix] ${method} retornou erro:`, response.error);
+                throw new Error(response.error.data || response.error.message);
+            }
             return response.result;
         } catch (err) {
             if (this.isSimulated) return this.getMockData(method, params);
+            console.error(`[Zabbix] Erro em ${method}:`, err.message);
             throw err;
         }
     }
@@ -162,55 +176,37 @@ class ZabbixClient {
 
     async getLinkProblems(groupId) {
         console.log('getLinkProblems called', groupId);
-        // 1. Get Problems (to get eventid and ack status)
-        // problem.get does NOT support selectHosts, so we fetch it later
-        const problemParams = {
+
+        // Zabbix 6.x: event.get suporta selectHosts diretamente
+        // source=0 (trigger), object=0 (trigger), value=1 (PROBLEM ativo)
+        // Limitar a eventos recentes (últimos 90 dias) para não derrubar o banco e causar Timeout
+        const ninetyDaysAgo = Math.floor(Date.now() / 1000) - (90 * 24 * 60 * 60);
+        
+        const params = {
             output: 'extend',
+            source: 0,
+            object: 0,
+            value: 1,               // só problemas ativos (não resolvidos)
+            time_from: ninetyDaysAgo, // Filtro temporal mais abrangente
             selectTags: 'extend',
             selectAcknowledges: 'extend',
-            sortfield: 'eventid',
-            sortorder: 'DESC'
+            selectHosts: ['hostid', 'name', 'host', 'status'],
+            sortfield: 'clock',
+            sortorder: 'DESC',
+            limit: 1000,              // Aumentado para pegar mais problemas ativos
         };
         if (groupId) {
-            problemParams.groupids = Array.isArray(groupId) ? groupId : [groupId];
+            params.groupids = Array.isArray(groupId) ? groupId : [groupId];
         }
 
-        const problems = await this.request('problem.get', problemParams);
+        const events = await this.request('event.get', params);
 
-        if (!problems || problems.length === 0) return [];
+        if (!events || events.length === 0) return [];
 
-        // 2. Get Triggers for these problems to get Hosts
-        const triggerIds = problems.map(p => p.objectid);
-        // Unique IDs
-        const uniqueTriggerIds = [...new Set(triggerIds)];
-
-        const triggerParams = {
-            triggerids: uniqueTriggerIds,
-            output: ['triggerid'],
-            selectHosts: ['name', 'hostid', 'host', 'status']
-        };
-
-        const triggers = await this.request('trigger.get', triggerParams);
-
-        // 3. Create a map of triggerId -> host
-        const triggerHostMap = {};
-        if (triggers) {
-            triggers.forEach(t => {
-                if (t.hosts && t.hosts.length > 0) {
-                    triggerHostMap[t.triggerid] = t.hosts;
-                }
-            });
-        }
-
-        // 4. Attach hosts and filter disabled ones
-        return problems.filter(p => {
-            if (triggerHostMap[p.objectid]) {
-                p.hosts = triggerHostMap[p.objectid];
-                // Filter out if all hosts are disabled (status '1')
-                // Zabbix host status: 0 - monitored, 1 - unmonitored
-                return p.hosts.some(h => h.status !== '1');
-            }
-            return true; // Keep if no host info (fallback)
+        // Filtrar hosts desabilitados e problemas sem hosts
+        return events.filter(ev => {
+            if (!ev.hosts || ev.hosts.length === 0) return false;
+            return ev.hosts.some(h => h.status !== '1');
         });
     }
 

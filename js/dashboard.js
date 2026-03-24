@@ -37,25 +37,37 @@ class NetworkDashboard {
             }
         });
 
-        document.getElementById('btn-open-map').addEventListener('click', () => {
-            if (this.currentMapUrl) {
-                const modal = document.getElementById('map-modal');
-                const iframe = document.getElementById('map-frame');
-                iframe.src = this.currentMapUrl;
-                modal.classList.add('show');
-                modal.style.display = 'flex';
-            } else {
-                alert("Mapa não disponível para esta loja.");
-            }
-        });
+        const btnOpenMap = document.getElementById('btn-open-map');
+        if (btnOpenMap) {
+            btnOpenMap.addEventListener('click', () => {
+                if (this.currentMapUrl) {
+                    const modal = document.getElementById('map-modal-old');
+                    const img = document.getElementById('map-image');
+                    // If it's an image URL, set it. If it was an iframe, we might need to adjust.
+                    // Assuming currentMapUrl is an image for now based on index.html structure
+                    if (img) img.src = this.currentMapUrl;
+                    if (modal) {
+                        modal.classList.add('show');
+                        modal.style.display = 'flex';
+                    }
+                } else {
+                    alert("Mapa não disponível para esta loja.");
+                }
+            });
+        }
 
-        document.getElementById('close-map-modal').addEventListener('click', () => {
-            const modal = document.getElementById('map-modal');
-            const iframe = document.getElementById('map-frame');
-            modal.classList.remove('show');
-            modal.style.display = 'none';
-            iframe.src = '';
-        });
+        const btnCloseMap = document.getElementById('close-map-modal-old');
+        if (btnCloseMap) {
+            btnCloseMap.addEventListener('click', () => {
+                const modal = document.getElementById('map-modal-old');
+                const img = document.getElementById('map-image');
+                if (modal) {
+                    modal.classList.remove('show');
+                    modal.style.display = 'none';
+                }
+                if (img) img.src = '';
+            });
+        }
     }
 
     async initializeDashboard() {
@@ -117,7 +129,9 @@ class NetworkDashboard {
 
     async initializeZabbixClient() {
         const config = configManager.config;
-        this.zabbixClient = new ZabbixClient(config.zabbix.url, config.zabbix.user, config.zabbix.password);
+        // O proxy backend injeta as credenciais reais do .env no user.login
+        // O frontend não precisa conhecer user/password — apenas a URL para o baseUrl
+        this.zabbixClient = new ZabbixClient(config.zabbix.url, '', '');
         await this.zabbixClient.authenticate();
         this.linksDashboard = new LinksDashboard(this.zabbixClient);
         window.linksDashboard = this.linksDashboard;
@@ -207,6 +221,17 @@ class NetworkDashboard {
                     if (btnMap) btnMap.style.display = 'inline-flex';
                 }
             } catch (e) { console.warn(e); }
+        }
+
+        // --- AUTOMATIC TOPOLOGY MAP OPENING ---
+        if (window.topologyMap) {
+            console.log('Dashboard: Triggering automatic topology map open for', storeId);
+            // Small delay to ensure UI update first
+            setTimeout(() => {
+                window.topologyMap.open(storeId);
+            }, 500);
+        } else {
+            console.warn('Dashboard: window.topologyMap not found!');
         }
         // ------------------------------------
 
@@ -339,8 +364,8 @@ class NetworkDashboard {
         const dot = document.getElementById('card-status-indicator');
         if (dot) dot.className = `status-dot ${isUp ? 'up' : 'down'}`;
 
-        if (data.cpu !== '--') window.dashboardCharts.chartManager.updateGaugeChart('cpu-gauge', parseFloat(data.cpu));
-        if (data.memory !== '--') window.dashboardCharts.chartManager.updateGaugeChart('memory-gauge', parseFloat(data.memory));
+        if (data.cpu !== '--' && window.dashboardCharts?.chartManager) window.dashboardCharts.chartManager.updateGaugeChart('cpu-gauge', parseFloat(data.cpu));
+        if (data.memory !== '--' && window.dashboardCharts?.chartManager) window.dashboardCharts.chartManager.updateGaugeChart('memory-gauge', parseFloat(data.memory));
         document.getElementById('cpu-gauge-value').textContent = data.cpu !== '--' ? data.cpu + '%' : '--';
         document.getElementById('memory-gauge-value').textContent = data.memory !== '--' ? data.memory + '%' : '--';
 

@@ -9,30 +9,28 @@ class Settings(BaseSettings):
     ZABBIX_PASSWORD: Optional[str] = None
     SSH_USER: Optional[str] = None
     SSH_PASSWORD: Optional[str] = None
-    OPENAI_API_KEY: Optional[str] = None
+    API_TOKEN: Optional[str] = None
+    PLAI_API_KEY: Optional[str] = None
+    PLAI_AGENT_ID: Optional[str] = None
+    # Chaves TACACS — carregadas do .env, nunca hardcoded no código
+    TACACS_KEY_PRIMARIO: Optional[str] = None
+    TACACS_KEY_SECUNDARIO: Optional[str] = None
+    TACACS_KEY_FORTI: Optional[str] = None
 
     class Config:
         env_file = ".env"
         extra = "ignore"
 
 def load_config():
-    # Load from .env first (via Pydantic)
+    # Carrega do .env via Pydantic (fonte única de verdade para credenciais)
     settings = Settings()
     
-    # Fallback/Merge with config.json if it exists (for backward compatibility or non-sensitive data)
+    # Fallback com config.json apenas para URL do Zabbix e notificações
     if os.path.exists("config.json"):
         try:
             with open("config.json", "r") as f:
                 data = json.load(f)
-                # Map JSON keys to Env vars if not already set
-                if not settings.ZABBIX_USER and data.get("zabbix", {}).get("user"):
-                    settings.ZABBIX_USER = data["zabbix"]["user"]
-                if not settings.ZABBIX_PASSWORD and data.get("zabbix", {}).get("password"):
-                    settings.ZABBIX_PASSWORD = data["zabbix"]["password"]
-                if not settings.SSH_USER and data.get("ssh", {}).get("user"):
-                    settings.SSH_USER = data["ssh"]["user"]
-                if not settings.SSH_PASSWORD and data.get("ssh", {}).get("password"):
-                    settings.SSH_PASSWORD = data["ssh"]["password"]
+                # Apenas URL — credenciais não são mais salvas no config.json
                 if not settings.ZABBIX_URL and data.get("zabbix", {}).get("url"):
                     settings.ZABBIX_URL = data["zabbix"]["url"]
         except Exception as e:

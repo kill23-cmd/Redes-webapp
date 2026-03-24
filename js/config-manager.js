@@ -27,6 +27,9 @@ class ConfigManager {
             notifications: {
                 enabled: false,
                 webhook_url: ''
+            },
+            security: {
+                apiToken: ''
             }
         };
 
@@ -49,12 +52,29 @@ class ConfigManager {
             if (response.ok) {
                 const serverConfig = await response.json();
 
-                // Merge server config
-                if (serverConfig.zabbix) this.config.zabbix = { ...this.config.zabbix, ...serverConfig.zabbix };
-                if (serverConfig.ssh) this.config.ssh = { ...this.config.ssh, ...serverConfig.ssh };
+                // Merge server config — servidor tem PRIORIDADE sobre localStorage
+                if (serverConfig.zabbix) {
+                    this.config.zabbix = {
+                        ...this.config.zabbix,
+                        ...serverConfig.zabbix,
+                        // URL do servidor sempre sobrescreve
+                        url: serverConfig.zabbix.url || this.config.zabbix.url,
+                        // user/password do servidor sobrescrevem (mesmo que sejam ***)
+                        user: serverConfig.zabbix.user ?? this.config.zabbix.user,
+                        password: serverConfig.zabbix.password ?? this.config.zabbix.password,
+                    };
+                }
+                if (serverConfig.ssh) {
+                    this.config.ssh = {
+                        ...this.config.ssh,
+                        ...serverConfig.ssh,
+                        user: serverConfig.ssh.user ?? this.config.ssh.user,
+                    };
+                }
                 if (serverConfig.dashboard) this.config.dashboard = { ...this.config.dashboard, ...serverConfig.dashboard };
                 if (serverConfig.ui) this.config.ui = { ...this.config.ui, ...serverConfig.ui };
                 if (serverConfig.notifications) this.config.notifications = { ...this.config.notifications, ...serverConfig.notifications };
+                if (serverConfig.security) this.config.security = { ...this.config.security, ...serverConfig.security };
 
                 // Update UI if settings modal is open or just to be safe
                 if (window.settingsUI) {
@@ -180,6 +200,9 @@ class ConfigManager {
             notifications: {
                 enabled: false,
                 webhook_url: ''
+            },
+            security: {
+                apiToken: ''
             }
         };
         storage.remove('network-monitor-config');
@@ -267,9 +290,15 @@ class ConfigManager {
      * @returns {Object} Configuration summary
      */
     getSummary() {
+        const zabbixUser = this.config.zabbix.user;
+        // '***configurado***' significa que o servidor tem credenciais no .env
+        const zabbixConfigured = !!(this.config.zabbix.url &&
+            (zabbixUser === '***configurado***' || zabbixUser));
+        const sshUser = this.config.ssh.user;
+        const sshConfigured = !!(sshUser === '***configurado***' || sshUser);
         return {
-            zabbixConfigured: !!(this.config.zabbix.url && this.config.zabbix.user),
-            sshConfigured: !!(this.config.ssh.user && this.config.ssh.password),
+            zabbixConfigured,
+            sshConfigured,
             refreshInterval: this.config.dashboard.refreshInterval,
             chartPeriod: this.config.dashboard.chartPeriod,
             autoRefresh: this.config.ui.autoRefresh,
@@ -371,7 +400,7 @@ class SettingsUI {
         // Auto-save on input change (with debounce)
         const debouncedSave = debounce(() => this.autoSave(), 1000);
 
-        ['zabbix-url', 'zabbix-user', 'zabbix-pass', 'ssh-user', 'ssh-pass', 'webhook-url'].forEach(id => {
+        ['zabbix-url', 'zabbix-user', 'zabbix-pass', 'ssh-user', 'ssh-pass', 'webhook-url', 'api-token'].forEach(id => {
             const element = document.getElementById(id);
             if (element) {
                 element.addEventListener('input', debouncedSave);
@@ -447,6 +476,10 @@ class SettingsUI {
 
         if (webhookUrl) webhookUrl.value = config.notifications?.webhook_url || '';
         if (notificationsEnabled) notificationsEnabled.checked = config.notifications?.enabled || false;
+
+        // Security settings
+        const apiToken = document.getElementById('api-token');
+        if (apiToken) apiToken.value = config.security?.apiToken || '';
     }
 
     /**
@@ -461,6 +494,7 @@ class SettingsUI {
         const sshPass = document.getElementById('ssh-pass').value;
         const webhookUrl = document.getElementById('webhook-url').value.trim();
         const notificationsEnabled = document.getElementById('notifications-enabled').checked;
+        const apiToken = document.getElementById('api-token').value.trim();
 
         // Update configuration
         this.configManager.set('zabbix.url', zabbixUrl);
@@ -470,6 +504,7 @@ class SettingsUI {
         this.configManager.set('ssh.password', sshPass);
         this.configManager.set('notifications.webhook_url', webhookUrl);
         this.configManager.set('notifications.enabled', notificationsEnabled);
+        this.configManager.set('security.apiToken', apiToken);
 
         // Validate
         const validation = this.configManager.validate();
@@ -494,6 +529,7 @@ class SettingsUI {
         const sshPass = document.getElementById('ssh-pass').value;
         const webhookUrl = document.getElementById('webhook-url').value.trim();
         const notificationsEnabled = document.getElementById('notifications-enabled').checked;
+        const apiToken = document.getElementById('api-token').value.trim();
 
         this.configManager.set('zabbix.url', zabbixUrl);
         this.configManager.set('zabbix.user', zabbixUser);
@@ -502,6 +538,7 @@ class SettingsUI {
         this.configManager.set('ssh.password', sshPass);
         this.configManager.set('notifications.webhook_url', webhookUrl);
         this.configManager.set('notifications.enabled', notificationsEnabled);
+        this.configManager.set('security.apiToken', apiToken);
 
         // Save to localStorage
         this.configManager.saveConfig();

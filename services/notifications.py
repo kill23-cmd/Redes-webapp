@@ -37,14 +37,15 @@ class NotificationService:
 
         try:
             # Detect Microsoft Teams Webhook (Workflows / Power Automate)
-            if "office.com" in self.webhook_url or "webhook.office" in self.webhook_url:
+            # Common domains: office.com, webhook.office.com, logic.azure.com (Power Automate)
+            if any(x in self.webhook_url for x in ["office.com", "webhook.office", "logic.azure.com", "workflows"]):
                 # Modern Adaptive Card Format
+                # Note: contentUrl must be omitted as it causes schema validation errors in Power Automate
                 payload = {
                     "type": "message",
                     "attachments": [
                         {
                             "contentType": "application/vnd.microsoft.card.adaptive",
-                            "contentUrl": None,
                             "content": {
                                 "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
                                 "type": "AdaptiveCard",
@@ -91,6 +92,7 @@ class NotificationService:
                     ]
                 }
 
+            print(f"[Notification] Sending Payload: {json.dumps(payload, indent=2)}")
             response = requests.post(self.webhook_url, json=payload, timeout=5)
             
             # 200=OK, 201=Created, 202=Accepted (Common for Workflows), 204=No Content

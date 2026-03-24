@@ -85,7 +85,13 @@ class LinksDashboard {
 
     async loadData() {
         const tbody = document.querySelector('#links-table tbody');
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center"><div class="spinner"></div> Carregando dados do Zabbix...</td></tr>';
+        const refreshBtn = document.getElementById('refresh-links-btn');
+        const originalBtnText = refreshBtn ? refreshBtn.innerHTML : '';
+        
+        if (refreshBtn) {
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '<div class="spinner inline-block mr-2"></div> Atualizando...';
+        }
 
         try {
             // 1. Try to find "Links" host group
@@ -131,8 +137,8 @@ class LinksDashboard {
                 if (p.r_eventid && p.r_eventid !== '0') return false;
 
                 // Filter for Link/Interface related issues
-                // Keywords: Link, Interface, Down, Ping, ICMP, OSPF, BGP, Tunnel, VPN, Connection
-                const keywords = ['link', 'interface', 'down', 'ping', 'icmp', 'ospf', 'bgp', 'tunnel', 'vpn', 'connection', 'loss'];
+                // Keywords: Link, Interface, Down, Ping, ICMP, OSPF, BGP, Tunnel, VPN, Connection, Indisponível, Unreachable
+                const keywords = ['link', 'interface', 'down', 'ping', 'icmp', 'ospf', 'bgp', 'tunnel', 'vpn', 'connection', 'loss', 'não disponível', 'indisponível', 'unreachable'];
                 const text = (p.name + (p.tags ? JSON.stringify(p.tags) : '')).toLowerCase();
                 return keywords.some(k => text.includes(k));
             }).sort((a, b) => b.clock - a.clock); // Client-side sort by date DESC
@@ -140,7 +146,15 @@ class LinksDashboard {
             this.renderTable(this.problems);
         } catch (error) {
             console.error('Error loading links data:', error);
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center error">Erro ao carregar dados: ${error.message}</td></tr>`;
+            // Só exibe o erro na tabela se a tabela estiver vazia, caso contrário loga no console
+            if (!this.problems || this.problems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center error">Erro ao carregar dados: ${error.message}</td></tr>`;
+            }
+        } finally {
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = originalBtnText;
+            }
         }
     }
 
@@ -187,6 +201,9 @@ class LinksDashboard {
                     <button class="${btnClass}" onclick="window.linksDashboard.acknowledgeProblem('${eventId}')" title="${btnTitle}">
                         <i data-lucide="${btnIcon}"></i> Ack
                     </button>
+                    <button class="btn-small" style="background: #8b5cf6; color: white;" onclick="window.linksDashboard.acknowledgeProblemIA('${eventId}', '${hostName}', '${p.name.replace(/'/g, "\\'")}')" title="Gerar Reconhecimento Inteligente com IA">
+                        <i data-lucide="bot"></i> Ack IA
+                    </button>
                 `;
             }
 
@@ -224,6 +241,41 @@ class LinksDashboard {
         } catch (error) {
             console.error("Erro ao reconhecer evento:", error);
             alert("Erro ao reconhecer evento: " + error.message);
+        }
+    }
+
+    async acknowledgeProblemIA(eventId, hostName, eventName) {
+        try {
+            // 1. Mostrar loading
+            const btn = document.activeElement;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader" class="spin"></i> Gerando...`;
+            btn.disabled = true;
+            if (window.lucide) window.lucide.createIcons();
+
+            // 2. Chamar Backend para gerar insight / msg
+            const res = await window.api.post('/api/zabbix-ack-ia', {
+                host: hostName,
+                event_name: eventName
+            });
+
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+            if (window.lucide) window.lucide.createIcons();
+
+            if (!res.success) throw new Error(res.error || "Erro desconhecido");
+
+            // 3. Confirmar com o usuário editável
+            const finalMessage = prompt("Confirme a mensagem sugerida pela IA:", res.ack_message || "IA: Investigando link fora.");
+            if (finalMessage === null) return;
+
+            // 4. Executar Ack
+            await this.zabbixClient.acknowledgeEvent(eventId, finalMessage);
+            alert("Evento reconhecido pela IA com sucesso!");
+            this.loadData();
+        } catch (error) {
+            console.error("Erro na funcionalidade Ack IA:", error);
+            alert("Erro na IA: " + error.message);
         }
     }
 

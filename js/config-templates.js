@@ -69,10 +69,10 @@ const VENDOR_CONFIG_SNIPPETS = {
             "tacacs-server directed-request\n" +
             "tacacs server 172.18.144.92\n" +
             " address ipv4 172.18.144.92\n" +
-            " key 7 06125707461A00400E1D4541\n" +
+            " key 7 {TACACS_KEY_PRIMARIO}\n" +
             "tacacs server 172.17.16.93\n" +
             " address ipv4 172.17.16.93\n" +
-            " key 7 01075E22515F0F562A461943\n" +
+            " key 7 {TACACS_KEY_SECUNDARIO}\n" +
             "end",
         "Interface: PC (VLAN 81+50)":
             "conf t\n" +
@@ -174,7 +174,7 @@ const VENDOR_CONFIG_SNIPPETS = {
         "Configurar TACACS":
             "config user tacacs+\n" +
             " edit \"ISE013-14\"\n" +
-            "  set key t8Fj4i9kj7*\n" +
+            "  set key {TACACS_KEY_FORTI}\n" +
             "  set server \"172.18.144.92\"\n" +
             " next\n" +
             "end\n" +
@@ -277,7 +277,8 @@ class ConfigTemplateManager {
             if (result.error) throw new Error(result.error);
 
             // Parse interfaces (simple regex for common patterns)
-            const output = result.output || '';
+            // A API retorna result.results[0].output (array de comandos)
+            const output = (result.results && result.results[0]) ? result.results[0].output : (result.output || '');
             const interfaces = this.parseInterfaces(output, this.currentDeviceType);
 
             if (interfaces.length === 0) {

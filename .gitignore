@@ -2,6 +2,11 @@ config.json
 node_modules/
 __pycache__/
 *.log
+*.log.*
 .env
+.env.local
 .vscode/
 .idea/
+lojas_data.json
+user_input_files/*.xlsx
+user_input_files/*.csv
