@@ -640,9 +640,18 @@ Release 1808P35, H3C S12504
                             }
                             try {
                                 const response = await window.opener.api.get(\`/api/ai-insights/\${'${res.host}'}\`);
-                                if (response && response.has_insight) {
-                                    clearInterval(aiPollInterval);
-                                    window.opener.sshCommandManager.showBackgroundInsight(window, response.insight);
+                                
+                                if (response) {
+                                    if (response.status === 'investigating' && response.message) {
+                                        window.opener.sshCommandManager.addChatMessage(window, 'assistant', response.message);
+                                        const chatContainer = window.document.getElementById('chat-messages');
+                                        if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+                                    }
+                                    
+                                    if (response.has_insight) {
+                                        clearInterval(aiPollInterval);
+                                        window.opener.sshCommandManager.showBackgroundInsight(window, response.insight);
+                                    }
                                 }
                             } catch(e) {
                                 console.warn('AI Polling erro:', e);

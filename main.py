@@ -460,9 +460,21 @@ async def run_proactive_ai_analysis(host: str, results: list, user: str = None, 
                             
                         print(f"[{host}] Agente IA solicitou: {cmd_to_run}")
                         
+                        # Avisar UI que estamos executando
+                        AI_INSIGHTS[host] = {
+                            "status": "investigating",
+                            "message": f"⏳ Solicitando execução de comando extra: `{cmd_to_run}`"
+                        }
+                        
                         loop = asyncio.get_event_loop()
                         cmd_out = await loop.run_in_executor(None, _execute_single_ssh_command, host, user, pwd, cmd_to_run)
                         print(f"[{host}] Resultado lido (primeiros caracteres):\n{cmd_out[:300]}...\n")
+                        
+                        # Avisar UI que recebemos resultado
+                        AI_INSIGHTS[host] = {
+                            "status": "investigating",
+                            "message": f"✅ Resultado de `{cmd_to_run}` recebido. Analisando..."
+                        }
                         
                         messages.append({"role": "assistant", "content": analysis})
                         messages.append({"role": "user", "content": f"Saída adicional recebida do comando '{cmd_to_run}' executado no equipamento:\n{cmd_out}\nO que você conclui agora? Se achar necessário, você tem mais {max_iterations - iteration - 1} chance(s) de usar <EXECUTE>."})
@@ -470,6 +482,7 @@ async def run_proactive_ai_analysis(host: str, results: list, user: str = None, 
                         # Chegou na conclusão ou não tinha credenciais
                         print(f"[{host}] Agente IA concluiu a análise!")
                         AI_INSIGHTS[host] = {
+                            "status": "completed",
                             "timestamp": time.time(),
                             "insight": analysis
                         }
@@ -484,12 +497,20 @@ async def run_proactive_ai_analysis(host: str, results: list, user: str = None, 
 async def get_ai_insights(host: str):
     insight = AI_INSIGHTS.get(host)
     if insight:
-        # Check if it was generated in the last 10 minutes (600 seconds)
         import time
-        if time.time() - insight["timestamp"] < 600:
-            # We serve it and clear it so it doesn't loop forever
-            del AI_INSIGHTS[host]
-            return {"has_insight": True, "insight": insight["insight"]}
+        if insight.get("status") == "investigating":
+            msg = insight.get("message")
+            if msg:
+                # Limpa a mensagem pra não mandar repetido no polling de 2s
+                insight["message"] = None 
+                return {"has_insight": False, "status": "investigating", "message": msg}
+            return {"has_insight": False, "status": "investigating"}
+            
+        elif insight.get("status") == "completed":
+            if time.time() - insight.get("timestamp", time.time()) < 600:
+                del AI_INSIGHTS[host]
+                return {"has_insight": True, "insight": insight["insight"]}
+                
     return {"has_insight": False}
 
 class ZabbixAckIARequest(BaseModel):
