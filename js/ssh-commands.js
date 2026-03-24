@@ -643,6 +643,12 @@ Release 1808P35, H3C S12504
                                 
                                 if (response) {
                                     if (response.status === 'investigating' && response.message) {
+                                        const container = window.document.getElementById('ai-analysis-container');
+                                        if (container && container.style.display === 'none') {
+                                            container.style.display = 'block';
+                                            // Adiciona mensagem inicial apenas quando exibe o container
+                                            window.opener.sshCommandManager.addChatMessage(window, 'assistant', '<em>Iniciando análise interativa dos logs...</em>');
+                                        }
                                         window.opener.sshCommandManager.addChatMessage(window, 'assistant', response.message);
                                         const chatContainer = window.document.getElementById('chat-messages');
                                         if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
